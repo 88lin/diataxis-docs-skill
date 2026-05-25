@@ -31,10 +31,6 @@ Look up exact facts       Reference             Structured facts
 Understand why            Explanation           Context and tradeoffs
 ```
 
-> Screenshot placeholder: add a screenshot or GIF here later to show this skill classifying a messy documentation request into tutorial, how-to, reference, and explanation.
-
-> Dark-mode friendly by default: the preview art uses a dark canvas with high-contrast text and accent colors.
-
 ---
 
 ## Table of Contents
