@@ -1,6 +1,6 @@
 ---
 name: diataxis-docs
-description: Use when writing, restructuring, or reviewing technical documentation with Diataxis: tutorials, how-to guides, reference docs, explanations, quickstarts, README, troubleshooting, glossary, style guide, or release notes. Use for prompts like "write docs", "organize docs", "fix docs", "make a template", "写文档", "整理文档", "文档框架", or "说明书".
+description: "Use when writing, restructuring, or reviewing technical documentation with Diataxis documentation forms including tutorials, how-to guides, reference docs, explanations, quickstarts, README, troubleshooting, glossary, style guide, and release notes. Use for prompts like write docs, organize docs, fix docs, make a template, 写文档, 整理文档, 文档框架, or 说明书."
 ---
 
 # Diataxis Documentation Skill
@@ -23,6 +23,13 @@ That yields four primary forms:
 
 Use the distinction first. Do not start by outlining sections.
 
+## Guiding principles
+
+- Clarity: write in simple, direct language.
+- Accuracy: keep facts, code snippets, and document details up to date.
+- User centricity: optimize for the reader's goal, not the author's internal structure.
+- Consistency: keep tone, terminology, and formatting aligned across the document set.
+
 ## Workflow
 
 1. Identify the reader.
@@ -34,6 +41,41 @@ Use the distinction first. Do not start by outlining sections.
 7. Check whether the document still feels complete, focused, and easy to use.
 
 If the request spans multiple needs, split it into multiple documents rather than blending them together.
+
+## Typical delivery pattern
+
+For most requests, follow this order:
+
+1. Clarify the document type, audience, goal, and scope if they are not obvious.
+2. Propose or infer the outline for that document type.
+3. Write the document in Markdown using the right blueprint.
+4. If the request is actually a mixed documentation system, split it into companion docs instead of one large page.
+
+Do not force a long approval loop for every task. Use a short clarification loop only when the user has not given enough information.
+
+## Large documentation systems
+
+When the user asks for a full documentation system, SDK docs, API docs, developer portal, or documentation site, gather these inputs before designing the structure:
+
+- source material: API specification, source code, existing docs, product notes, or screenshots
+- target audience profiles: beginners, experienced developers, admins, support teams, partners, or non-technical users
+- platform preference: Markdown, Docusaurus, ReadTheDocs, Mintlify, GitBook, static site, or repository docs
+- style constraints: brand voice, terminology, localization, accessibility, and formatting rules
+- code example needs: languages, runnable examples, SDK snippets, CLI examples, or sample repositories
+- lifecycle needs: versioning, search, navigation, release notes, changelog, and deprecation policy
+
+For a full documentation system, propose output artifacts such as:
+
+- tutorial sequence or getting-started path
+- how-to guide collection
+- API or CLI reference pages
+- explanation and concept articles
+- troubleshooting section
+- code examples or sample app repository
+- navigation structure
+- versioning and release-note structure
+
+Keep the Diataxis separation intact even when the final site has platform-specific navigation.
 
 ## Reference files
 
@@ -122,6 +164,14 @@ Use these as concrete specializations of the four forms:
 - Glossary: terms and definitions for project-specific language
 - Release notes: what changed, why it matters, and known issues
 - Style guide: team rules for writing consistently
+
+For API and SDK documentation, treat these as common combinations:
+
+- Getting started or quickstart -> tutorial
+- Authentication setup -> how-to or reference, depending on whether it is task steps or field definitions
+- Endpoint, method, class, option, or error-code pages -> reference
+- Architecture, design model, rate limits, pagination model, or SDK philosophy -> explanation
+- Migration and upgrade guides -> how-to with reference links
 
 When a request sounds like one of these, map it back to the four Diataxis needs before writing.
 

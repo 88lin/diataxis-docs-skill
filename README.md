@@ -86,6 +86,7 @@ It is especially useful for prompts like:
 - "Write a README and quickstart for this project."
 - "Split this page into tutorial, how-to, reference, and explanation."
 - "Review this documentation structure and tell me what is mixed together."
+- "Design a Diataxis documentation system for my SDK or API."
 
 ---
 
@@ -203,6 +204,15 @@ The skill includes practical blueprints for:
 | Glossary | Project-specific terms and definitions |
 | Release notes | User-facing change summaries |
 
+For larger systems, the skill can also help plan:
+
+- SDK onboarding paths
+- API or CLI reference structures
+- developer portal navigation
+- runnable code example requirements
+- documentation versioning and release-note structures
+- platform-oriented docs for Markdown, Docusaurus, ReadTheDocs, Mintlify, GitBook, or repository docs
+
 ---
 
 ## Design principles
@@ -236,6 +246,7 @@ Good contributions usually improve one of these areas:
 - better documentation blueprints
 - more realistic eval prompts
 - examples of successful documentation transformations
+- SDK, API, and developer portal examples
 - translations or localization improvements
 
 Please keep the style practical, reader-first, and aligned with Diataxis.

@@ -94,6 +94,7 @@
 - 你想把旧文档按 Diataxis 重新拆分
 - 你想让 AI 写出来的文档更像“真正给用户用的文档”
 - 你想复用一个稳定的文档写作框架，而不是每次重新提示 AI
+- 你想为 SDK、API 或开发者门户设计完整文档体系
 
 ---
 
@@ -211,6 +212,15 @@ Help me split this messy docs site into tutorial, how-to, reference, and explana
 | Glossary / 术语表 | 项目特定术语和定义 |
 | Release notes / 发布说明 | 面向用户的版本变化说明 |
 
+对于更大的文档系统，它还可以帮助规划：
+
+- SDK 入门路径
+- API 或 CLI 参考文档结构
+- 开发者门户导航
+- 可运行代码示例需求
+- 文档版本管理和发布说明结构
+- Markdown、Docusaurus、ReadTheDocs、Mintlify、GitBook 或仓库文档等平台形态
+
 ---
 
 ## 设计原则
@@ -244,6 +254,7 @@ Help me split this messy docs site into tutorial, how-to, reference, and explana
 - 增加更好的文档蓝图
 - 增加更真实的 eval 示例
 - 补充实际文档改造案例
+- 补充 SDK、API、开发者门户案例
 - 改进中文或英文表达
 
 请尽量保持风格：实用、读者优先、符合 Diataxis 的分类逻辑。
