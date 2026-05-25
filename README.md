@@ -8,6 +8,7 @@
 [![Skill: Opencode](https://img.shields.io/badge/Skill-Opencode-111827)](SKILL.md)
 [![Framework: Diataxis](https://img.shields.io/badge/Framework-Diataxis-2563eb)](https://diataxis.fr/)
 [![Docs: Good Docs Project](https://img.shields.io/badge/Templates-Good%20Docs%20Project-16a34a)](https://www.thegooddocsproject.dev/)
+[![GitHub stars](https://img.shields.io/github/stars/88lin/diataxis-docs-skill?style=social)](https://github.com/88lin/diataxis-docs-skill)
 
 [中文文档](README.zh-CN.md) · [Skill file](SKILL.md) · [Blueprints](references/doc-blueprints.md) · [Template map](references/template-map.md)
 
@@ -16,6 +17,10 @@
 ---
 
 ## Preview
+
+<p align="center">
+  <img src="assets/preview.svg" alt="Diataxis Docs Skill preview" width="100%">
+</p>
 
 ```text
 User need                 Diataxis form        Output style
@@ -27,6 +32,8 @@ Understand why            Explanation           Context and tradeoffs
 ```
 
 > Screenshot placeholder: add a screenshot or GIF here later to show this skill classifying a messy documentation request into tutorial, how-to, reference, and explanation.
+
+> Dark-mode friendly by default: the preview art uses a dark canvas with high-contrast text and accent colors.
 
 ---
 
@@ -118,6 +125,8 @@ The skill then applies reusable writing rules and document blueprints so the out
 ├── README.md
 ├── README.zh-CN.md
 ├── LICENSE
+├── assets/
+│   └── preview.svg
 ├── references/
 │   ├── doc-blueprints.md
 │   ├── reader-analysis.md
@@ -135,6 +144,7 @@ The skill then applies reusable writing rules and document blueprints so the out
 | `references/doc-blueprints.md` | Reusable structures for common documentation types |
 | `references/template-map.md` | Mapping between Diataxis forms and Good Docs Project templates |
 | `evals/evals.json` | Sample prompts for checking whether the skill behaves as expected |
+| `assets/preview.svg` | Preview art for the GitHub README header |
 
 ---
 
@@ -239,6 +249,8 @@ The repository does not mirror those sources. It distills their ideas into a reu
 ## Contributing
 
 Issues and pull requests are welcome.
+
+If you want to propose a bigger change, open an issue first so we can keep the skill focused and avoid overfitting it to a single documentation style.
 
 Good contributions usually improve one of these areas:
 

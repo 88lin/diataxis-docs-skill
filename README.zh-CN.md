@@ -8,6 +8,7 @@
 [![Skill: Opencode](https://img.shields.io/badge/Skill-Opencode-111827)](SKILL.md)
 [![Framework: Diataxis](https://img.shields.io/badge/Framework-Diataxis-2563eb)](https://diataxis.fr/)
 [![Docs: Good Docs Project](https://img.shields.io/badge/Templates-Good%20Docs%20Project-16a34a)](https://www.thegooddocsproject.dev/)
+[![GitHub stars](https://img.shields.io/github/stars/88lin/diataxis-docs-skill?style=social)](https://github.com/88lin/diataxis-docs-skill)
 
 [English](README.md) · [Skill 文件](SKILL.md) · [文档蓝图](references/doc-blueprints.md) · [模板映射](references/template-map.md)
 
@@ -16,6 +17,10 @@
 ---
 
 ## 预览
+
+<p align="center">
+  <img src="assets/preview.svg" alt="Diataxis Docs Skill 预览图" width="100%">
+</p>
 
 ```text
 用户需求                 Diataxis 文档类型        输出形态
@@ -27,6 +32,8 @@
 ```
 
 > 截图位：后续可以在这里放一张截图或 GIF，展示这个 Skill 如何把混乱文档拆成教程、操作指南、参考文档和解释说明。
+
+> 这张预览图对深色模式更友好：暗色画布、高对比文字、彩色强调。
 
 ---
 
@@ -126,6 +133,8 @@
 ├── README.md
 ├── README.zh-CN.md
 ├── LICENSE
+├── assets/
+│   └── preview.svg
 ├── references/
 │   ├── doc-blueprints.md
 │   ├── reader-analysis.md
@@ -143,6 +152,7 @@
 | `references/doc-blueprints.md` | 教程、操作指南、参考文档、解释说明等文档骨架 |
 | `references/template-map.md` | Diataxis 类型和 The Good Docs Project 模板的映射关系 |
 | `evals/evals.json` | 用于检查 Skill 效果的示例提示词 |
+| `assets/preview.svg` | GitHub 首页预览图 |
 
 ---
 
@@ -247,6 +257,8 @@ Help me split this messy docs site into tutorial, how-to, reference, and explana
 ## 贡献
 
 欢迎提交 issue 和 pull request。
+
+如果你想提一个比较大的改动，建议先开 issue。这样更容易保持这个 Skill 的聚焦，不会被某一种文档风格带偏。
 
 比较适合贡献的方向包括：
 
