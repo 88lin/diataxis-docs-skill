@@ -1,0 +1,23 @@
+{
+  "skill_name": "diataxis-docs",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to rewrite our product docs because the tutorial, how-to steps, API reference, and background notes are all mixed together. Please organize the documentation using Diátaxis and tell me what should go in each doc.",
+      "expected_output": "A document strategy that separates tutorial, how-to, reference, and explanation content, with a clear classification rationale.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Can you help me write a README and a quickstart for a developer tool? The README should be the first impression, and the quickstart should get new users to a first success fast.",
+      "expected_output": "A README/quickstart plan or draft that distinguishes entry-point content from a short first-success tutorial.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "We keep getting complaints that our docs pages are half explanation and half procedure. I need a repeatable framework for deciding whether a page should be reference, how-to, tutorial, or explanation.",
+      "expected_output": "A reusable decision framework or skill-like guidance that classifies page types and explains the differences.",
+      "files": []
+    }
+  ]
+}
