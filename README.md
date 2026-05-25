@@ -1,45 +1,122 @@
+<div align="center">
+
 # Diataxis Docs Skill 📚
 
+**A reusable Opencode skill for writing structured, user-first technical documentation.**
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Docs: Markdown](https://img.shields.io/badge/Docs-Markdown-000000)](#)
+[![Skill: Opencode](https://img.shields.io/badge/Skill-Opencode-111827)](SKILL.md)
+[![Framework: Diataxis](https://img.shields.io/badge/Framework-Diataxis-2563eb)](https://diataxis.fr/)
+[![Docs: Good Docs Project](https://img.shields.io/badge/Templates-Good%20Docs%20Project-16a34a)](https://www.thegooddocsproject.dev/)
 
-A reusable Opencode skill for writing clearer technical documentation with the Diataxis framework.
+[中文文档](README.zh-CN.md) · [Skill file](SKILL.md) · [Blueprints](references/doc-blueprints.md) · [Template map](references/template-map.md)
 
-一个可复用的 Opencode 技能，用 Diataxis 框架把技术文档拆清楚、写明白、写好看。✨
+</div>
 
-## What this skill does / 这个技能能做什么
+---
 
-| Need | Diataxis form | What you get |
-| --- | --- | --- |
-| Learn by doing | Tutorial / 教程 | A guided learning experience |
-| Finish a task | How-to / 操作指南 | Practical, task-focused directions |
-| Look up facts | Reference / 参考文档 | Neutral, structured information |
-| Understand why | Explanation / 解释说明 | Context, tradeoffs, and background |
+## Preview
 
-It also provides reusable blueprints for common documentation types:
+```text
+User need                 Diataxis form        Output style
+────────────────────────────────────────────────────────────────
+Learn by doing            Tutorial             Guided lesson
+Complete a real task      How-to guide          Practical steps
+Look up exact facts       Reference             Structured facts
+Understand why            Explanation           Context and tradeoffs
+```
 
-- Quickstart / 快速开始
-- README
-- Troubleshooting / 故障排查
-- Glossary / 术语表
-- Release notes / 发布说明
-- Style guide / 风格指南
+> Screenshot placeholder: add a screenshot or GIF here later to show this skill classifying a messy documentation request into tutorial, how-to, reference, and explanation.
 
-## Why it exists / 为什么要做这个仓库
+---
 
-English:
+## Table of Contents
 
-Most documentation problems are really classification problems. Users do not want a single mixed page that teaches, explains, lists facts, and solves errors all at once. They want the right kind of document for the job. This skill helps you classify the request first, then write with a tighter structure and less noise.
+- [Why this exists](#why-this-exists)
+- [What this skill helps with](#what-this-skill-helps-with)
+- [How it works](#how-it-works)
+- [Repository structure](#repository-structure)
+- [Installation](#installation)
+- [Example prompts](#example-prompts)
+- [Included blueprints](#included-blueprints)
+- [Design principles](#design-principles)
+- [Sources](#sources)
+- [Contributing](#contributing)
+- [License](#license)
 
-中文：
+---
 
-大多数文档问题，本质上都是“分类问题”。用户并不想要一页把教程、解释、参考信息和故障排查全混在一起的内容。他们想要的是“这件事最适合哪一种文档”。这个技能会先帮你判断文档类型，再按对应结构写作，让内容更清晰、更稳定，也更好维护。
+## Why this exists
 
-## Included files / 包含内容
+Most documentation problems are classification problems.
+
+When a single page tries to teach a beginner, guide a working user, list API facts, explain design tradeoffs, and troubleshoot errors all at once, the page becomes noisy. Beginners feel lost, experienced users cannot find the facts, and maintainers do not know where new content belongs.
+
+This skill uses the [Diataxis](https://diataxis.fr/) framework to help an AI assistant decide what kind of document is needed before writing it.
+
+The goal is simple:
+
+- choose the right document type
+- write for the reader's actual state
+- keep each page focused on one user need
+- link related material instead of mixing everything together
+- make documentation easier to maintain over time
+
+---
+
+## What this skill helps with
+
+Use this skill when you want to write, rewrite, organize, or review technical documentation such as:
+
+- tutorials
+- how-to guides
+- reference documentation
+- explanation or concept articles
+- quickstarts
+- READMEs
+- troubleshooting guides
+- glossaries
+- release notes
+- documentation style guides
+
+It is especially useful for prompts like:
+
+- "Help me organize this documentation site."
+- "Turn this messy guide into Diataxis-style docs."
+- "Write a README and quickstart for this project."
+- "Split this page into tutorial, how-to, reference, and explanation."
+- "Review this documentation structure and tell me what is mixed together."
+
+---
+
+## How it works
+
+The skill starts with two questions:
+
+1. Is the content about action or cognition?
+2. Is the reader acquiring skill or applying skill?
+
+That produces four documentation forms:
+
+| Reader need | Diataxis form | Typical question | Best format |
+| --- | --- | --- | --- |
+| Learn through action | Tutorial | "Can you teach me?" | A guided lesson |
+| Complete a task | How-to guide | "How do I do this?" | A practical sequence |
+| Look up exact facts | Reference | "What does this mean?" | Tables, lists, schemas |
+| Build understanding | Explanation | "Why does this work this way?" | Contextual discussion |
+
+The skill then applies reusable writing rules and document blueprints so the output stays focused.
+
+---
+
+## Repository structure
 
 ```text
 .
 ├── SKILL.md
+├── README.md
+├── README.zh-CN.md
+├── LICENSE
 ├── references/
 │   ├── doc-blueprints.md
 │   ├── reader-analysis.md
@@ -48,74 +125,123 @@ Most documentation problems are really classification problems. Users do not wan
     └── evals.json
 ```
 
-### `SKILL.md`
+### Key files
 
-The main skill instructions: trigger guidance, classification logic, writing rules, and quality checks.
+| File | Purpose |
+| --- | --- |
+| `SKILL.md` | Main skill instructions, trigger guidance, classification logic, and quality checks |
+| `references/reader-analysis.md` | Reader-first checklist before drafting documentation |
+| `references/doc-blueprints.md` | Reusable structures for common documentation types |
+| `references/template-map.md` | Mapping between Diataxis forms and Good Docs Project templates |
+| `evals/evals.json` | Sample prompts for checking whether the skill behaves as expected |
 
-### `references/reader-analysis.md`
+---
 
-A short checklist for understanding who the reader is, what they need, and what should be left out.
+## Installation
 
-### `references/doc-blueprints.md`
+### Option 1: clone into an Opencode skill directory
 
-Reusable skeletons for tutorials, how-tos, reference docs, explanations, quickstarts, READMEs, troubleshooting pages, glossaries, and release notes.
+```bash
+git clone https://github.com/88lin/diataxis-docs-skill.git ~/.config/opencode/skills/diataxis-docs
+```
 
-### `references/template-map.md`
+Restart Opencode after cloning so the skill list is reloaded.
 
-A compact map from Diataxis forms to common Good Docs Project templates.
+### Option 2: add the repository path to `skills.paths`
 
-### `evals/evals.json`
-
-Sample prompts you can use to sanity-check whether the skill still behaves well over time.
-
-## How to use / 如何使用
-
-### Install / 安装
-
-1. Clone or download this repository.
-2. Place it where Opencode scans skills, or add the repo path to `skills.paths`.
-3. Restart Opencode so the skill is loaded.
-
-### Option 1: place it where Opencode already scans
-
-If you keep the repo inside an Opencode skill directory, Opencode can discover it automatically.
-
-### Option 2: add the repo path to `skills.paths`
+Add the folder path to your `opencode.json`:
 
 ```jsonc
 {
   "skills": {
-    "paths": ["C:/Users/Computer/.config/opencode/skills/diataxis-docs"]
+    "paths": ["/path/to/diataxis-docs-skill"]
   }
 }
 ```
 
-After saving config changes, restart Opencode so it reloads the skill list.
+Then restart Opencode.
 
-### Example prompts / 示例提问
+---
 
-- "Help me split this messy docs site into tutorial, how-to, reference, and explanation"
-- "Write a README and quickstart for this tool"
-- "Turn this API doc into a proper reference page"
-- "Explain the difference between tutorial and how-to for my team"
-- "帮我把这份文档拆成教程、操作指南、参考文档和解释文档"
-- "帮我写一个好看的中英文 README"
+## Example prompts
 
-## Source notes / 来源说明
+```text
+Help me split this messy docs site into tutorial, how-to, reference, and explanation.
+```
 
-This skill is inspired by:
+```text
+Write a README and quickstart for this developer tool.
+```
+
+```text
+Turn this API page into a proper reference document.
+```
+
+```text
+Review this documentation and tell me where it mixes concepts, procedures, and reference data.
+```
+
+```text
+帮我把这份文档拆成教程、操作指南、参考文档和解释文档。
+```
+
+---
+
+## Included blueprints
+
+The skill includes practical blueprints for:
+
+| Blueprint | Use it for |
+| --- | --- |
+| Tutorial | A guided learning path with visible progress |
+| How-to | A focused task or real-world problem |
+| Reference | Parameters, fields, commands, flags, values, limits, and schemas |
+| Explanation | Concepts, background, design reasons, tradeoffs, and alternatives |
+| Quickstart | A short path to first success |
+| README | A project entry point and first impression |
+| Troubleshooting | Symptoms, causes, solutions, and verification |
+| Glossary | Project-specific terms and definitions |
+| Release notes | User-facing change summaries |
+
+---
+
+## Design principles
+
+- Reader first: write for what the reader is trying to do right now.
+- One need per page: avoid mixing learning, working, lookup, and reflection.
+- Link, do not overload: move extra explanation or reference into companion docs.
+- Structure follows purpose: choose the document type before choosing headings.
+- Practical over theoretical: use Diataxis as a working tool, not as decoration.
+
+---
+
+## Sources
+
+This skill is inspired by and based on ideas from:
 
 - [Diataxis](https://diataxis.fr/)
 - [The Good Docs Project](https://www.thegooddocsproject.dev/)
 
-The linked study page mentioned during development could not be fetched in this session, so it is not mirrored here.
+The repository does not mirror those sources. It distills their ideas into a reusable Opencode skill.
 
-## Contributing / 贡献
+---
 
-Pull requests and issues are welcome.
+## Contributing
 
-If you improve the skill, please keep the writing style practical, reader-first, and tightly aligned with Diataxis.
+Issues and pull requests are welcome.
 
-## License / 许可证
+Good contributions usually improve one of these areas:
 
-MIT. See `LICENSE`.
+- clearer trigger wording in `SKILL.md`
+- better documentation blueprints
+- more realistic eval prompts
+- examples of successful documentation transformations
+- translations or localization improvements
+
+Please keep the style practical, reader-first, and aligned with Diataxis.
+
+---
+
+## License
+
+MIT. See [LICENSE](LICENSE).
