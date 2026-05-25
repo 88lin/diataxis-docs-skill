@@ -10,7 +10,7 @@
 [![Docs: Good Docs Project](https://img.shields.io/badge/Templates-Good%20Docs%20Project-16a34a)](https://www.thegooddocsproject.dev/)
 [![GitHub stars](https://img.shields.io/github/stars/88lin/diataxis-docs-skill?style=social)](https://github.com/88lin/diataxis-docs-skill)
 
-[中文文档](README.zh-CN.md) · [Skill file](SKILL.md) · [Blueprints](references/doc-blueprints.md) · [Template map](references/template-map.md)
+[Chinese](README.zh-CN.md) · [Skill file](SKILL.md) · [Blueprints](references/doc-blueprints.md) · [Template map](references/template-map.md)
 
 </div>
 
@@ -193,7 +193,7 @@ Review this documentation and tell me where it mixes concepts, procedures, and r
 ```
 
 ```text
-帮我把这份文档拆成教程、操作指南、参考文档和解释文档。
+Design a Diataxis documentation system for my SDK or API.
 ```
 
 ---

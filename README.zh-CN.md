@@ -10,7 +10,7 @@
 [![Docs: Good Docs Project](https://img.shields.io/badge/Templates-Good%20Docs%20Project-16a34a)](https://www.thegooddocsproject.dev/)
 [![GitHub stars](https://img.shields.io/github/stars/88lin/diataxis-docs-skill?style=social)](https://github.com/88lin/diataxis-docs-skill)
 
-[English](README.md) · [Skill 文件](SKILL.md) · [文档蓝图](references/doc-blueprints.md) · [模板映射](references/template-map.md)
+[英文文档](README.md) · [Skill 文件](SKILL.md) · [文档蓝图](references/doc-blueprints.md) · [模板映射](references/template-map.md)
 
 </div>
 
@@ -201,7 +201,7 @@ git clone https://github.com/88lin/diataxis-docs-skill.git ~/.config/opencode/sk
 ```
 
 ```text
-Help me split this messy docs site into tutorial, how-to, reference, and explanation.
+帮我把这套混乱的文档站拆成教程、操作指南、参考文档和解释说明。
 ```
 
 ---
