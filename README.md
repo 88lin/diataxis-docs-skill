@@ -173,7 +173,7 @@ Then restart Opencode.
 ## Example prompts
 
 ```text
-Help me split this messy docs site into tutorial, how-to, reference, and explanation.
+Design a Diataxis documentation system for my SDK or API.
 ```
 
 ```text

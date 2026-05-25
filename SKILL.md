@@ -1,6 +1,6 @@
 ---
 name: diataxis-docs
-description: "Use when writing, restructuring, or reviewing technical documentation with Diataxis documentation forms including tutorials, how-to guides, reference docs, explanations, quickstarts, README, troubleshooting, glossary, style guide, and release notes. Use for prompts like write docs, organize docs, fix docs, make a template, 写文档, 整理文档, 文档框架, or 说明书."
+description: "Use when writing, restructuring, or reviewing technical documentation with Diataxis documentation forms including tutorials, how-to guides, reference docs, explanations, quickstarts, README, troubleshooting, glossary, style guide, and release notes. Use for prompts like write docs, organize docs, fix docs, or make a template."
 ---
 
 # Diataxis Documentation Skill
@@ -224,38 +224,22 @@ Before finishing, ask:
 - Did I avoid unnecessary structure at the top level?
 - Did I leave room for linked companion documents?
 
-## Source-informed reference points
+## References
 
-This skill is based on the Diataxis framework and The Good Docs Project template system.
-
-Primary sources consulted:
+Use these as the primary source material behind this skill:
 
 - https://diataxis.fr/
 - https://diataxis.fr/start-here/
+- https://diataxis.fr/compass/
+- https://diataxis.fr/how-to-use-diataxis/
 - https://diataxis.fr/tutorials/
 - https://diataxis.fr/how-to-guides/
 - https://diataxis.fr/reference/
 - https://diataxis.fr/explanation/
-- https://diataxis.fr/compass/
-- https://diataxis.fr/how-to-use-diataxis/
-- https://diataxis.fr/quality/
-- https://diataxis.fr/tutorials-how-to/
-- https://diataxis.fr/reference-explanation/
-- https://diataxis.fr/complex-hierarchies/
 - https://www.thegooddocsproject.dev/
 - https://www.thegooddocsproject.dev/template/
-- https://www.thegooddocsproject.dev/template/concept
-- https://www.thegooddocsproject.dev/template/how-to
-- https://www.thegooddocsproject.dev/template/reference
-- https://www.thegooddocsproject.dev/template/tutorial
-- https://www.thegooddocsproject.dev/template/troubleshooting
-- https://www.thegooddocsproject.dev/template/readme
-- https://www.thegooddocsproject.dev/template/release-notes
-- https://www.thegooddocsproject.dev/template/quickstart
-- https://www.thegooddocsproject.dev/template/glossary
-- https://www.thegooddocsproject.dev/template/style-guide
 
-The linked study page at https://jubt.top/cn/study.html could not be fetched in this session, so it is not incorporated into the skill body.
+This skill distills those sources into a practical documentation workflow.
 
 ## Practical output pattern
 
