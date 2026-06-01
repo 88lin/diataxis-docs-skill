@@ -7,7 +7,26 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
-### Added
+### Align SKILL.md with the official Diataxis compass
+
+#### Added
+
+- `SKILL.md`: new `The Diataxis compass` section as the primary classification tool, with the official four-row truth-table from `diataxis.fr/compass/`, the two canonical questions, the "use the compass flexibly" principle, and the "compass can be applied to existing documentation" principle.
+- `SKILL.md`: new `Workflow philosophy` section that explicitly encodes the official Diataxis workflow — use as a guide not a plan, do not worry about structure, work one step at a time, structure emerges from the inside.
+- `SKILL.md`: new `Anti-patterns for large systems` section that warns against creating empty sections up front, allocating content quotas per quadrant, forcing IA before content is good, and treating "documentation system" as a deliverable.
+- `README.md` and `README.zh-CN.md`: rewrote the `How it works` / `核心工作方式` section so the compass is the headline tool, with the truth-table, a link to the source, the official quote, and a new `Workflow philosophy` / `工作流哲学` subsection.
+
+#### Changed
+
+- `SKILL.md`: `Large documentation systems` rewritten to be iterative, not top-down. Inputs are now framed as "ask only what is needed", the artifact map is relabelled "reference map (not a checklist)" and each row now includes its compass cell, and the decision flow is replaced with "How to work iteratively" steps.
+- `SKILL.md`: `Workflow` now points to the new `Workflow philosophy` and `Large documentation systems` sections for whole-system work.
+- `SKILL.md`: `When to use this skill` now mentions the compass, single-page audit, and one-page-at-a-time work.
+- `SKILL.md`: frontmatter `description` now mentions the compass, applies to both new and existing content, and references the iterative workflow.
+- `SKILL.md`: `Quick decision tree` now opens with a one-liner saying the compass is the canonical tool and the tree is a quick aid.
+
+### Worked example, slash commands, and CI
+
+#### Added
 
 - `SKILL.md`: new `Quick decision tree` section that gives a one-screen visual aid for picking a Diataxis form before drafting.
 - `SKILL.md`: new `When to use this skill` and `When NOT to use this skill` sections that scope the skill explicitly.
@@ -28,7 +47,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - `.github/workflows/ci.yml`: a CI workflow with three jobs - `validate-evals`, `check-internal-links`, `verify-structure`.
 - `scripts/check_local.py`: the same checks, runnable locally before pushing.
 
-### Changed
+#### Changed
 
 - `SKILL.md`: reorganized the body so the workflow reads as: classify (decision tree) -> scope (when to use / not to use) -> write (workflow, delivery pattern) -> avoid (anti-patterns) -> scale (large documentation systems) -> reference -> check.
 - `SKILL.md`: `Quality checks` now runs both an `Intent check` and a `Mixed-doc smell test` with concrete split signals.
@@ -38,7 +57,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - `README.md` and `README.zh-CN.md`: `Repository structure` and `Key files` table extended to include `examples/`, `.opencode/commands/`, `.github/workflows/`, and `scripts/`.
 - `evals/evals.json`: added a top-level `version` and `description` field for easier machine consumption.
 
-### Fixed
+#### Fixed
 
 - `README.md` and `README.zh-CN.md`: removed duplicate example prompts that appeared twice in `Example prompts` / `示例提问`.
 - `README.md` and `README.zh-CN.md`: fixed broken internal links in the worked example (`after/02-how-to.md`, `after/04-explanation.md`) where sibling pages were incorrectly written as `../<file>.md` instead of `<file>.md`.

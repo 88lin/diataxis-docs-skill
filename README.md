@@ -117,19 +117,18 @@ If the request is about _what_ to say more than _which kind of document_ to writ
 
 ## How it works
 
-The skill starts with two questions:
+The skill is built around the [Diataxis compass](https://diataxis.fr/compass/) — a two-question truth-table that maps any piece of content to exactly one of four forms.
 
-1. Is the content about action or cognition?
-2. Is the reader acquiring skill or applying skill?
+| If the content… | …and serves the user's… | …then it must belong to… |
+| --- | --- | --- |
+| informs action | acquisition of skill | a tutorial |
+| informs action | application of skill | a how-to guide |
+| informs cognition | application of skill | reference |
+| informs cognition | acquisition of skill | explanation |
 
-That produces four documentation forms:
+The compass can be applied to a single sentence, a page, or a whole documentation set. It can be applied to new content, and equally well to existing content that may need to be moved.
 
-| Reader need | Diataxis form | Typical question | Best format |
-| --- | --- | --- | --- |
-| Learn through action | Tutorial | "Can you teach me?" | A guided lesson |
-| Complete a task | How-to guide | "How do I do this?" | A practical sequence |
-| Look up exact facts | Reference | "What does this mean?" | Tables, lists, schemas |
-| Build understanding | Explanation | "Why does this work this way?" | Contextual discussion |
+> "The compass can be applied equally to user situations that need documentation, or to documentation itself that perhaps needs to be moved or improved. Like many good tools, it's surprisingly banal." — diataxis.fr/compass
 
 ### Quick decision tree
 
@@ -153,7 +152,16 @@ What is the reader trying to do right now?
 
 The skill also ships an **anti-patterns checklist** that flags the most common failure mode: a single page that mixes two or more of these forms. The full checklist is in [`SKILL.md`](SKILL.md#anti-patterns-what-not-to-do).
 
-The skill then applies reusable writing rules and document blueprints so the output stays focused.
+### Workflow philosophy
+
+Diataxis is meant to be used as a guide, not as a plan. The skill follows the official workflow:
+
+- **Use Diataxis as a guide, not a plan.** Apply the compass where you are, not where you wish you were.
+- **Do not worry about structure.** Focus on content quality. The structure emerges from the work.
+- **Work one step at a time.** Make small, responsive improvements. Do not plan a complete rewrite before starting.
+- **Diataxis changes the structure of your documentation from the inside.** It is not a template to impose on top of existing content.
+
+In other words, a messy page that is honest about its content is better than a clean four-section site with nothing in three of the four sections.
 
 ---
 

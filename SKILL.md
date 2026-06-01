@@ -1,6 +1,6 @@
 ---
 name: diataxis-docs
-description: "Use when writing, restructuring, splitting, classifying, reviewing, or auditing technical documentation with Diataxis forms: tutorials, how-to guides, reference, explanation, quickstarts, READMEs, troubleshooting, glossaries, release notes, and style guides. Trigger on prompts like write docs, organize docs, fix docs, split this page, classify this docs page, audit our docs site, migrate to Diataxis, review this draft, or design a documentation system for an SDK or API."
+description: "Use the Diataxis compass to write, restructure, split, classify, review, audit, or migrate technical documentation. Covers tutorials, how-to guides, reference, explanation, quickstarts, READMEs, troubleshooting, glossaries, release notes, and style guides. Trigger on prompts like write docs, organize docs, fix docs, split this page, classify this docs page, audit our docs site, migrate to Diataxis, review this draft, or design a documentation system for an SDK or API. Apply the compass flexibly to both new and existing content, and work one page at a time rather than imposing a top-down plan."
 ---
 
 # Diataxis Documentation Skill
@@ -23,9 +23,42 @@ That yields four primary forms:
 
 Use the distinction first. Do not start by outlining sections.
 
+## The Diataxis compass
+
+The compass is Diataxis's main classification tool. It reduces a two-dimensional problem to two questions and yields a single answer.
+
+| If the content… | …and serves the user's… | …then it must belong to… |
+| --- | --- | --- |
+| informs action | acquisition of skill | a tutorial |
+| informs action | application of skill | a how-to guide |
+| informs cognition | application of skill | reference |
+| informs cognition | acquisition of skill | explanation |
+
+To use the compass, ask just two questions:
+
+- Is the content about **action** (practical steps, doing) or **cognition** (theoretical or propositional knowledge, thinking)?
+- Is the user **acquiring** skill (study) or **applying** skill (work)?
+
+> "The compass can be applied equally to user situations that need documentation, or to documentation itself that perhaps needs to be moved or improved. Like many good tools, it's surprisingly banal." — [diataxis.fr/compass](https://diataxis.fr/compass/)
+
+### Use the compass flexibly
+
+Do not get fixated on the exact names. If a question feels ambiguous, both readings may be valid. Apply the compass at any scale: at the level of a single sentence, a section, an entire page, or a whole documentation set.
+
+The questions can be used in different ways:
+
+- "Do I think I am writing for *x* or *y*?"
+- "Is this writing in front of me engaged in *x* or *y*?"
+- "Does the user need *x* or *y*?"
+- "Do I want to *x* or *y*?"
+
+### Apply the compass to existing documentation
+
+The compass is just as useful for auditing existing pages as for greenfield work. For each page, ask the two questions. If the page's current form does not match the answer, the page needs to be moved or rewritten — not labelled differently.
+
 ## Quick decision tree
 
-When in doubt, walk through this before drafting:
+The compass above is the canonical tool. The tree below is a quick aid for the most common cases.
 
 ```text
 What is the reader trying to do right now?
@@ -36,23 +69,24 @@ What is the reader trying to do right now?
 │
 ├── Applying a known skill to a real task?
 │   ├── General task with a clear goal → How-to
-│   └── Diagnosing a failure or error → Troubleshooting
+│   └── Stuck on an error → Troubleshooting
 │
 ├── Looking up an exact fact, field, command, or limit? → Reference
 │
 └── Trying to understand why or how it works?        → Explanation
 ```
 
-If the request hits more than one branch, split it into multiple documents rather than blending them.
+If the request hits more than one branch, split it into multiple documents rather than blending them. The same questions can be applied to existing pages: when a page's content disagrees with its current form, the page needs to be moved, not relabelled.
 
 ## When to use this skill
 
 Use this skill when the task is to:
 
 - write, rewrite, restructure, or review a documentation page
-- choose the right document type for a new request
+- apply the Diataxis compass to classify a page or a request
 - split a single messy page into the right Diataxis forms
-- design a full documentation system for an SDK, API, CLI, or product
+- audit or migrate an existing documentation set, one page at a time
+- design a full documentation system for an SDK, API, CLI, or product (using the compass as a guide, not as a plan)
 - map user questions to the correct documentation form
 
 ## When NOT to use this skill
@@ -74,6 +108,8 @@ Do not use this skill for:
 
 ## Workflow
 
+For a single page, work in this order:
+
 1. Identify the reader.
 2. Identify the reader's current state: learning, working, looking up facts, or reflecting.
 3. Identify the user need: a task, a fact, a concept, or a learning path.
@@ -82,7 +118,7 @@ Do not use this skill for:
 6. Link out to the other forms instead of mixing them in.
 7. Check whether the document still feels complete, focused, and easy to use.
 
-If the request spans multiple needs, split it into multiple documents rather than blending them together.
+If the request spans multiple needs, split it into multiple documents rather than blending them together. For a whole documentation system, work one page at a time, not as a top-down plan — see the [Workflow philosophy](#workflow-philosophy) and [Large documentation systems](#large-documentation-systems) sections.
 
 ## Typical delivery pattern
 
@@ -169,11 +205,44 @@ When a page trips the smell test, the right response is to **split it**, not to 
 - **Style guide that classifies**: the style guide should describe voice and rules, not re-derive Diataxis.
 - **Quickstart that explores**: a quickstart optimizes for first success, not for completeness.
 
+## Workflow philosophy
+
+Diataxis is meant to be used as a guide, not as a plan. The official workflow says:
+
+- **Use Diataxis as a guide, not a plan.** Apply the compass where you are, not where you wish you were. Do not create empty structures in advance.
+- **Do not worry about structure.** Focus on content quality. The structure will emerge from the work.
+- **Work one step at a time.** Make small, responsive improvements. Do not plan a complete rewrite before starting.
+- **Diataxis changes the structure of your documentation from the inside.** It is not a template to impose on top of existing content.
+
+In practice, this means:
+
+- When the user asks for "a complete documentation system", do not deliver an empty scaffold. Ask what already exists and start there.
+- When the user asks for "a single mega-page that does everything", do not just split it. Walk through the compass with the user; the split is a consequence, not a goal.
+- When a single improvement would move a page from one form to another, make that improvement before planning the next.
+
+A messy page that is honest about its content is better than a clean four-section site with nothing in three of the four sections.
+
 ## Large documentation systems
 
-When the user asks for a full documentation system, SDK docs, API docs, developer portal, or documentation site, plan it as a layered deliverable rather than a single page.
+When the user asks for a full documentation system, SDK docs, API docs, developer portal, or documentation site, **use the compass as a guide, not a plan**. Diataxis explicitly warns against top-down planning: the structure should emerge from content, not be imposed on it.
 
-### Inputs to gather first
+### How to work iteratively
+
+1. Apply the compass to any existing material first. Tag every existing page with a compass cell. Move pages that are misplaced before adding new ones.
+2. For new content, write one page at a time. Apply the compass to that page alone. Do not create empty top-level sections in advance.
+3. After enough pages exist, the top-level structure will start to demand certain headings. Let those emerge from the work, not from a plan.
+4. If you are asked to propose a structure up front, treat it as a sketch, not a contract. The structure is allowed to change as the content improves.
+
+### Anti-patterns for large systems
+
+- **Creating empty sections up front.** An empty "Tutorials" section is worse than no Tutorials section.
+- **Allocating fixed content quotas per quadrant.** Compass cells are not buckets to fill.
+- **Forcing IA before content is good.** A navigation that pre-commits to four forms is brittle.
+- **Treating "documentation system" as a deliverable.** It is a practice, not a product.
+
+### Inputs to gather, but only what is needed
+
+Ask only what you need to start. The compass does the rest.
 
 | Category | Items to confirm |
 | --- | --- |
@@ -183,24 +252,22 @@ When the user asks for a full documentation system, SDK docs, API docs, develope
 | Style constraints | Brand voice, terminology, localization, accessibility, formatting rules |
 | Code examples | Languages, runnable snippets, SDK samples, CLI examples, sample repositories |
 | Lifecycle needs | Versioning, search, navigation, release notes, changelog, deprecation policy |
-| Success metrics | What readers must be able to do after reading; what feedback the team expects |
 
-### Output artifacts to propose
+### Reference map (not a checklist)
 
-Map each artifact to a Diataxis form so the system stays honest:
+The map below shows the common artifact types and their compass cell. Use it as a reference, not as a list to be ticked off.
 
-| Artifact | Primary form | Purpose |
+| Artifact | Compass cell | Purpose |
 | --- | --- | --- |
-| Getting started path or quickstart | Tutorial | First success for a new user |
-| How-to guide collection | How-to | One task per page, assumes competence |
-| API, CLI, config, or schema reference | Reference | Neutral, structured facts |
-| Concept, architecture, and design articles | Explanation | Why and how it works, tradeoffs |
-| Troubleshooting section | How-to (with reference links) | Symptom → cause → solution |
-| Glossary | Reference | Project-specific terms |
-| Release notes and changelog | Reference (with user-facing framing) | What changed and why it matters |
-| Style guide | Meta | Team rules for consistent writing |
-| Sample apps and runnable examples | Tutorial / Reference | Validate the system end to end |
-| Navigation and information architecture | Structural layer | Keep Diataxis separation visible in IA |
+| Getting started path or quickstart | action + acquisition (tutorial) | First success for a new user |
+| How-to guide collection | action + application (how-to) | One task per page, assumes competence |
+| API, CLI, config, or schema reference | cognition + application (reference) | Neutral, structured facts |
+| Concept, architecture, and design articles | cognition + acquisition (explanation) | Why and how it works, tradeoffs |
+| Troubleshooting | action + application (how-to) | Symptom → cause → solution |
+| Glossary | cognition + application (reference) | Project-specific terms |
+| Release notes and changelog | cognition + application (reference) | What changed and why it matters |
+| Style guide | meta | Team rules for consistent writing |
+| Sample apps and runnable examples | action + acquisition (tutorial) or cognition + application (reference) | Validate the system end to end |
 
 ### Per-platform notes
 
@@ -209,15 +276,7 @@ Map each artifact to a Diataxis form so the system stays honest:
 - **ReadTheDocs / static sites**: use section labels and admonitions sparingly; do not hide form boundaries inside prose.
 - **Multi-product portals**: keep one Diataxis quadrant per page; let the cross-product index live in a separate overview page.
 
-### Decision flow
-
-1. Clarify the audience, platform, and source material.
-2. List the artifacts above and tag each with a primary form.
-3. For each artifact, choose the matching blueprint from `references/doc-blueprints.md`.
-4. Build the navigation so the four forms remain visibly separated.
-5. Add a release-notes and deprecation policy if the system has a versioned lifecycle.
-
-Keep the Diataxis separation intact even when the final site has platform-specific navigation.
+Keep the Diataxis separation intact when navigation does emerge, but do not force the separation before there is content to separate.
 
 ## Reference files
 
