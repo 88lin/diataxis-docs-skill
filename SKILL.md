@@ -30,11 +30,11 @@ To use the compass, ask just two questions:
 
 > "The compass can be applied equally to user situations that need documentation, or to documentation itself that perhaps needs to be moved or improved. Like many good tools, it's surprisingly banal." — [diataxis.fr/compass](https://diataxis.fr/compass/)
 
-The compass is a tool for finding your bearings, not a map of the territory. Diataxis is also published as a 2x2 map ([diataxis.fr](https://diataxis.fr/)) that shows the four quadrants visually; the compass is the same idea re-expressed as two questions and a truth-table. The map is good for orientation; the compass is good for decisions. They are not interchangeable — when the official source says "use the map" it usually means the static quadrant view, and when it says "use the compass" it means the question-based decision tool used here.
+The compass is a tool for finding your bearings, not a map of the territory. Diataxis is also published as a 2x2 quadrant diagram on [diataxis.fr](https://diataxis.fr/); this skill calls that the *map*. The map is good for orientation; the compass is good for decisions. The two are not interchangeable.
 
 ### Use the compass flexibly
 
-The compass is particularly effective when you think you are doing one thing but feel doubt or difficulty in the work. It forces you to stop and reconsider. Sometimes intuition provides an immediate answer that is also wrong.
+The compass is particularly effective when you think you are doing one thing — or the documentation in front of you seems to be — but feel doubt or difficulty in the work. It forces you to stop and reconsider. Sometimes intuition provides an immediate answer that is also wrong.
 
 Do not get fixated on the exact names. If a question feels ambiguous, both readings may be valid. Apply the compass at any scale: at the level of a single sentence, a section, an entire page, or a whole documentation set.
 
@@ -168,7 +168,7 @@ The most common failure in technical documentation is **mixing forms**. The rule
 - Step-by-step instructions. Explanations do not give procedures.
 - "How to" titles. Use "About …" or "Why …" framing.
 - Unbounded scope. Cover one concept, one design decision, or one tradeoff at a time.
-- No opinion. An explanation that does not commit to a perspective is just a summary.
+- No point of view or insight. An explanation that neither offers a perspective nor helps the reader form a new understanding is just a summary.
 
 ### Mixed-doc smell test
 
@@ -204,8 +204,8 @@ Diataxis is meant to be used as a guide, not as a plan. The official workflow sa
 
 - **Use Diataxis as a guide, not a plan.** Apply the compass where you are, not where you wish you were. Do not create empty structures in advance.
 - **Do not worry about structure.** Focus on content quality. The structure will emerge from the work.
-- **Work one step at a time.** Make small, responsive improvements. Do not plan a complete rewrite before starting.
-- **Diataxis changes the structure of your documentation from the inside.** It is not a template to impose on top of existing content.
+- **Work one step at a time.** Make small, responsive improvements; finish and ship each one before starting the next. Do not plan a complete rewrite before starting.
+- **Diataxis changes the structure of your documentation from the inside, the way cells form a tissue.** It is not a template to impose on top of existing content. Allow the work to develop organically; the structure will differentiate once enough content is in place.
 
 In practice, this means:
 
@@ -278,7 +278,7 @@ Use when the reader needs a guided learning experience.
 
 Write it as a safe, structured lesson:
 
-- start with a clear learning outcome
+- start with what the reader will do or build
 - use a single path
 - keep steps concrete and sequential
 - show expected results early and often
@@ -287,7 +287,7 @@ Write it as a safe, structured lesson:
 
 Good signs:
 
-- "learn", "try", "first time", "hands-on", "intro", "walkthrough"
+- "try", "first time", "hands-on", "intro", "walkthrough"
 - the user is not yet competent
 
 ### How-to

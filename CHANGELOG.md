@@ -18,6 +18,17 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - `scripts/check_local.py`: `check_skill_frontmatter()` now prints a soft warning when the SKILL.md `description` exceeds 60 words, and adds the word count to the existing OK line. The warning is intentionally not a hard error: the current description is 52 words, well under the budget, and contributors who push past 60 words should see the warning and trim it without the build failing.
 - `CHANGELOG.md`: the "Preview image refresh and tag normalization" block has been moved from `[Unreleased]` into `[0.1.0]` so the changelog matches the actual content of the v0.1.0 tag (it was previously listed under Unreleased even though that commit was the one the tag points to).
 
+### Compass, workflow, and tutorial fidelity fixes
+
+#### Changed
+
+- `SKILL.md`: the `Use the compass flexibly` paragraph is now closer to the official diataxis.fr wording. The double "you think that you think" was dropped (the rhetorical self-doubt is captured by the surrounding "— or the documentation in front of you seems to be —" interpolation), but the parenthetical that the compass also applies to existing documentation is now present, and the surrounding sentence reads as a more faithful gloss of the official page.
+- `SKILL.md`: the compass-vs-map paragraph no longer speculates about what the official source means by "use the map". It now just defines the term — the *map* is the static 2x2 quadrant diagram on diataxis.fr; the *compass* is the question-based decision tool in this skill — and leaves the "use the map" / "use the compass" rhetorical distinction to the official page itself.
+- `SKILL.md`: `Workflow philosophy` now includes the official "organic" metaphor ("the way cells form a tissue") and the "finish and ship" reading of "one step at a time". The first makes the inside-out growth pattern explicit; the second closes the loop on the "small, responsive improvements" point — a step that is never shipped is not an improvement.
+- `SKILL.md`: `Tutorial` no longer asks for "a clear learning outcome" (the official tutorial page is explicit that "In this tutorial you will learn …" is presumptuous and recommends "we will create and deploy …" framing). The bullet is now "start with what the reader will do or build".
+- `SKILL.md`: `Tutorial` "Good signs" no longer includes `learn` as a trigger keyword. The other signals (`try`, `first time`, `hands-on`, `intro`, `walkthrough`) are all about the reader's stance and stay.
+- `SKILL.md`: the `Explanation` anti-pattern "No opinion. An explanation that does not commit to a perspective is just a summary" is now "No point of view or insight. An explanation that neither offers a perspective nor helps the reader form a new understanding is just a summary." The original wording made committing to a perspective a hard requirement, which the official page does not. Context-laying explanations that offer a frame without taking a position are still valid.
+
 ## [0.1.0] - 2026-06-02
 
 First tagged release. Includes the four rounds of changes accumulated since the previous unreleased state.
