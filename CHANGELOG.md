@@ -35,6 +35,14 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 - `SKILL.md`: the `Per-form final check` Explanation line still said "the author commits to a perspective" — a direct contradiction of the softened anti-pattern above. It now says "the author offers a point of view or insight", matching the new anti-pattern exactly. Caught during a follow-up review of the same Explanation guidance.
 
+### Bilingual and reference sync
+
+#### Changed
+
+- `README.md` and `README.zh-CN.md`: the `Workflow philosophy` / `工作流哲学` section is now in sync with `SKILL.md`. The English `Work one step at a time` bullet now says "finish and ship each one before starting the next"; the Chinese `一次只做一步` bullet now says "每步做完就发布，再开始下一步". The English `Diataxis changes the structure of your documentation from the inside` bullet now says "allow the work to develop organically and the structure will emerge"; the Chinese `Diataxis 从内部改变文档结构` bullet now says "让工作有机生长，结构会自然浮现". The README is the entry page for most readers, and the missing "ship" wording was a real gap — a step that is never shipped is not an improvement, and the constraint should appear on the entry page.
+- `references/doc-blueprints.md`: dropped the redundant `Learning goal` field from the Tutorial blueprint. The blueprint still has `What you will build or do` (a second-person planning field that the writer fills in with the same wording they will use in the output), and `Learning goal` was a near-duplicate that used the "learning" word SKILL.md has been moving away from. One field, no "learning", no redundancy.
+- `SKILL.md`: the `Mixed-doc smell test` line "A 'How-to' that begins with a learning outcome statement" is now "A 'How-to' that begins with 'In this tutorial you will learn…' or similar tutorial-style framing". The signal is the same; the wording now uses a concrete verbatim phrase instead of an abstract term that no longer appears in the positive guidance of this skill.
+
 ## [0.1.0] - 2026-06-02
 
 First tagged release. Includes the four rounds of changes accumulated since the previous unreleased state.

@@ -178,7 +178,7 @@ A page is probably mixing forms if it has two or more of:
 - Both narrative paragraphs **and** parameter tables in roughly equal weight
 - Both "Why we built it this way" framing **and** "Run this command" instructions
 - A "Tutorial" heading that includes optional branches or troubleshooting
-- A "How-to" that begins with a learning outcome statement
+- A "How-to" that begins with "In this tutorial you will learn…" or similar tutorial-style framing
 - A README longer than about 500 lines that tries to teach, instruct, list, and explain at once
 
 When a page trips the smell test, the right response is to **split it**, not to add headings.

@@ -172,8 +172,8 @@ Diataxis is meant to be used as a guide, not as a plan. The skill follows the of
 
 - **Use Diataxis as a guide, not a plan.** Apply the compass where you are, not where you wish you were.
 - **Do not worry about structure.** Focus on content quality. The structure emerges from the work.
-- **Work one step at a time.** Make small, responsive improvements. Do not plan a complete rewrite before starting.
-- **Diataxis changes the structure of your documentation from the inside.** It is not a template to impose on top of existing content.
+- **Work one step at a time.** Make small, responsive improvements; finish and ship each one before starting the next. Do not plan a complete rewrite before starting.
+- **Diataxis changes the structure of your documentation from the inside.** It is not a template to impose on top of existing content; allow the work to develop organically and the structure will emerge.
 
 In other words, a messy page that is honest about its content is better than a clean four-section site with nothing in three of the four sections.
 

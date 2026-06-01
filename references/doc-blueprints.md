@@ -5,7 +5,6 @@ Use these as starting structures. Adapt them to the reader and the product, but 
 ## Tutorial blueprint
 
 - Title
-- Learning goal
 - Audience
 - Prerequisites
 - What you will build or do
