@@ -1,0 +1,184 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  validate-evals:
+    name: Validate evals.json
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate evals.json structure
+        run: |
+          python - <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          path = Path("evals/evals.json")
+          data = json.loads(path.read_text(encoding="utf-8"))
+
+          required_top = {"skill_name", "evals"}
+          missing = required_top - set(data.keys())
+          assert not missing, f"Missing top-level fields: {missing}"
+
+          evals = data["evals"]
+          assert isinstance(evals, list), "evals must be a list"
+          assert len(evals) > 0, "evals must not be empty"
+
+          required_per_eval = {"id", "category", "prompt", "expected_output", "files"}
+          known_categories = {
+              "classification",
+              "per-form-writing",
+              "decision-framework",
+              "single-page-classification",
+              "mixed-form-detection",
+              "review",
+              "large-system",
+              "migration",
+              "adjacent-types",
+              "anti-pattern-avoidance",
+          }
+
+          seen_ids = set()
+          problems = []
+          for i, ev in enumerate(evals):
+              for field in required_per_eval:
+                  if field not in ev:
+                      problems.append(f"eval[{i}] missing field: {field}")
+              if "id" in ev:
+                  if ev["id"] in seen_ids:
+                      problems.append(f"duplicate id: {ev['id']}")
+                  seen_ids.add(ev["id"])
+              if "category" in ev and ev["category"] not in known_categories:
+                  problems.append(
+                      f"eval[{ev.get('id', i)}] unknown category: {ev['category']!r}"
+                  )
+              if "prompt" in ev and len(ev["prompt"].strip()) < 10:
+                  problems.append(f"eval[{ev.get('id', i)}] prompt is too short")
+              if "expected_output" in ev and len(ev["expected_output"].strip()) < 10:
+                  problems.append(f"eval[{ev.get('id', i)}] expected_output is too short")
+
+          if problems:
+              print("evals.json validation FAILED:")
+              for p in problems:
+                  print(f"  - {p}")
+              sys.exit(1)
+
+          print(f"evals.json OK: {len(evals)} evals across {len({e['category'] for e in evals})} categories")
+          PY
+
+  check-internal-links:
+    name: Check internal markdown links
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate internal links
+        run: |
+          python - <<'PY'
+          import re
+          import sys
+          from pathlib import Path
+
+          root = Path(".")
+          md_files = sorted(root.rglob("*.md"))
+          # Skip .git, node_modules, etc.
+          md_files = [p for p in md_files if ".git" not in p.parts]
+
+          link_re = re.compile(r"\[[^\]]*\]\((?!https?://|#|mailto:)([^)#]+?)(?:#[^)]*)?\)")
+          problems = []
+
+          for md in md_files:
+              text = md.read_text(encoding="utf-8")
+              for match in link_re.finditer(text):
+                  target = match.group(1).strip()
+                  if not target:
+                      continue
+                  # Resolve relative to the markdown file
+                  candidate = (md.parent / target).resolve()
+                  if not candidate.exists():
+                      problems.append(f"{md}: broken link to {target}")
+
+          if problems:
+              print("Internal link check FAILED:")
+              for p in problems:
+                  print(f"  - {p}")
+              sys.exit(1)
+
+          print(f"Internal link check OK: scanned {len(md_files)} markdown files")
+          PY
+
+  verify-structure:
+    name: Verify repository structure
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check required files
+        run: |
+          set -e
+          for f in SKILL.md README.md README.zh-CN.md LICENSE CHANGELOG.md CONTRIBUTING.md \
+                   evals/evals.json references/doc-blueprints.md references/reader-analysis.md \
+                   references/template-map.md assets/preview.svg; do
+            if [ ! -f "$f" ]; then
+              echo "Missing required file: $f"
+              exit 1
+            fi
+          done
+          echo "Repository structure OK"
+
+      - name: Check example files
+        run: |
+          set -e
+          for f in examples/messy-to-diataxis/README.md \
+                   examples/messy-to-diataxis/before.md \
+                   examples/messy-to-diataxis/after/01-tutorial.md \
+                   examples/messy-to-diataxis/after/02-how-to.md \
+                   examples/messy-to-diataxis/after/03-reference.md \
+                   examples/messy-to-diataxis/after/04-explanation.md; do
+            if [ ! -f "$f" ]; then
+              echo "Missing example file: $f"
+              exit 1
+            fi
+          done
+          echo "Example files OK"
+
+      - name: Check command files
+        run: |
+          set -e
+          for f in .opencode/commands/docs-classify.md \
+                   .opencode/commands/docs-split.md \
+                   .opencode/commands/docs-review.md \
+                   .opencode/commands/docs-audit.md \
+                   .opencode/commands/docs-quickstart.md; do
+            if [ ! -f "$f" ]; then
+              echo "Missing command file: $f"
+              exit 1
+            fi
+            # Each command must have frontmatter with name and description
+            head -n 5 "$f" | grep -q "^name:" || { echo "$f: missing name in frontmatter"; exit 1; }
+            head -n 5 "$f" | grep -q "^description:" || { echo "$f: missing description in frontmatter"; exit 1; }
+          done
+          echo "Command files OK"
