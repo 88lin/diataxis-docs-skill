@@ -1,29 +1,98 @@
-<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="1200" height="630" rx="32" fill="#0B1020"/>
-  <circle cx="1040" cy="120" r="180" fill="#2563EB" opacity="0.18"/>
-  <circle cx="170" cy="520" r="220" fill="#16A34A" opacity="0.14"/>
-  <rect x="72" y="64" width="1056" height="502" rx="28" fill="#111827" stroke="#334155" stroke-width="2"/>
-  <text x="108" y="132" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="42" font-weight="700">Diataxis Docs Skill</text>
-  <text x="108" y="176" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="22">A reusable Opencode skill for structured, user-first technical documentation.</text>
-  <g transform="translate(108 226)">
-    <rect width="450" height="116" rx="18" fill="#172033" stroke="#334155"/>
-    <text x="28" y="42" fill="#60A5FA" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700">Tutorial</text>
-    <text x="28" y="78" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="18">Learn by doing with a guided path</text>
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg" font-family="Inter, 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0B1120"/>
+      <stop offset="1" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="card-tutorial" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0E1F18"/>
+      <stop offset="1" stop-color="#0A1812"/>
+    </linearGradient>
+    <linearGradient id="card-howto" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1F1A0A"/>
+      <stop offset="1" stop-color="#181206"/>
+    </linearGradient>
+    <linearGradient id="card-explanation" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1B0F26"/>
+      <stop offset="1" stop-color="#150A1F"/>
+    </linearGradient>
+    <linearGradient id="card-reference" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0A1B26"/>
+      <stop offset="1" stop-color="#06141C"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle background accents -->
+  <circle cx="80" cy="80" r="220" fill="#10B981" opacity="0.04"/>
+  <circle cx="1120" cy="550" r="240" fill="#A855F7" opacity="0.04"/>
+
+  <!-- Faint grid -->
+  <g stroke="#1E293B" stroke-width="0.5" opacity="0.5">
+    <line x1="0" y1="100" x2="1200" y2="100"/>
+    <line x1="0" y1="200" x2="1200" y2="200"/>
+    <line x1="0" y1="300" x2="1200" y2="300"/>
+    <line x1="0" y1="400" x2="1200" y2="400"/>
+    <line x1="0" y1="500" x2="1200" y2="500"/>
   </g>
-  <g transform="translate(642 226)">
-    <rect width="450" height="116" rx="18" fill="#172033" stroke="#334155"/>
-    <text x="28" y="42" fill="#34D399" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700">How-to</text>
-    <text x="28" y="78" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="18">Complete a real-world task</text>
+
+  <!-- Header -->
+  <text x="600" y="58" text-anchor="middle" fill="#64748B" font-size="12" font-weight="700" letter-spacing="3">DIATAXIS DOCUMENTATION SKILL</text>
+  <text x="600" y="100" text-anchor="middle" fill="#F1F5F9" font-size="38" font-weight="700">The Compass</text>
+  <text x="600" y="132" text-anchor="middle" fill="#94A3B8" font-size="16">Two questions pick one form. Apply it to a sentence, a page, or a whole docs set.</text>
+
+  <!-- Top column labels -->
+  <text x="370" y="172" text-anchor="middle" fill="#94A3B8" font-size="11" font-weight="700" letter-spacing="3">ACQUISITION</text>
+  <text x="830" y="172" text-anchor="middle" fill="#94A3B8" font-size="11" font-weight="700" letter-spacing="3">APPLICATION</text>
+
+  <!-- Left row labels (rotated) -->
+  <text transform="rotate(-90 38 265)" x="38" y="265" text-anchor="middle" dominant-baseline="middle" fill="#94A3B8" font-size="11" font-weight="700" letter-spacing="3">ACTION</text>
+  <text transform="rotate(-90 38 435)" x="38" y="435" text-anchor="middle" dominant-baseline="middle" fill="#94A3B8" font-size="11" font-weight="700" letter-spacing="3">COGNITION</text>
+
+  <!-- Quadrant: Tutorial (action + acquisition) -->
+  <g transform="translate(120 195)">
+    <rect width="500" height="140" rx="14" fill="url(#card-tutorial)" stroke="#1E3A5F" stroke-width="1.5"/>
+    <rect x="0" y="0" width="4" height="140" rx="2" fill="#10B981"/>
+    <text x="28" y="44" fill="#10B981" font-size="11" font-weight="700" letter-spacing="3">TUTORIAL</text>
+    <text x="28" y="86" fill="#F1F5F9" font-size="28" font-weight="700">Learn by doing</text>
+    <text x="28" y="116" fill="#94A3B8" font-size="15">A guided lesson to a first success.</text>
   </g>
-  <g transform="translate(108 374)">
-    <rect width="450" height="116" rx="18" fill="#172033" stroke="#334155"/>
-    <text x="28" y="42" fill="#FBBF24" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700">Reference</text>
-    <text x="28" y="78" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="18">Look up exact facts and constraints</text>
+
+  <!-- Quadrant: How-to (action + application) -->
+  <g transform="translate(660 195)">
+    <rect width="500" height="140" rx="14" fill="url(#card-howto)" stroke="#5C3D0F" stroke-width="1.5"/>
+    <rect x="0" y="0" width="4" height="140" rx="2" fill="#F59E0B"/>
+    <text x="28" y="44" fill="#F59E0B" font-size="11" font-weight="700" letter-spacing="3">HOW-TO</text>
+    <text x="28" y="86" fill="#F1F5F9" font-size="28" font-weight="700">Solve a real task</text>
+    <text x="28" y="116" fill="#94A3B8" font-size="15">Practical steps to a working result.</text>
   </g>
-  <g transform="translate(642 374)">
-    <rect width="450" height="116" rx="18" fill="#172033" stroke="#334155"/>
-    <text x="28" y="42" fill="#F472B6" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700">Explanation</text>
-    <text x="28" y="78" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="18">Understand why and compare tradeoffs</text>
+
+  <!-- Quadrant: Explanation (cognition + acquisition) -->
+  <g transform="translate(120 365)">
+    <rect width="500" height="140" rx="14" fill="url(#card-explanation)" stroke="#3F1E5F" stroke-width="1.5"/>
+    <rect x="0" y="0" width="4" height="140" rx="2" fill="#A855F7"/>
+    <text x="28" y="44" fill="#A855F7" font-size="11" font-weight="700" letter-spacing="3">EXPLANATION</text>
+    <text x="28" y="86" fill="#F1F5F9" font-size="28" font-weight="700">Understand the why</text>
+    <text x="28" y="116" fill="#94A3B8" font-size="15">Context, tradeoffs, design history.</text>
   </g>
-  <text x="108" y="536" fill="#64748B" font-family="Segoe UI, Arial, sans-serif" font-size="18">Reader-first documentation • Diataxis framework • Good Docs Project inspired</text>
+
+  <!-- Quadrant: Reference (cognition + application) -->
+  <g transform="translate(660 365)">
+    <rect width="500" height="140" rx="14" fill="url(#card-reference)" stroke="#1E4F5F" stroke-width="1.5"/>
+    <rect x="0" y="0" width="4" height="140" rx="2" fill="#06B6D4"/>
+    <text x="28" y="44" fill="#06B6D4" font-size="11" font-weight="700" letter-spacing="3">REFERENCE</text>
+    <text x="28" y="86" fill="#F1F5F9" font-size="28" font-weight="700">Look up exact facts</text>
+    <text x="28" y="116" fill="#94A3B8" font-size="15">Neutral, structured descriptions.</text>
+  </g>
+
+  <!-- Center crosshairs to emphasize the 2x2 -->
+  <line x1="640" y1="200" x2="640" y2="500" stroke="#1E293B" stroke-width="1" opacity="0.6"/>
+  <line x1="125" y1="350" x2="1155" y2="350" stroke="#1E293B" stroke-width="1" opacity="0.6"/>
+
+  <!-- Footer -->
+  <text x="600" y="555" text-anchor="middle" fill="#94A3B8" font-size="14">"The compass can be applied equally to user situations that need documentation,</text>
+  <text x="600" y="576" text-anchor="middle" fill="#94A3B8" font-size="14">or to documentation itself that perhaps needs to be moved or improved."</text>
+  <text x="600" y="600" text-anchor="middle" fill="#475569" font-size="12" font-style="italic">— diataxis.fr/compass</text>
 </svg>

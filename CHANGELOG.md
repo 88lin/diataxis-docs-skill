@@ -7,6 +7,18 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+### Preview image refresh and tag normalization
+
+#### Changed
+
+- `assets/preview.svg`: regenerated. The preview is now an actual Diataxis compass — a 2x2 grid with the two axis labels (ACQUISITION / APPLICATION at the top, ACTION / COGNITION rotated on the left), the four forms placed in their correct compass cells (Tutorial = action + acquisition, How-to = action + application, Explanation = cognition + acquisition, Reference = cognition + application), the official compass quote, and a subtle cross-hair down the middle to make the structure explicit. Each card has a tinted background gradient and a colored left bar keyed to the form (green / amber / purple / cyan).
+- `examples/messy-to-diataxis/before.md`: replaced the non-standard `explanation-light` tags (and the related `troubleshooting` and `mixed entry point` labels) with the strict 4-form vocabulary. The convention is now: use one of `tutorial`, `how-to`, `reference`, `explanation` for a real Diataxis form; use `meta: <role>` for things that are not a form at all (page-level framing, scope notes, link farms). Final tag count: 4 forms + 4 `meta:` = 23 tags, zero non-standard labels.
+- `examples/messy-to-diataxis/README.md`: updated "How to read this example" and "Applying this to your own docs" to describe the form-or-`meta:` convention.
+
+## [0.1.0] - 2026-06-02
+
+First tagged release. Includes the four rounds of changes accumulated since the previous unreleased state.
+
 ### Frontmatter hygiene, decision-tree fix, and eval expansion
 
 #### Added
