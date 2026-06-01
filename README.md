@@ -401,6 +401,25 @@ CI is defined in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) and runs
 
 ---
 
+## Helper for Cursor and Cline users
+
+While this repository is structured specifically as an Opencode skill (using `.opencode/commands/` and Opencode-specific frontmatter), the core guidance in `SKILL.md` can also serve users of other AI coding assistants.
+
+We provide a helper script that extracts the body of `SKILL.md` (stripping the Opencode frontmatter) and writes it to `.cursorrules` and `.clinerules` in the current directory:
+
+```bash
+python scripts/export_rules.py
+```
+
+This will generate:
+
+- `.cursorrules` (for Cursor)
+- `.clinerules` (for Cline / Roo Code)
+
+Note: the script does not overwrite existing files. Diataxis is meant to be used as a guide, not a rigid plan, so feel free to adapt the generated rules file to your team's specific workflow.
+
+---
+
 ## FAQ
 
 **Q: Is this skill just a summary of the Diataxis website?**

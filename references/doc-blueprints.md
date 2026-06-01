@@ -4,14 +4,33 @@ Use these as starting structures. Adapt them to the reader and the product, but 
 
 ## Tutorial blueprint
 
-- Title
-- Audience
-- Prerequisites
-- What you will build or do
-- Steps
-- Checkpoints or expected results
-- Summary
-- Next steps
+**Goal:** Make the user feel successful.
+
+A Tutorial is a single linear path from "I have never done this" to "I just did this". Adapt the reader and the product, but do not introduce branches, alternatives, or deep explanation along the way.
+
+````markdown
+# [Action-oriented Title, e.g., Build your first X]
+
+## Introduction
+Briefly state what we will build or do. (Max 2 sentences).
+
+## Prerequisites
+- What they need installed.
+- What prior knowledge is assumed.
+
+## Step 1: [Action]
+Clear instruction.
+​```bash
+# exact command
+​```
+*Expected output:* [Show exactly what they should see].
+
+## Step 2: [Action]
+...
+
+## Summary
+What we achieved. Link to the **How-to** for real-world variations.
+````
 
 Rules:
 

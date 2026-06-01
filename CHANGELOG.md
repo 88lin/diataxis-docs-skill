@@ -49,6 +49,19 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 - `evals/evals.json`: eval #8's `expected_output` still said "An explanation that commits to a perspective …" — the old hard-requirement wording that the SKILL.md anti-pattern and final check were softened away from. It now says "offers a point of view or insight", matching the new anti-pattern and final check exactly. Caught by a content sweep after the Round 6 softening. The eval was the only place outside the changelog that still used the old wording.
 
+### Cross-IDE helper, trap evals, and Tutorial blueprint refresh
+
+#### Added
+
+- `scripts/export_rules.py`: a helper that reads `SKILL.md`, strips the Opencode-specific frontmatter, and writes the body to `.cursorrules` and `.clinerules` in the current working directory. Existing files are not overwritten. A short preamble (aligned with the "use as a guide, not a plan" philosophy, not the previous "strictly adhering" framing) is prepended so the rules file reads as a guide rather than a directive. This makes the core Diataxis guidance usable in Cursor and Cline / Roo Code workflows without turning the diataxis-docs-skill repo into a multi-IDE project.
+- `evals/evals.json`: two new `anti-pattern-avoidance` evals (#30 Quickstart on OAuth2, #31 Reference page that smuggles a 5-step bcrypt guide plus a "best practices" section). Both expected outputs use the soft "the AI should suggest splitting" wording, consistent with the project's "use the compass flexibly" stance. IDs are integers (30, 31) to match the existing 1-29 sequence.
+- `README.md` and `README.zh-CN.md`: new `Helper for Cursor and Cline users` / `给 Cursor 和 Cline 用户的辅助脚本` section explaining the export script. The README explicitly notes that the diataxis-docs-skill repo itself is an Opencode skill; the script is a *helper* for users of other AI coding assistants, not a claim that the skill is universally applicable as-is.
+
+#### Changed
+
+- `references/doc-blueprints.md`: the `Tutorial blueprint` is now a concrete markdown skeleton (Action-oriented title, Introduction that states what the reader will build or do, Prerequisites, numbered Steps with an inline bash block and an `*Expected output*` callout, Summary that links to the How-to for real-world variations) wrapped in a `**Goal:** Make the user feel successful` framing. The previous bullet-list form is replaced, not appended, so the file reads as a usable skeleton instead of a checklist. The other blueprints (How-to, Reference, Explanation) keep their existing bullet-list form for now; the Tutorial change is the only one that needed the "what the user will build or do" fix to align with the rest of the skill.
+- `scripts/check_local.py`: the `check_structure()` required-files list now includes `scripts/export_rules.py` so the helper cannot be deleted without the build failing.
+
 ## [0.1.0] - 2026-06-02
 
 First tagged release. Includes the four rounds of changes accumulated since the previous unreleased state.

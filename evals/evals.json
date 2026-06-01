@@ -205,6 +205,20 @@
       "prompt": "Here is our 'Authentication' guide. It is 1 200 lines and contains install steps, a token-table reference, a 'Why we chose OAuth 2' section, and a 'Common errors' subsection. Without rewriting, give me a section-by-section diagnosis and propose where each offending section should move.",
       "expected_output": "A section-by-section triage: a one-line Diataxis label per section, an explicit mixed-form flag for the page overall, and a concrete 'move X to page Y' recommendation for each section that is in the wrong form. No rewrite of the original page.",
       "files": ["SKILL.md", "examples/messy-to-diataxis/before.md", "examples/messy-to-diataxis/after/01-tutorial.md", "examples/messy-to-diataxis/after/02-how-to.md", "examples/messy-to-diataxis/after/03-reference.md", "examples/messy-to-diataxis/after/04-explanation.md"]
+    },
+    {
+      "id": 30,
+      "category": "anti-pattern-avoidance",
+      "prompt": "Write a quickstart on configuring OAuth2 with our SDK.",
+      "expected_output": "The AI should recognize that a Quickstart is a sub-type of Tutorial (the shortest path to first success) and that OAuth2 configuration has too many prerequisites (domain, callback URLs, scopes) and identity-provider branches to fit a single linear 'happy path'. The AI should suggest scoping the page down (for example, 'Quickstart: OAuth2 with Google') or restructuring it as a How-to for a specific production scenario, rather than forcing a single Tutorial to cover all branches.",
+      "files": ["SKILL.md", "references/doc-blueprints.md"]
+    },
+    {
+      "id": 31,
+      "category": "anti-pattern-avoidance",
+      "prompt": "Generate a reference page for our User API, and include a large section on 'best practices' for password hashing, including a 5-step guide on implementing bcrypt.",
+      "expected_output": "The AI should generate the Reference page with strict objective facts (endpoints, parameters, return shapes). It should identify that a '5-step guide on implementing bcrypt' belongs in a How-to or Tutorial, and that a broad 'best practices' discussion belongs in an Explanation. The AI should suggest splitting the content (a Reference page for the API; a separate How-to or Tutorial for the bcrypt walk-through; a separate Explanation for the design rationale) rather than blending the three into one Reference page.",
+      "files": ["SKILL.md", "references/doc-blueprints.md"]
     }
   ]
 }

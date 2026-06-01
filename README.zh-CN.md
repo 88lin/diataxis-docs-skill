@@ -409,6 +409,25 @@ CI 定义在 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)，对 `maste
 
 ---
 
+## 给 Cursor 和 Cline 用户的辅助脚本
+
+虽然这个仓库本身是按 Opencode skill 的结构组织的（用 `.opencode/commands/` 和 Opencode 专属的 frontmatter），但 `SKILL.md` 里的核心指导同样适用于其它 AI 编程助手。
+
+我们提供了一个辅助脚本，提取 `SKILL.md` 的正文部分（去掉 Opencode 专属的 frontmatter），写到当前目录下的 `.cursorrules` 和 `.clinerules`：
+
+```bash
+python scripts/export_rules.py
+```
+
+会生成：
+
+- `.cursorrules`（给 Cursor）
+- `.clinerules`（给 Cline / Roo Code）
+
+注意：脚本不会覆盖已存在的文件。Diataxis 是用作指南的，不是用作计划的，所以你可以按团队工作流自由调整生成的 rules 文件。
+
+---
+
 ## 常见问题
 
 **Q：这个 Skill 只是 Diataxis 网站的摘要吗？**

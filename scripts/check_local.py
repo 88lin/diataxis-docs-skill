@@ -129,6 +129,7 @@ def check_structure() -> list[str]:
         ".opencode/commands/docs-review.md",
         ".opencode/commands/docs-audit.md",
         ".opencode/commands/docs-quickstart.md",
+        "scripts/export_rules.py",
     ]
     problems = [f"missing: {p}" for p in required if not (ROOT / p).is_file()]
     if not problems:
