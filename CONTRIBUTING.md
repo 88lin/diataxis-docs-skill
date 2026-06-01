@@ -117,4 +117,4 @@ The three must match. If you change behaviour in a way that affects the contract
 
 ## Questions
 
-Open an issue if you are not sure whether a change fits the project.
+Open an issue if you are not sure whether a change fits the project. Use the templates in `.github/ISSUE_TEMPLATE/` (bug, feature, docs, or general question) and the PR template in `.github/PULL_REQUEST_TEMPLATE.md` so reviewers have what they need on the first read.

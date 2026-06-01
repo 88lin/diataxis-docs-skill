@@ -136,6 +136,46 @@ def check_structure() -> list[str]:
     return problems
 
 
+def check_skill_frontmatter() -> list[str]:
+    """Check that SKILL.md has a valid YAML frontmatter with name, version, description.
+
+    The frontmatter is the OpenCode entry point for the skill. A missing or
+    broken frontmatter silently disables the skill, so we fail the build if
+    the delimiters, fields, or values are wrong.
+    """
+    path = ROOT / "SKILL.md"
+    problems: list[str] = []
+    if not path.is_file():
+        return ["SKILL.md: file not found"]
+    text = path.read_text(encoding="utf-8")
+    if not text.startswith("---"):
+        problems.append("SKILL.md: missing opening --- frontmatter delimiter")
+        return problems
+    parts = text.split("---", 2)
+    if len(parts) < 3:
+        problems.append("SKILL.md: frontmatter not properly closed")
+        return problems
+
+    fm = parts[1].strip()
+    fields = {"name": "", "version": "", "description": ""}
+    for line in fm.splitlines():
+        for key in fields:
+            if line.startswith(f"{key}:"):
+                fields[key] = line[len(key) + 1 :].strip().strip('"').strip("'")
+                break
+
+    for key, value in fields.items():
+        if not value:
+            problems.append(f"SKILL.md: frontmatter missing or empty field: {key}")
+
+    if not problems:
+        print(
+            f"  SKILL.md frontmatter OK: name={fields['name']!r} "
+            f"version={fields['version']!r} description={len(fields['description'])} chars"
+        )
+    return problems
+
+
 def main() -> int:
     print("Running local checks...")
     all_problems: list[str] = []
@@ -143,6 +183,7 @@ def main() -> int:
         ("evals", check_evals),
         ("links", check_links),
         ("structure", check_structure),
+        ("frontmatter", check_skill_frontmatter),
     ]:
         all_problems.extend(fn())
 

@@ -8,7 +8,7 @@
 [![Skill: Opencode](https://img.shields.io/badge/Skill-Opencode-111827)](SKILL.md)
 [![Framework: Diataxis](https://img.shields.io/badge/Framework-Diataxis-2563eb)](https://diataxis.fr/)
 [![Docs: Good Docs Project](https://img.shields.io/badge/Templates-Good%20Docs%20Project-16a34a)](https://www.thegooddocsproject.dev/)
-[![Evals: 27](https://img.shields.io/badge/Evals-27-blueviolet)](evals/evals.json)
+[![Evals: 29](https://img.shields.io/badge/Evals-29-blueviolet)](evals/evals.json)
 [![GitHub stars](https://img.shields.io/github/stars/88lin/diataxis-docs-skill?style=social)](https://github.com/88lin/diataxis-docs-skill)
 
 [英文文档](README.md) · [Skill 文件](SKILL.md) · [文档蓝图](references/doc-blueprints.md) · [模板映射](references/template-map.md)
@@ -127,7 +127,7 @@
 
 这个 Skill 以 [Diataxis 罗盘](https://diataxis.fr/compass/) 为核心——一张只需要回答两个问题就能定位到唯一一种文档类型的真相表。
 
-| 如果内容是…… | …且服务用户的…… | …那么它一定属于…… |
+| 如果内容是…… | …且服务用户的…… | …那么它归入…… |
 | --- | --- | --- |
 | 指导行动 | 习得技能 | 教程 / Tutorial |
 | 指导行动 | 应用技能 | 操作指南 / How-to |
@@ -155,7 +155,7 @@
 │
 ├── 查询某个具体的事实、字段、命令或参数上限？  → Reference / 参考文档
 │
-└── 想理解为什么这样设计、怎么运作？  → Explanation / 解释说明
+└── 想理解为什么这样设计、怎么运作？            → Explanation / 解释说明
 ```
 
 这个 Skill 还内置了一个**反模式清单**，专门识别最容易踩的坑：把两到多种类型的内容混在同一页里。完整清单见 [`SKILL.md`](SKILL.md#anti-patterns-what-not-to-do)。

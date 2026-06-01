@@ -7,6 +7,30 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+### Frontmatter hygiene, decision-tree fix, and eval expansion
+
+#### Added
+
+- `evals/evals.json`: 2 new evals in the two highest-frequency categories — `classification` (#28, glossary placement) and `mixed-form-detection` (#29, 1 200-line Authentication guide). Suite is now 29 evals across 11 categories, with `classification` and `mixed-form-detection` at 3 each.
+- `evals/evals.json`: top-level `description` now explicitly states that for `non-trigger` evals `files` is empty because the skill must not read any reference files.
+- `scripts/check_local.py`: new `check_skill_frontmatter()` that verifies `SKILL.md` has an opening `---` delimiter, a closing `---` delimiter, and non-empty `name`, `version`, and `description` fields. Wired into `main()` alongside the other checks.
+- `.github/workflows/ci.yml`: new "Check SKILL.md frontmatter" step inside the `verify-structure` job, using the same logic as `check_skill_frontmatter()` so a broken frontmatter breaks CI before it can be merged.
+- `.github/ISSUE_TEMPLATE/`: four issue templates — `bug_report.md`, `feature_request.md`, `docs.md`, `question.md` — each with a YAML frontmatter that drives the GitHub picker.
+- `.github/PULL_REQUEST_TEMPLATE.md`: a short checklist-style PR template that requires `python scripts/check_local.py` to pass, requires bilingual parity, and reminds contributors to bump all three version sources together.
+
+#### Changed
+
+- `SKILL.md`: frontmatter `description` is now trigger-only. Removed the 10-item doc-type enumeration and the trailing "apply the compass flexibly / work one page at a time" workflow guidance, both of which duplicated body content and hurt trigger matching.
+- `SKILL.md`: `Core idea` collapsed from a 4-type list into a single sentence that points at the compass and the classification guide.
+- `SKILL.md`: `Large documentation systems` softened. "Inputs to gather" is now a single prose paragraph (the table was reading as a checklist). "Reference map" was renamed to "Common artifact patterns (for reference only)" and prefixed with a "Do not treat this as a backlog. Only produce artifacts the compass calls for." warning.
+- `SKILL.md`: `Quality checks` no longer duplicates the Mixed-doc smell test. The Quality Checks section now opens by pointing at the canonical smell test in [Anti-patterns: what NOT to do](#anti-patterns-what-not-to-do) instead of repeating the same checklist inline. Net: 478 -> 444 lines.
+- `README.md` and `README.zh-CN.md`: the `Quick decision tree` ASCII art now correctly shows Explanation as a sibling of Reference (same indentation as the other root branches), not as a sub-branch.
+- `README.zh-CN.md`: the compass table header changed from "那么它一定属于" to "那么它归入" to soften the mandatory tone and stay consistent with the workflow philosophy.
+
+#### Fixed
+
+- `SKILL.md`, `README.md`, `README.zh-CN.md`: the Quick decision tree ASCII art had a stray `│` on the line between Reference and Explanation that visually placed Explanation as a child of Reference. Both the stray rail and the alignment of the `→` arrow are now correct.
+
 ### Eval coverage, contributing guidance, and version pinning
 
 #### Added

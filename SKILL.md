@@ -1,7 +1,7 @@
 ---
 name: diataxis-docs
 version: 0.1.0
-description: "Use the Diataxis compass to write, restructure, split, classify, review, audit, or migrate technical documentation. Covers tutorials, how-to guides, reference, explanation, quickstarts, READMEs, troubleshooting, glossaries, release notes, and style guides. Trigger on prompts like write docs, organize docs, fix docs, split this page, classify this docs page, audit our docs site, migrate to Diataxis, review this draft, or design a documentation system for an SDK or API. Apply the compass flexibly to both new and existing content, and work one page at a time rather than imposing a top-down plan."
+description: "Apply the Diataxis compass to write, restructure, split, classify, review, audit, or migrate technical documentation. Trigger on requests like write docs, organize docs, fix docs, split this page, classify this docs page, audit our docs site, migrate to Diataxis, review this draft, or design a documentation system for an SDK or API."
 ---
 
 # Diataxis Documentation Skill
@@ -10,19 +10,7 @@ Use this skill to turn a documentation request into the right document type, wit
 
 ## Core idea
 
-Diataxis separates documentation by two questions:
-
-- Is the content about action or cognition?
-- Is the reader acquiring skill or applying skill?
-
-That yields four primary forms:
-
-- Tutorial: action + acquisition
-- How-to: action + application
-- Reference: cognition + application
-- Explanation: cognition + acquisition
-
-Use the distinction first. Do not start by outlining sections.
+Diataxis separates documentation by two questions — action or cognition, and acquiring or applying skill — and yields four primary forms: tutorial, how-to, reference, explanation. See the compass below for the canonical tool, and [Classification guide](#classification-guide) for the per-form writing details.
 
 ## The Diataxis compass
 
@@ -74,7 +62,7 @@ What is the reader trying to do right now?
 │
 ├── Looking up an exact fact, field, command, or limit? → Reference
 │
-└── Trying to understand why or how it works?        → Explanation
+└── Trying to understand why or how it works?            → Explanation
 ```
 
 If the request hits more than one branch, split it into multiple documents rather than blending them. The same questions can be applied to existing pages: when a page's content disagrees with its current form, the page needs to be moved, not relabelled.
@@ -243,20 +231,11 @@ When the user asks for a full documentation system, SDK docs, API docs, develope
 
 ### Inputs to gather, but only what is needed
 
-Ask only what you need to start. The compass does the rest.
+Before starting, confirm what you actually need: source material (API spec, source code, existing docs, product notes), audience (beginners, experienced developers, admins, support, partners, non-technical users), platform preference (plain Markdown, Docusaurus, ReadTheDocs, Mintlify, GitBook, static site, repo docs), style constraints (brand voice, terminology, localization, accessibility, formatting rules), code examples (languages, runnable snippets, SDK samples, CLI examples, sample repositories), and lifecycle needs (versioning, search, navigation, release notes, changelog, deprecation policy). Ask only what is needed right now; the compass does the rest.
 
-| Category | Items to confirm |
-| --- | --- |
-| Source material | API spec, source code, existing docs, product notes, screenshots, transcripts |
-| Audience profiles | Beginners, experienced developers, admins, support, partners, non-technical users |
-| Platform preference | Plain Markdown, Docusaurus, ReadTheDocs, Mintlify, GitBook, static site, repo docs |
-| Style constraints | Brand voice, terminology, localization, accessibility, formatting rules |
-| Code examples | Languages, runnable snippets, SDK samples, CLI examples, sample repositories |
-| Lifecycle needs | Versioning, search, navigation, release notes, changelog, deprecation policy |
+### Common artifact patterns (for reference only)
 
-### Reference map (not a checklist)
-
-The map below shows the common artifact types and their compass cell. Use it as a reference, not as a list to be ticked off.
+Do not treat this as a backlog. Only produce artifacts the compass calls for.
 
 | Artifact | Compass cell | Purpose |
 | --- | --- | --- |
@@ -418,7 +397,7 @@ If the user asks for:
 
 ## Quality checks
 
-Before finishing, run both the **intent check** and the **smell test**.
+Before finishing, run both the **intent check** and the **smell test** (see [Mixed-doc smell test](#mixed-doc-smell-test) above for the full list of signals).
 
 ### Intent check
 
@@ -428,18 +407,6 @@ Before finishing, run both the **intent check** and the **smell test**.
 - Did I keep the document focused on one need?
 - Did I avoid unnecessary structure at the top level?
 - Did I leave room for linked companion documents?
-
-### Mixed-doc smell test
-
-If two or more of the following are true, split the document before publishing:
-
-- The page has both a "Background" or "Concepts" section and a "Steps" or "Procedure" section.
-- Narrative paragraphs and parameter tables carry roughly equal weight.
-- The page explains why something works and also tells the reader to run specific commands.
-- The page uses a tutorial framing (learning outcomes, "let's", encouraging tone) for a task-driven audience.
-- The page uses a how-to framing (imperative steps) for a beginner audience that needs a guided lesson.
-- The page uses a reference framing (tables, parameter lists) for an audience that needs motivation or context.
-- The page is longer than the reader's patience for that form (for example, a 2 000-line README).
 
 ### Per-form final check
 

@@ -1,7 +1,7 @@
 {
   "skill_name": "diataxis-docs",
   "version": "0.1.0",
-  "description": "Sample evaluation prompts for checking whether the diataxis-docs skill behaves as expected. Each eval targets a specific decision the skill must make well: classification, mixed-form detection, per-form writing, review, large-system planning, migration, adjacent doc types, anti-pattern avoidance, and explicit non-trigger cases. The `files` field lists the references inside this repo that back the expected output. The `non-trigger` category is intentionally negative: the skill must decline or stay silent on these prompts.",
+  "description": "Sample evaluation prompts for checking whether the diataxis-docs skill behaves as expected. Each eval targets a specific decision the skill must make well: classification, mixed-form detection, per-form writing, review, large-system planning, migration, adjacent doc types, anti-pattern avoidance, and explicit non-trigger cases. The `files` field lists the references inside this repo that back the expected output. The `non-trigger` category is intentionally negative: the skill must decline or stay silent on these prompts. For `non-trigger` evals, `files` is empty because the skill must not read any reference files.",
   "evals": [
     {
       "id": 1,
@@ -190,6 +190,20 @@
       "category": "migration",
       "prompt": "Our existing docs are 60 Markdown files in a single /docs folder, none of them tagged by form. Give me a 5-step migration plan that does not require re-reading every file at once.",
       "expected_output": "A 5-step iterative plan, for example: (1) rank pages by traffic, (2) classify only the top 10, (3) split the mixed ones, (4) tag and link, (5) repeat. The plan should be honest about doing this in waves, not all at once.",
+      "files": ["SKILL.md", "examples/messy-to-diataxis/before.md", "examples/messy-to-diataxis/after/01-tutorial.md", "examples/messy-to-diataxis/after/02-how-to.md", "examples/messy-to-diataxis/after/03-reference.md", "examples/messy-to-diataxis/after/04-explanation.md"]
+    },
+    {
+      "id": 28,
+      "category": "classification",
+      "prompt": "Glossary pages are often the most contested form in a docs site. Where does a glossary belong in Diataxis, and what is the trade-off of placing it under reference versus explanation?",
+      "expected_output": "A position that places glossary primarily under reference (cognition + application: the reader is working and needs to look up a term), names the trade-off (entries that carry design history bleed into explanation), and ends with a one-sentence practical rule for when to split a glossary entry into a separate explanation page.",
+      "files": ["SKILL.md", "references/template-map.md"]
+    },
+    {
+      "id": 29,
+      "category": "mixed-form-detection",
+      "prompt": "Here is our 'Authentication' guide. It is 1 200 lines and contains install steps, a token-table reference, a 'Why we chose OAuth 2' section, and a 'Common errors' subsection. Without rewriting, give me a section-by-section diagnosis and propose where each offending section should move.",
+      "expected_output": "A section-by-section triage: a one-line Diataxis label per section, an explicit mixed-form flag for the page overall, and a concrete 'move X to page Y' recommendation for each section that is in the wrong form. No rewrite of the original page.",
       "files": ["SKILL.md", "examples/messy-to-diataxis/before.md", "examples/messy-to-diataxis/after/01-tutorial.md", "examples/messy-to-diataxis/after/02-how-to.md", "examples/messy-to-diataxis/after/03-reference.md", "examples/messy-to-diataxis/after/04-explanation.md"]
     }
   ]

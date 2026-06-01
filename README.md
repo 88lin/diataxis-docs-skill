@@ -8,7 +8,7 @@
 [![Skill: Opencode](https://img.shields.io/badge/Skill-Opencode-111827)](SKILL.md)
 [![Framework: Diataxis](https://img.shields.io/badge/Framework-Diataxis-2563eb)](https://diataxis.fr/)
 [![Docs: Good Docs Project](https://img.shields.io/badge/Templates-Good%20Docs%20Project-16a34a)](https://www.thegooddocsproject.dev/)
-[![Evals: 27](https://img.shields.io/badge/Evals-27-blueviolet)](evals/evals.json)
+[![Evals: 29](https://img.shields.io/badge/Evals-29-blueviolet)](evals/evals.json)
 [![GitHub stars](https://img.shields.io/github/stars/88lin/diataxis-docs-skill?style=social)](https://github.com/88lin/diataxis-docs-skill)
 
 [Chinese](README.zh-CN.md) · [Skill file](SKILL.md) · [Blueprints](references/doc-blueprints.md) · [Template map](references/template-map.md)
@@ -147,7 +147,7 @@ What is the reader trying to do right now?
 │
 ├── Looking up an exact fact, field, command, or limit? → Reference
 │
-└── Trying to understand why or how it works?        → Explanation
+└── Trying to understand why or how it works?            → Explanation
 ```
 
 The skill also ships an **anti-patterns checklist** that flags the most common failure mode: a single page that mixes two or more of these forms. The full checklist is in [`SKILL.md`](SKILL.md#anti-patterns-what-not-to-do).

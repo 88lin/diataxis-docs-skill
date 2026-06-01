@@ -183,3 +183,36 @@ jobs:
             head -n 5 "$f" | grep -q "^description:" || { echo "$f: missing description in frontmatter"; exit 1; }
           done
           echo "Command files OK"
+
+      - name: Check SKILL.md frontmatter
+        run: |
+          set -e
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          import sys
+
+          path = Path("SKILL.md")
+          if not path.is_file():
+              print("SKILL.md: file not found")
+              sys.exit(1)
+          text = path.read_text(encoding="utf-8")
+          if not text.startswith("---"):
+              print("SKILL.md: missing opening --- frontmatter delimiter")
+              sys.exit(1)
+          parts = text.split("---", 2)
+          if len(parts) < 3:
+              print("SKILL.md: frontmatter not properly closed")
+              sys.exit(1)
+          fm = parts[1].strip()
+          problems = []
+          for field in ("name", "version", "description"):
+              match = re.search(rf"^{re.escape(field)}:\s*(.+)$", fm, re.MULTILINE)
+              if not match or not match.group(1).strip().strip('"').strip("'"):
+                  problems.append(f"SKILL.md: frontmatter missing or empty field: {field}")
+          if problems:
+              for p in problems:
+                  print(p)
+              sys.exit(1)
+          print("SKILL.md frontmatter OK")
+          PY
