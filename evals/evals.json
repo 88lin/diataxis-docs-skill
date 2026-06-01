@@ -56,7 +56,7 @@
       "id": 8,
       "category": "per-form-writing",
       "prompt": "Write an explanation article about why we chose eventual consistency over strong consistency in our sync engine. The reader is a backend engineer who is evaluating whether to adopt the product.",
-      "expected_output": "An explanation that commits to a perspective, discusses tradeoffs, history, and alternatives, and deliberately contains no step-by-step instructions.",
+      "expected_output": "An explanation that offers a point of view or insight, discusses tradeoffs, history, and alternatives, and deliberately contains no step-by-step instructions.",
       "files": ["SKILL.md", "references/doc-blueprints.md"]
     },
     {

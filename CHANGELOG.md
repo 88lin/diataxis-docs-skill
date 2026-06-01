@@ -43,6 +43,12 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - `references/doc-blueprints.md`: dropped the redundant `Learning goal` field from the Tutorial blueprint. The blueprint still has `What you will build or do` (a second-person planning field that the writer fills in with the same wording they will use in the output), and `Learning goal` was a near-duplicate that used the "learning" word SKILL.md has been moving away from. One field, no "learning", no redundancy.
 - `SKILL.md`: the `Mixed-doc smell test` line "A 'How-to' that begins with a learning outcome statement" is now "A 'How-to' that begins with 'In this tutorial you will learn…' or similar tutorial-style framing". The signal is the same; the wording now uses a concrete verbatim phrase instead of an abstract term that no longer appears in the positive guidance of this skill.
 
+### Eval wording alignment
+
+#### Fixed
+
+- `evals/evals.json`: eval #8's `expected_output` still said "An explanation that commits to a perspective …" — the old hard-requirement wording that the SKILL.md anti-pattern and final check were softened away from. It now says "offers a point of view or insight", matching the new anti-pattern and final check exactly. Caught by a content sweep after the Round 6 softening. The eval was the only place outside the changelog that still used the old wording.
+
 ## [0.1.0] - 2026-06-02
 
 First tagged release. Includes the four rounds of changes accumulated since the previous unreleased state.
