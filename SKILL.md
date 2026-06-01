@@ -1,5 +1,6 @@
 ---
 name: diataxis-docs
+version: 0.1.0
 description: "Use the Diataxis compass to write, restructure, split, classify, review, audit, or migrate technical documentation. Covers tutorials, how-to guides, reference, explanation, quickstarts, READMEs, troubleshooting, glossaries, release notes, and style guides. Trigger on prompts like write docs, organize docs, fix docs, split this page, classify this docs page, audit our docs site, migrate to Diataxis, review this draft, or design a documentation system for an SDK or API. Apply the compass flexibly to both new and existing content, and work one page at a time rather than imposing a top-down plan."
 ---
 

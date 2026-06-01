@@ -8,7 +8,7 @@
 [![Skill: Opencode](https://img.shields.io/badge/Skill-Opencode-111827)](SKILL.md)
 [![Framework: Diataxis](https://img.shields.io/badge/Framework-Diataxis-2563eb)](https://diataxis.fr/)
 [![Docs: Good Docs Project](https://img.shields.io/badge/Templates-Good%20Docs%20Project-16a34a)](https://www.thegooddocsproject.dev/)
-[![Evals: 14](https://img.shields.io/badge/Evals-14-blueviolet)](evals/evals.json)
+[![Evals: 27](https://img.shields.io/badge/Evals-27-blueviolet)](evals/evals.json)
 [![GitHub stars](https://img.shields.io/github/stars/88lin/diataxis-docs-skill?style=social)](https://github.com/88lin/diataxis-docs-skill)
 
 [英文文档](README.md) · [Skill 文件](SKILL.md) · [文档蓝图](references/doc-blueprints.md) · [模板映射](references/template-map.md)
@@ -153,7 +153,7 @@
 │   ├── 一般任务，目标是明确的       → How-to / 操作指南
 │   └── 卡在某个错误上               → Troubleshooting / 故障排查
 │
-├── 查询某个具体的事实、字段、命令？  → Reference / 参考文档
+├── 查询某个具体的事实、字段、命令或参数上限？  → Reference / 参考文档
 │
 └── 想理解为什么这样设计、怎么运作？  → Explanation / 解释说明
 ```

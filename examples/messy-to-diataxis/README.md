@@ -24,7 +24,8 @@ A common failure mode is "we have one big Getting Started page that does everyth
 
 ## How to read this example
 
-- Start with `before.md` and mark which paragraphs feel like teaching, which feel like task steps, which feel like a parameter table, and which feel like background.
+- Open `before.md` **in source view** — each top-level section (and many sub-sections) carries an HTML comment of the form `<!-- diataxis: <form> -->` that tags it with the form it currently belongs to. The comment is invisible in the rendered Markdown, so the page still reads as a normal doc, but every section is already labelled.
+- Use those tags to see exactly which sections need to move. The "What just happened" block inside the tutorial, the "Why we built QuokkaDB" section, the parameter table, the error-code table, the troubleshooting list, and the how-to recipe cluster all have different forms and end up in different files.
 - Then read `after/01-tutorial.md` to `after/04-explanation.md` in order and confirm each one is single-purpose.
 - Compare the totals. The split version is similar in length overall, but each page is focused and easy to scan.
 
@@ -32,7 +33,7 @@ A common failure mode is "we have one big Getting Started page that does everyth
 
 Use the same procedure on any page that fails the smell test:
 
-1. Open the page and tag each section as tutorial, how-to, reference, or explanation.
+1. Open the page in source view and tag each section as tutorial, how-to, reference, or explanation. The convention in this example is a single HTML comment, `<!-- diataxis: <form> -->`, at the start of the section. Pick a convention that survives a Markdown render and is easy to grep for.
 2. Group sections by tag.
 3. For each group, write a new page using the matching blueprint from `references/doc-blueprints.md`.
 4. Replace the original with a short overview page that links to the four.

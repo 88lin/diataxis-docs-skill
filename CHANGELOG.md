@@ -7,6 +7,26 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+### Eval coverage, contributing guidance, and version pinning
+
+#### Added
+
+- `evals/evals.json`: new `non-trigger` category with 4 negative evals (marketing copy, code debugging, translation, generic explanation) so the skill is tested for what it should refuse as well as what it should do.
+- `evals/evals.json`: 7 new positive evals in previously under-represented categories (decision-framework, single-page-classification, mixed-form-detection, review, large-system, adjacent-types, anti-pattern-avoidance), plus 1 extra in `classification` and 1 extra in `migration`, bringing the suite from 14 to 27 evals across 11 categories.
+- `evals/evals.json`: every non-trigger eval now has `files: []` and the schema description explains that this is the only case where an empty list is correct.
+- `SKILL.md`: frontmatter `version: 0.1.0` so the skill has a single, machine-readable version.
+- `CONTRIBUTING.md`: full rewrite with sections on good contributions, local validation, adding/editing evals (including the `non-trigger` category and the `files` convention), adding/editing slash commands, style, and a `Versioning and releasing` section that pins `SKILL.md`, `evals/evals.json`, and the CHANGELOG to the same version.
+- `examples/messy-to-diataxis/before.md`: every top-level section (and most sub-sections) is now tagged with an HTML comment of the form `<!-- diataxis: <form> -->` so new contributors can see the form of each block in source view.
+- `examples/messy-to-diataxis/README.md`: updated the "How to read this example" and "Applying this to your own docs" sections to describe the HTML-comment annotation convention.
+
+#### Changed
+
+- `evals/evals.json`: top-level `version` changed from `1.1.0` to `0.1.0` to match `SKILL.md` frontmatter. Both will move in lockstep on future releases.
+- `evals/evals.json`: every eval now has a populated `files` field listing the references inside the repo that back its expected output. `non-trigger` evals are the only ones with `files: []`.
+- `scripts/check_local.py` and `.github/workflows/ci.yml`: `known_categories` whitelist extended to include `non-trigger`.
+- `README.md` and `README.zh-CN.md`: the `Evals: 14` badge is now `Evals: 27`, and the `Quick decision tree` text in the English README now matches `SKILL.md` exactly (`Acquiring a new skill from scratch?`, `... field, command, or limit?`). The Chinese README's reference branch is extended to `事实、字段、命令或参数上限` for parity.
+- `CHANGELOG.md`: the previously noted `Evals: 14` badge entry is now obsolete; the new entry above supersedes it.
+
 ### Align SKILL.md with the official Diataxis compass
 
 #### Added
@@ -33,7 +53,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - `SKILL.md`: new `Anti-patterns: what NOT to do` section covering the four cardinal sins, per-form anti-patterns, a mixed-doc smell test, README-specific anti-patterns, and adjacent-type anti-patterns.
 - `SKILL.md`: new `Per-form final check` list in `Quality checks` for the four primary forms.
 - `SKILL.md`: `Large documentation systems` section restructured into a layered deliverable: an inputs table, an output-artifacts table mapped to Diataxis forms, per-platform notes, and a 5-step decision flow.
-- `README.md` and `README.zh-CN.md`: new `Evals: 14` badge so the eval count is visible at a glance.
+- `README.md` and `README.zh-CN.md`: new eval-count badge so the eval count is visible at a glance (set to `Evals: 14` at the time; later bumped to `Evals: 27` when the negative-eval pass landed).
 - `README.md` and `README.zh-CN.md`: new `When NOT to use this skill` (English) / `不适合用在什么场景` (Chinese) section.
 - `README.md` and `README.zh-CN.md`: new `Quick decision tree` subsection inside `How it works` / `核心工作方式`.
 - `README.md` and `README.zh-CN.md`: new `How this skill differs from generic writing help` / `它和普通写作助手有什么不同` comparison table.

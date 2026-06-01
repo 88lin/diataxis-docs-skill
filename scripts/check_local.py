@@ -49,6 +49,7 @@ def check_evals() -> list[str]:
         "migration",
         "adjacent-types",
         "anti-pattern-avoidance",
+        "non-trigger",
     }
 
     seen_ids: set[int] = set()
