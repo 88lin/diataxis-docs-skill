@@ -62,6 +62,13 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - `references/doc-blueprints.md`: the `Tutorial blueprint` is now a concrete markdown skeleton (Action-oriented title, Introduction that states what the reader will build or do, Prerequisites, numbered Steps with an inline bash block and an `*Expected output*` callout, Summary that links to the How-to for real-world variations) wrapped in a `**Goal:** Make the user feel successful` framing. The previous bullet-list form is replaced, not appended, so the file reads as a usable skeleton instead of a checklist. The other blueprints (How-to, Reference, Explanation) keep their existing bullet-list form for now; the Tutorial change is the only one that needed the "what the user will build or do" fix to align with the rest of the skill.
 - `scripts/check_local.py`: the `check_structure()` required-files list now includes `scripts/export_rules.py` so the helper cannot be deleted without the build failing.
 
+### Universal AI IDE Integration (9 targets)
+
+#### Changed
+
+- `scripts/export_rules.py`: expanded from 2 targets to 9. The new list covers Cursor (legacy + new rules), Cline, Roo Code, Windsurf, GitHub Copilot, Claude Code, OpenAI Codex, and Aider. The script creates parent directories on demand (e.g., `.github/`, `.cursor/rules/`) with `exist_ok=True` to avoid a benign race when the directory was just created by another process. Existing rule files are still never overwritten; the script prints a skip message and moves on.
+- `README.md` and `README.zh-CN.md`: the `Helper for Cursor and Cline users` section is replaced with `Universal AI IDE Integration` / `跨 AI IDE 集成`. The "universally applicable" framing is softened to "portable to other AI coding assistants, though each tool has its own conventions and you may want to adapt the file format to fit your stack". The "automatically formats and places" wording is corrected to "automatically writes the Diataxis rules to the standard rule-file path" — the script does not actually format differently per tool, it writes the same body to each target. The new section closes with a `Tool-specific notes` / `工具适配说明` subsection that honestly documents the two cases where users have to do something after running the script: Cursor new rules and Roo Code work better with a `description:` YAML frontmatter that the script does not add, and Aider requires `CONVENTIONS.md` to be added to the `read:` list in `.aider.conf.yml` to be loaded.
+
 ## [0.1.0] - 2026-06-02
 
 First tagged release. Includes the four rounds of changes accumulated since the previous unreleased state.

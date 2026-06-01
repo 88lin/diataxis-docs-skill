@@ -401,22 +401,48 @@ CI is defined in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) and runs
 
 ---
 
-## Helper for Cursor and Cline users
+## Universal AI IDE Integration
 
-While this repository is structured specifically as an Opencode skill (using `.opencode/commands/` and Opencode-specific frontmatter), the core guidance in `SKILL.md` can also serve users of other AI coding assistants.
+While this repository is structured specifically as an Opencode skill, the core Diataxis guidance in `SKILL.md` is portable to other AI coding assistants, though each tool has its own conventions and you may want to adapt the file format to fit your stack.
 
-We provide a helper script that extracts the body of `SKILL.md` (stripping the Opencode frontmatter) and writes it to `.cursorrules` and `.clinerules` in the current directory:
+The modern AI coding ecosystem is fragmented. To help you enforce Diátaxis standards across your team's preferred tools, we provide a universal export script that automatically writes the Diataxis rules to the standard rule-file path for **9 major AI assistants**:
+
+| AI Tool | Target File / Path |
+| :--- | :--- |
+| **Cursor** | `.cursorrules` / `.cursor/rules/diataxis.md` |
+| **Cline / Roo Code** | `.clinerules` / `.roo/rules/diataxis.md` |
+| **Windsurf** | `.windsurfrules` |
+| **GitHub Copilot** | `.github/copilot-instructions.md` |
+| **Claude Code** | `CLAUDE.md` |
+| **OpenAI Codex** | `AGENTS.md` |
+| **Aider** | `CONVENTIONS.md` |
+
+Run the helper script to generate the files for your specific stack:
 
 ```bash
 python scripts/export_rules.py
 ```
 
-This will generate:
+*Note: The script is safe to run in existing projects. It will automatically create necessary hidden directories (like `.github/`) but will **never overwrite** existing rule files.*
 
-- `.cursorrules` (for Cursor)
-- `.clinerules` (for Cline / Roo Code)
+### Tool-specific notes
 
-Note: the script does not overwrite existing files. Diataxis is meant to be used as a guide, not a rigid plan, so feel free to adapt the generated rules file to your team's specific workflow.
+The export script writes the core guidance to the standard paths, but some tools require minor manual adjustments to fully integrate the rules:
+
+- **Cursor (New Rules) & Roo Code:** These tools work best when rule files (like `.cursor/rules/diataxis.md` or `.roo/rules/diataxis.md`) include a `description:` field in their YAML frontmatter. Consider adding the following to the very top of the generated files:
+
+  ```yaml
+  ---
+  description: Diataxis documentation guidelines
+  ---
+  ```
+
+- **Aider:** Generating `CONVENTIONS.md` is only the first step. You must explicitly instruct Aider to load it by adding the file to the `read:` list in your `.aider.conf.yml`:
+
+  ```yaml
+  read:
+    - CONVENTIONS.md
+  ```
 
 ---
 

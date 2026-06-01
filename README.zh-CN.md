@@ -409,22 +409,48 @@ CI 定义在 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)，对 `maste
 
 ---
 
-## 给 Cursor 和 Cline 用户的辅助脚本
+## 跨 AI IDE 集成
 
-虽然这个仓库本身是按 Opencode skill 的结构组织的（用 `.opencode/commands/` 和 Opencode 专属的 frontmatter），但 `SKILL.md` 里的核心指导同样适用于其它 AI 编程助手。
+虽然这个仓库本身是按 Opencode skill 的结构组织的，但 `SKILL.md` 里的核心 Diataxis 指导可以移植到其它 AI 编程助手——不过每个工具都有自己的约定，你可能需要按所选工具的格式做一点适配。
 
-我们提供了一个辅助脚本，提取 `SKILL.md` 的正文部分（去掉 Opencode 专属的 frontmatter），写到当前目录下的 `.cursorrules` 和 `.clinerules`：
+现代 AI 编程生态很碎片化。为了让你能在团队偏好的工具里贯彻 Diátaxis 标准，我们提供了一个通用导出脚本，自动把 Diataxis 规则写到 **9 个主流 AI 助手**的标准 rules 文件路径：
+
+| AI 工具 | 目标文件 / 路径 |
+| :--- | :--- |
+| **Cursor** | `.cursorrules` / `.cursor/rules/diataxis.md` |
+| **Cline / Roo Code** | `.clinerules` / `.roo/rules/diataxis.md` |
+| **Windsurf** | `.windsurfrules` |
+| **GitHub Copilot** | `.github/copilot-instructions.md` |
+| **Claude Code** | `CLAUDE.md` |
+| **OpenAI Codex** | `AGENTS.md` |
+| **Aider** | `CONVENTIONS.md` |
+
+按你团队使用的工具栈跑脚本即可：
 
 ```bash
 python scripts/export_rules.py
 ```
 
-会生成：
+*注：脚本对已有项目是安全的——会自动创建必要的隐藏目录（比如 `.github/`），但**绝不覆盖**已有的 rules 文件。*
 
-- `.cursorrules`（给 Cursor）
-- `.clinerules`（给 Cline / Roo Code）
+### 工具适配说明
 
-注意：脚本不会覆盖已存在的文件。Diataxis 是用作指南的，不是用作计划的，所以你可以按团队工作流自由调整生成的 rules 文件。
+脚本会把核心指导写到标准路径，但有几个工具还需要做一点手动调整才能完整生效：
+
+- **Cursor (New Rules) 和 Roo Code**：这两个工具在 rules 文件（`.cursor/rules/diataxis.md` 或 `.roo/rules/diataxis.md`）里带 `description:` 字段的 YAML frontmatter 时效果最好。建议在生成的文件最顶部加上：
+
+  ```yaml
+  ---
+  description: Diataxis documentation guidelines
+  ---
+  ```
+
+- **Aider**：生成 `CONVENTIONS.md` 只是第一步，还必须在 `.aider.conf.yml` 的 `read:` 列表里显式加入这个文件，Aider 才会加载它：
+
+  ```yaml
+  read:
+    - CONVENTIONS.md
+  ```
 
 ---
 
