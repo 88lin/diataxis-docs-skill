@@ -69,6 +69,18 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - `scripts/export_rules.py`: expanded from 2 targets to 9. The new list covers Cursor (legacy + new rules), Cline, Roo Code, Windsurf, GitHub Copilot, Claude Code, OpenAI Codex, and Aider. The script creates parent directories on demand (e.g., `.github/`, `.cursor/rules/`) with `exist_ok=True` to avoid a benign race when the directory was just created by another process. Existing rule files are still never overwritten; the script prints a skip message and moves on.
 - `README.md` and `README.zh-CN.md`: the `Helper for Cursor and Cline users` section is replaced with `Universal AI IDE Integration` / `跨 AI IDE 集成`. The "universally applicable" framing is softened to "portable to other AI coding assistants, though each tool has its own conventions and you may want to adapt the file format to fit your stack". The "automatically formats and places" wording is corrected to "automatically writes the Diataxis rules to the standard rule-file path" — the script does not actually format differently per tool, it writes the same body to each target. The new section closes with a `Tool-specific notes` / `工具适配说明` subsection that honestly documents the two cases where users have to do something after running the script: Cursor new rules and Roo Code work better with a `description:` YAML frontmatter that the script does not add, and Aider requires `CONVENTIONS.md` to be added to the `read:` list in `.aider.conf.yml` to be loaded.
 
+### README and Installation sync
+
+#### Fixed
+
+- `README.md` and `README.zh-CN.md`: the `Repository structure` tree was missing `scripts/export_rules.py` even though the script and its README section were added in the previous round. Added the missing line to both files' directory trees.
+- `README.md` and `README.zh-CN.md`: the `Installation` / `安装方式` `Option 2` JSON example used `/path/to/diataxis-docs-skill` while `Option 1` used `~/.config/opencode/skills/diataxis-docs`. The two paths disagreed; a contributor copy-pasting both would have ended up with a config that does not match the clone. Aligned the JSON example to use the same `~/.config/opencode/skills/diataxis-docs` path so the two options now agree end to end.
+- `README.md` and `README.zh-CN.md`: the FAQ "How is the skill evaluated?" answer still said "29 sample prompts" even though the suite has been 31 since the trap evals (#30, #31) were added. Changed to "over 30" / "30 多条" so the wording stays correct as the suite grows without becoming a maintenance trap on every new eval.
+
+#### Changed
+
+- `README.md` and `README.zh-CN.md`: the `Included blueprints` / 内置的文档骨架 section now has a one-line layering note after the table. The first 5 rows are the core Diataxis forms (Tutorial, How-to, Reference, Explanation, plus Quickstart as a Tutorial sub-type); the last 4 rows (README, Troubleshooting, Glossary, Release notes) are adjacent types mapped to the closest Diataxis form via the Good Docs Project templates in `references/template-map.md`. All 9 rows are kept (the file actually contains all 9 blueprint sections, so the original 9-row list was accurate — only the layering was missing). The README now mirrors the same core-vs-adjacent split that `references/template-map.md` already uses internally.
+
 ## [0.1.0] - 2026-06-02
 
 First tagged release. Includes the four rounds of changes accumulated since the previous unreleased state.

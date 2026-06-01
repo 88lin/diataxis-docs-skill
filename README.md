@@ -215,7 +215,8 @@ In other words, a messy page that is honest about its content is better than a c
 │   └── workflows/
 │       └── ci.yml
 └── scripts/
-    └── check_local.py
+    ├── check_local.py
+    └── export_rules.py
 ```
 
 ### Key files
@@ -252,7 +253,7 @@ Add the folder path to your `opencode.json`:
 ```jsonc
 {
   "skills": {
-    "paths": ["/path/to/diataxis-docs-skill"]
+    "paths": ["~/.config/opencode/skills/diataxis-docs"]
   }
 }
 ```
@@ -343,6 +344,8 @@ The skill includes practical blueprints for:
 | Troubleshooting | Symptoms, causes, solutions, and verification |
 | Glossary | Project-specific terms and definitions |
 | Release notes | User-facing change summaries |
+
+The first five rows (Tutorial, How-to, Reference, Explanation, Quickstart) are the core Diataxis forms. The last four (README, Troubleshooting, Glossary, Release notes) are adjacent documentation types mapped to the closest Diataxis form via the Good Docs Project templates — see [`references/template-map.md`](references/template-map.md) for the full mapping.
 
 For larger systems, the skill can also help plan:
 
@@ -466,7 +469,7 @@ The skill is language-agnostic. The bundled READMEs are bilingual (English and S
 
 **Q: How is the skill evaluated?**
 
-The repository ships [`evals/evals.json`](evals/evals.json) with 29 sample prompts across 11 categories, including classification, mixed-form detection, per-form writing, review, migration, large-system planning, adjacent types, anti-pattern avoidance, and explicit non-trigger cases. Each eval declares a category and an expected output shape so regressions are easy to spot.
+The repository ships [`evals/evals.json`](evals/evals.json) with over 30 sample prompts across 11 categories, including classification, mixed-form detection, per-form writing, review, migration, large-system planning, adjacent types, anti-pattern avoidance, and explicit non-trigger cases. Each eval declares a category and an expected output shape so regressions are easy to spot.
 
 **Q: Will the skill write code examples for me?**
 
