@@ -8,7 +8,7 @@
 [![Skill: Opencode](https://img.shields.io/badge/Skill-Opencode-111827)](SKILL.md)
 [![Framework: Diataxis](https://img.shields.io/badge/Framework-Diataxis-2563eb)](https://diataxis.fr/)
 [![Docs: Good Docs Project](https://img.shields.io/badge/Templates-Good%20Docs%20Project-16a34a)](https://www.thegooddocsproject.dev/)
-[![Evals: 29](https://img.shields.io/badge/Evals-29-blueviolet)](evals/evals.json)
+[![Evals: 31](https://img.shields.io/badge/Evals-31-blueviolet)](evals/evals.json)
 [![GitHub stars](https://img.shields.io/github/stars/88lin/diataxis-docs-skill?style=social)](https://github.com/88lin/diataxis-docs-skill)
 
 [英文文档](README.md) · [Skill 文件](SKILL.md) · [文档蓝图](references/doc-blueprints.md) · [模板映射](references/template-map.md)

@@ -81,6 +81,12 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 - `README.md` and `README.zh-CN.md`: the `Included blueprints` / 内置的文档骨架 section now has a one-line layering note after the table. The first 5 rows are the core Diataxis forms (Tutorial, How-to, Reference, Explanation, plus Quickstart as a Tutorial sub-type); the last 4 rows (README, Troubleshooting, Glossary, Release notes) are adjacent types mapped to the closest Diataxis form via the Good Docs Project templates in `references/template-map.md`. All 9 rows are kept (the file actually contains all 9 blueprint sections, so the original 9-row list was accurate — only the layering was missing). The README now mirrors the same core-vs-adjacent split that `references/template-map.md` already uses internally.
 
+### Evals badge count
+
+#### Fixed
+
+- `README.md` and `README.zh-CN.md`: the top-of-page `Evals` shields.io badge hard-coded the value `29` from the original suite size, but the suite has been `31` since the trap evals (#30 Quickstart on OAuth2, #31 Reference page that smuggles a 5-step bcrypt guide) were added. Updated both badges to `Evals-31-blueviolet`. The `over 30` / `30 多条` wording in the FAQ is already in place; this round only fixes the badge.
+
 ## [0.1.0] - 2026-06-02
 
 First tagged release. Includes the four rounds of changes accumulated since the previous unreleased state.
