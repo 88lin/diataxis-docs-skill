@@ -29,6 +29,12 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - `SKILL.md`: `Tutorial` "Good signs" no longer includes `learn` as a trigger keyword. The other signals (`try`, `first time`, `hands-on`, `intro`, `walkthrough`) are all about the reader's stance and stay.
 - `SKILL.md`: the `Explanation` anti-pattern "No opinion. An explanation that does not commit to a perspective is just a summary" is now "No point of view or insight. An explanation that neither offers a perspective nor helps the reader form a new understanding is just a summary." The original wording made committing to a perspective a hard requirement, which the official page does not. Context-laying explanations that offer a frame without taking a position are still valid.
 
+### Per-form final check alignment
+
+#### Fixed
+
+- `SKILL.md`: the `Per-form final check` Explanation line still said "the author commits to a perspective" — a direct contradiction of the softened anti-pattern above. It now says "the author offers a point of view or insight", matching the new anti-pattern exactly. Caught during a follow-up review of the same Explanation guidance.
+
 ## [0.1.0] - 2026-06-02
 
 First tagged release. Includes the four rounds of changes accumulated since the previous unreleased state.

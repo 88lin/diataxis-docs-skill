@@ -417,7 +417,7 @@ Before finishing, run both the **intent check** and the **smell test** (see [Mix
 - **Tutorial**: a complete beginner can finish it without reading anything else; every step has a visible result.
 - **How-to**: an experienced user can find the answer in under a minute; the page covers exactly one goal.
 - **Reference**: every entry is structured identically; nothing is missing or redundant.
-- **Explanation**: a single concept is covered; the author commits to a perspective; no procedures are included.
+- **Explanation**: a single concept is covered; the author offers a point of view or insight; no procedures are included.
 
 ## References
 
