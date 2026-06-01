@@ -1,22 +1,104 @@
 {
   "skill_name": "diataxis-docs",
+  "version": "1.1.0",
+  "description": "Sample evaluation prompts for checking whether the diataxis-docs skill behaves as expected. Each eval targets a specific decision the skill must make well: classification, mixed-form detection, per-form writing, review, and large-system planning.",
   "evals": [
     {
       "id": 1,
-      "prompt": "I need to rewrite our product docs because the tutorial, how-to steps, API reference, and background notes are all mixed together. Please organize the documentation using Diátaxis and tell me what should go in each doc.",
-      "expected_output": "A document strategy that separates tutorial, how-to, reference, and explanation content, with a clear classification rationale.",
+      "category": "classification",
+      "prompt": "I need to rewrite our product docs because the tutorial, how-to steps, API reference, and background notes are all mixed together. Please organize the documentation using Diataxis and tell me what should go in each doc.",
+      "expected_output": "A document strategy that separates tutorial, how-to, reference, and explanation content, with a clear classification rationale for each split.",
       "files": []
     },
     {
       "id": 2,
+      "category": "per-form-writing",
       "prompt": "Can you help me write a README and a quickstart for a developer tool? The README should be the first impression, and the quickstart should get new users to a first success fast.",
-      "expected_output": "A README/quickstart plan or draft that distinguishes entry-point content from a short first-success tutorial.",
+      "expected_output": "A README/quickstart plan or draft that distinguishes entry-point content from a short first-success tutorial, and avoids putting tutorial content inside the README.",
       "files": []
     },
     {
       "id": 3,
+      "category": "decision-framework",
       "prompt": "We keep getting complaints that our docs pages are half explanation and half procedure. I need a repeatable framework for deciding whether a page should be reference, how-to, tutorial, or explanation.",
-      "expected_output": "A reusable decision framework or skill-like guidance that classifies page types and explains the differences.",
+      "expected_output": "A reusable decision framework or skill-like guidance that classifies page types, lists the signals for each, and explains the differences clearly.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "category": "single-page-classification",
+      "prompt": "Here is a docs page from our project. It opens with a 'Why we built it this way' section, then a long parameter table, then a step-by-step 'Getting started' section, then a 'Design decisions' appendix. What document type should this be, and how would you split it?",
+      "expected_output": "A diagnosis that the page mixes at least three Diataxis forms, a proposal to split it into the right documents, and a short outline for each split piece.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "category": "mixed-form-detection",
+      "prompt": "Review this draft page and tell me whether it mixes Diataxis forms. If it does, point to the specific sections that should be moved to other documents.",
+      "expected_output": "A mixed-form review that names the offending sections, classifies each as a different Diataxis form, and proposes a concrete split rather than a rewrite.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "category": "per-form-writing",
+      "prompt": "Write a how-to guide for configuring single sign-on with our platform. The reader is an experienced admin who already understands SAML basics. Keep it focused, no teaching, no conceptual background.",
+      "expected_output": "A how-to that opens with the goal, assumes competence, uses a single linear sequence, and links to reference and explanation pages for the supporting material.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "category": "per-form-writing",
+      "prompt": "Write a reference page for our REST API's /orders endpoint. Cover method, path, parameters, request body, response fields, status codes, and a minimal example. No narrative, no recommendations.",
+      "expected_output": "A neutral, structured reference page that mirrors the endpoint's structure, includes parameter and response tables, and avoids imperative or persuasive language.",
+      "files": []
+    },
+    {
+      "id": 8,
+      "category": "per-form-writing",
+      "prompt": "Write an explanation article about why we chose eventual consistency over strong consistency in our sync engine. The reader is a backend engineer who is evaluating whether to adopt the product.",
+      "expected_output": "An explanation that commits to a perspective, discusses tradeoffs, history, and alternatives, and deliberately contains no step-by-step instructions.",
+      "files": []
+    },
+    {
+      "id": 9,
+      "category": "per-form-writing",
+      "prompt": "Write a troubleshooting guide for the top five errors our users hit when running our CLI. The reader is stuck and needs to fix the problem fast.",
+      "expected_output": "A troubleshooting guide organized by symptom, with likely causes, concrete solutions, and verification steps. Explanatory content should be linked out, not inlined.",
+      "files": []
+    },
+    {
+      "id": 10,
+      "category": "review",
+      "prompt": "Audit our existing documentation site. For each top-level page, classify it using Diataxis, flag pages that mix forms, and recommend a clean split. Output should be a structured report.",
+      "expected_output": "A page-by-page audit with a Diataxis label, a mixed-form flag where applicable, and a recommended split or fix for each problem page.",
+      "files": []
+    },
+    {
+      "id": 11,
+      "category": "large-system",
+      "prompt": "We are launching a new SDK and need a complete documentation site. Plan the documentation system: getting started, how-tos, API reference, concepts, troubleshooting, release notes, and glossary. Audience ranges from first-time users to experienced platform engineers.",
+      "expected_output": "A documentation plan that maps each artifact to a Diataxis form, lists the input questions to confirm with the user, and proposes a navigation structure that keeps the four forms visibly separated.",
+      "files": []
+    },
+    {
+      "id": 12,
+      "category": "migration",
+      "prompt": "Our existing docs were written without a documentation framework. Help me migrate them to a Diataxis-based system. For each existing page, suggest a target form, a split plan if needed, and a migration order.",
+      "expected_output": "A migration plan that prioritizes the most-trafficked pages first, lists a target Diataxis form for each, and identifies which pages must be split before they can be moved.",
+      "files": []
+    },
+    {
+      "id": 13,
+      "category": "adjacent-types",
+      "prompt": "Draft release notes for version 2.0 of our product. The notes should be user-facing, list new features, breaking changes, deprecations, and known issues. No marketing language, no internal jargon.",
+      "expected_output": "Release notes organized by category (new, improved, fixed, breaking, deprecated, known issues), each item stating change and impact in plain language.",
+      "files": []
+    },
+    {
+      "id": 14,
+      "category": "anti-pattern-avoidance",
+      "prompt": "I wrote a single mega-page that tries to teach new users, list every CLI flag, explain the architecture, and walk through deployment. I am worried it mixes Diataxis forms. Refactor it for me.",
+      "expected_output": "A refactor plan that splits the page into the correct Diataxis forms, with a short outline for each new document and a recommended navigation order between them.",
       "files": []
     }
   ]
