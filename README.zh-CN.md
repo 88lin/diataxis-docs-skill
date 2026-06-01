@@ -80,6 +80,20 @@
 - 把其它内容链接出去，而不是塞进同一篇文档
 - 让文档系统长期更容易维护
 
+“臃肿”的文档在实践中长什么样——下面是仓库里最小的一个完整示例：
+
+```text
+BEFORE  examples/messy-to-diataxis/before.md     # 1 页，同时干了 4 件事
+
+AFTER   examples/messy-to-diataxis/after/
+        ├── 01-tutorial.md                       # 教程
+        ├── 02-how-to.md                         # 操作指南
+        ├── 03-reference.md                      # 参考
+        └── 04-explanation.md                    # 解释
+```
+
+完整的 before / after 在 [`examples/messy-to-diataxis/`](examples/messy-to-diataxis/)，下方的[完整示例](#完整示例)章节会带你走一遍拆分过程。
+
 ---
 
 ## 它能帮你做什么
@@ -415,7 +429,7 @@ CI 定义在 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)，对 `maste
 
 **Q：这个 Skill 是怎么评估的？**
 
-仓库内置 [`evals/evals.json`](evals/evals.json)，目前包含 14 条评测用例，覆盖分类、检测混合类型、每种类型的写作、审查、迁移、大系统规划。每个用例都标注了 category 和 expected output shape，方便追踪回归。
+仓库内置 [`evals/evals.json`](evals/evals.json)，目前包含 29 条评测用例，跨越 11 个类别，覆盖分类、检测混合类型、每种类型的写作、审查、迁移、大系统规划、相邻类型、反模式规避，以及显式不触发（non-trigger）用例。每个用例都标注了 category 和 expected output shape，方便追踪回归。
 
 **Q：这个 Skill 会帮我写代码示例吗？**
 

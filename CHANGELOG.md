@@ -7,13 +7,16 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
-### Preview image refresh and tag normalization
+### Compass guidance, FAQ sync, and Before/After visual
 
 #### Changed
 
-- `assets/preview.svg`: regenerated. The preview is now an actual Diataxis compass — a 2x2 grid with the two axis labels (ACQUISITION / APPLICATION at the top, ACTION / COGNITION rotated on the left), the four forms placed in their correct compass cells (Tutorial = action + acquisition, How-to = action + application, Explanation = cognition + acquisition, Reference = cognition + application), the official compass quote, and a subtle cross-hair down the middle to make the structure explicit. Each card has a tinted background gradient and a colored left bar keyed to the form (green / amber / purple / cyan).
-- `examples/messy-to-diataxis/before.md`: replaced the non-standard `explanation-light` tags (and the related `troubleshooting` and `mixed entry point` labels) with the strict 4-form vocabulary. The convention is now: use one of `tutorial`, `how-to`, `reference`, `explanation` for a real Diataxis form; use `meta: <role>` for things that are not a form at all (page-level framing, scope notes, link farms). Final tag count: 4 forms + 4 `meta:` = 23 tags, zero non-standard labels.
-- `examples/messy-to-diataxis/README.md`: updated "How to read this example" and "Applying this to your own docs" to describe the form-or-`meta:` convention.
+- `SKILL.md`: `Use the compass flexibly` now opens with the official "when to use the compass" guidance. The compass is most useful when the work feels routine and the answer is not yet clear, because intuition can give an immediate answer that is also wrong. This pulls in a piece of the official compass page that was previously implicit in the body.
+- `SKILL.md`: the compass section now distinguishes the **compass** (a decision tool: two questions + truth-table) from the **Diataxis map** (the static 2x2 quadrant view on diataxis.fr). The map is for orientation; the compass is for decisions; the two are not interchangeable.
+- `README.md` and `README.zh-CN.md`: the FAQ "How is the skill evaluated?" answer now reports 29 evals across 11 categories and names the nine coverage areas (classification, mixed-form detection, per-form writing, review, migration, large-system planning, adjacent types, anti-pattern avoidance, non-trigger). The old text claimed 14 evals across 6 categories and had drifted out of sync with the `Evals: 29` badge.
+- `README.md` and `README.zh-CN.md`: the `Why this exists` / `为什么要这个 Skill` section now closes with a compact before-and-after file tree showing the `examples/messy-to-diataxis/` split (one mixed-form page → four single-form pages), so a new reader can see concretely what the skill produces.
+- `scripts/check_local.py`: `check_skill_frontmatter()` now prints a soft warning when the SKILL.md `description` exceeds 60 words, and adds the word count to the existing OK line. The warning is intentionally not a hard error: the current description is 52 words, well under the budget, and contributors who push past 60 words should see the warning and trim it without the build failing.
+- `CHANGELOG.md`: the "Preview image refresh and tag normalization" block has been moved from `[Unreleased]` into `[0.1.0]` so the changelog matches the actual content of the v0.1.0 tag (it was previously listed under Unreleased even though that commit was the one the tag points to).
 
 ## [0.1.0] - 2026-06-02
 
@@ -118,6 +121,14 @@ First tagged release. Includes the four rounds of changes accumulated since the 
 - `README.md` and `README.zh-CN.md`: removed duplicate example prompts that appeared twice in `Example prompts` / `示例提问`.
 - `README.md` and `README.zh-CN.md`: fixed broken internal links in the worked example (`after/02-how-to.md`, `after/04-explanation.md`) where sibling pages were incorrectly written as `../<file>.md` instead of `<file>.md`.
 - `evals/evals.json`: each eval now carries an `id` and a `category`, so coverage gaps are easier to spot.
+
+### Preview image refresh and tag normalization
+
+#### Changed
+
+- `assets/preview.svg`: regenerated. The preview is now an actual Diataxis compass — a 2x2 grid with the two axis labels (ACQUISITION / APPLICATION at the top, ACTION / COGNITION rotated on the left), the four forms placed in their correct compass cells (Tutorial = action + acquisition, How-to = action + application, Explanation = cognition + acquisition, Reference = cognition + application), the official compass quote, and a subtle cross-hair down the middle to make the structure explicit. Each card has a tinted background gradient and a colored left bar keyed to the form (green / amber / purple / cyan).
+- `examples/messy-to-diataxis/before.md`: replaced the non-standard `explanation-light` tags (and the related `troubleshooting` and `mixed entry point` labels) with the strict 4-form vocabulary. The convention is now: use one of `tutorial`, `how-to`, `reference`, `explanation` for a real Diataxis form; use `meta: <role>` for things that are not a form at all (page-level framing, scope notes, link farms). Final tag count: 4 forms + 4 `meta:` = 23 tags, zero non-standard labels.
+- `examples/messy-to-diataxis/README.md`: updated "How to read this example" and "Applying this to your own docs" to describe the form-or-`meta:` convention.
 
 ## Earlier versions
 

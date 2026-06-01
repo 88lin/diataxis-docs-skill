@@ -168,10 +168,19 @@ def check_skill_frontmatter() -> list[str]:
         if not value:
             problems.append(f"SKILL.md: frontmatter missing or empty field: {key}")
 
+    description_words = len(fields["description"].split())
+    if description_words > 60:
+        print(
+            f"  WARN: SKILL.md: description is {description_words} words "
+            f"(recommended: <= 60). A long description can dilute trigger matching; "
+            f"move workflow guidance and enumeration into the body instead."
+        )
+
     if not problems:
         print(
             f"  SKILL.md frontmatter OK: name={fields['name']!r} "
-            f"version={fields['version']!r} description={len(fields['description'])} chars"
+            f"version={fields['version']!r} description={len(fields['description'])} chars "
+            f"({description_words} words)"
         )
     return problems
 

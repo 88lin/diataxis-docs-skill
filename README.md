@@ -72,6 +72,20 @@ The goal is simple:
 - link related material instead of mixing everything together
 - make documentation easier to maintain over time
 
+What a "noisy" page looks like in practice — one of the smallest worked examples in this repo:
+
+```text
+BEFORE  examples/messy-to-diataxis/before.md     # 1 page, 4 jobs at once
+
+AFTER   examples/messy-to-diataxis/after/
+        ├── 01-tutorial.md                       # tutorial
+        ├── 02-how-to.md                         # how-to
+        ├── 03-reference.md                      # reference
+        └── 04-explanation.md                    # explanation
+```
+
+The full before-and-after is in [`examples/messy-to-diataxis/`](examples/messy-to-diataxis/); the [Worked example](#worked-example) section below walks through the split.
+
 ---
 
 ## What this skill helps with
@@ -407,7 +421,7 @@ The skill is language-agnostic. The bundled READMEs are bilingual (English and S
 
 **Q: How is the skill evaluated?**
 
-The repository ships [`evals/evals.json`](evals/evals.json) with 14 sample prompts covering classification, mixed-form detection, per-form writing, review, migration, and large-system planning. Each eval declares a category and an expected output shape so regressions are easy to spot.
+The repository ships [`evals/evals.json`](evals/evals.json) with 29 sample prompts across 11 categories, including classification, mixed-form detection, per-form writing, review, migration, large-system planning, adjacent types, anti-pattern avoidance, and explicit non-trigger cases. Each eval declares a category and an expected output shape so regressions are easy to spot.
 
 **Q: Will the skill write code examples for me?**
 

@@ -30,7 +30,11 @@ To use the compass, ask just two questions:
 
 > "The compass can be applied equally to user situations that need documentation, or to documentation itself that perhaps needs to be moved or improved. Like many good tools, it's surprisingly banal." — [diataxis.fr/compass](https://diataxis.fr/compass/)
 
+The compass is a tool for finding your bearings, not a map of the territory. Diataxis is also published as a 2x2 map ([diataxis.fr](https://diataxis.fr/)) that shows the four quadrants visually; the compass is the same idea re-expressed as two questions and a truth-table. The map is good for orientation; the compass is good for decisions. They are not interchangeable — when the official source says "use the map" it usually means the static quadrant view, and when it says "use the compass" it means the question-based decision tool used here.
+
 ### Use the compass flexibly
+
+The compass is particularly effective when you think you are doing one thing but feel doubt or difficulty in the work. It forces you to stop and reconsider. Sometimes intuition provides an immediate answer that is also wrong.
 
 Do not get fixated on the exact names. If a question feels ambiguous, both readings may be valid. Apply the compass at any scale: at the level of a single sentence, a section, an entire page, or a whole documentation set.
 
