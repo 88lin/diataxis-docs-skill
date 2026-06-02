@@ -107,19 +107,59 @@ jobs:
           # Skip .git, node_modules, etc.
           md_files = [p for p in md_files if ".git" not in p.parts]
 
-          link_re = re.compile(r"\[[^\]]*\]\((?!https?://|#|mailto:)([^)#]+?)(?:#[^)]*)?\)")
+          zero_width_chars = {
+              "\u200b": "U+200B ZERO WIDTH SPACE",
+              "\ufeff": "U+FEFF ZERO WIDTH NO-BREAK SPACE",
+          }
+          link_re = re.compile(r"\[[^\]]*\]\((?!https?://|mailto:)([^)]+?)\)")
           problems = []
+          anchor_cache = {}
+
+          def markdown_anchor(text):
+              text = re.sub(r"<[^>]+>", "", text)
+              text = text.replace("`", "").replace("*", "").replace("_", "").replace("~", "")
+              text = text.strip().lower()
+              text = re.sub(r"[^\w\u4e00-\u9fff\- ]+", "", text)
+              text = re.sub(r"\s+", "-", text)
+              return re.sub(r"-+", "-", text).strip("-")
+
+          def anchors_for_markdown(path):
+              heading_re = re.compile(r"^(#{1,6})\s+(.+?)\s*#*\s*$", re.MULTILINE)
+              counts = {}
+              anchors = set()
+              text = path.read_text(encoding="utf-8")
+              for match in heading_re.finditer(text):
+                  base = markdown_anchor(match.group(2))
+                  if not base:
+                      continue
+                  count = counts.get(base, 0)
+                  counts[base] = count + 1
+                  anchors.add(base if count == 0 else f"{base}-{count}")
+              return anchors
 
           for md in md_files:
               text = md.read_text(encoding="utf-8")
+              for char, label in zero_width_chars.items():
+                  for line_no, line in enumerate(text.splitlines(), 1):
+                      if char in line:
+                          problems.append(f"{md}:{line_no}: contains {label}")
+
               for match in link_re.finditer(text):
-                  target = match.group(1).strip()
-                  if not target:
+                  raw_target = match.group(1).strip()
+                  if not raw_target:
                       continue
-                  # Resolve relative to the markdown file
-                  candidate = (md.parent / target).resolve()
+                  target_path, _, anchor = raw_target.partition("#")
+                  if not target_path and anchor:
+                      candidate = md.resolve()
+                  else:
+                      candidate = (md.parent / target_path).resolve()
                   if not candidate.exists():
-                      problems.append(f"{md}: broken link to {target}")
+                      problems.append(f"{md}: broken link to {raw_target}")
+                      continue
+                  if anchor:
+                      anchor_cache.setdefault(candidate, anchors_for_markdown(candidate))
+                      if anchor not in anchor_cache[candidate]:
+                          problems.append(f"{md}: broken anchor in link to {raw_target}")
 
           if problems:
               print("Internal link check FAILED:")
@@ -127,7 +167,7 @@ jobs:
                   print(f"  - {p}")
               sys.exit(1)
 
-          print(f"Internal link check OK: scanned {len(md_files)} markdown files")
+          print(f"Internal links and markdown hygiene OK: scanned {len(md_files)} markdown files")
           PY
 
   verify-structure:

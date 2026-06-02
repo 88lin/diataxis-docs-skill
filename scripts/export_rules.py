@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Universal AI IDE Rules Exporter for Diataxis.
 
-Exports SKILL.md to rule files for 9 major AI coding assistants
-(Cursor, Cline, Roo Code, Windsurf, GitHub Copilot, Claude Code,
-OpenAI Codex, Aider). Reads SKILL.md, strips the Opencode-specific
-frontmatter, prepends a gentle preamble aligned with the
+Exports SKILL.md to 12 rule-file targets across 11 major AI coding
+assistants (Cursor, Cline, Roo Code, Windsurf, GitHub Copilot,
+Claude Code, OpenAI Codex, Aider, Gemini CLI, Continue, Amazon Q
+Developer). Reads SKILL.md, strips the Opencode-specific frontmatter,
+prepends a gentle preamble aligned with the
 "guide, not a plan" philosophy, and writes the body to the
 standard rule-file path for each tool.
 
@@ -30,6 +31,9 @@ TARGETS = [
     ("Claude Code", "CLAUDE.md"),
     ("OpenAI Codex", "AGENTS.md"),
     ("Aider", "CONVENTIONS.md"),
+    ("Gemini CLI", "GEMINI.md"),
+    ("Continue", ".continue/rules/diataxis.md"),
+    ("Amazon Q Developer", ".amazonq/rules/diataxis.md"),
 ]
 
 

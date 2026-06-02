@@ -77,7 +77,7 @@
       "id": 11,
       "category": "large-system",
       "prompt": "We are launching a new SDK and need a complete documentation site. Plan the documentation system: getting started, how-tos, API reference, concepts, troubleshooting, release notes, and glossary. Audience ranges from first-time users to experienced platform engineers.",
-      "expected_output": "A documentation plan that maps each artifact to a Diataxis form, lists the input questions to confirm with the user, and proposes a navigation structure that keeps the four forms visibly separated.",
+      "expected_output": "An iterative documentation plan that maps each proposed artifact to a Diataxis form, lists the input questions to confirm with the user, identifies the smallest useful pages to write first, and treats any navigation structure as a sketch that can emerge as real content is created rather than a fixed four-section IA.",
       "files": ["SKILL.md", "references/doc-blueprints.md", "references/reader-analysis.md"]
     },
     {

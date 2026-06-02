@@ -13,6 +13,36 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+ZERO_WIDTH_CHARS = {
+    "\u200b": "U+200B ZERO WIDTH SPACE",
+    "\ufeff": "U+FEFF ZERO WIDTH NO-BREAK SPACE",
+}
+
+
+def markdown_anchor(text: str) -> str:
+    """Return the GitHub-style heading anchor for common markdown headings."""
+    text = re.sub(r"<[^>]+>", "", text)
+    text = text.replace("`", "").replace("*", "").replace("_", "").replace("~", "")
+    text = text.strip().lower()
+    text = re.sub(r"[^\w\u4e00-\u9fff\- ]+", "", text)
+    text = re.sub(r"\s+", "-", text)
+    return re.sub(r"-+", "-", text).strip("-")
+
+
+def anchors_for_markdown(path: Path) -> set[str]:
+    """Collect heading anchors from a markdown file."""
+    heading_re = re.compile(r"^(#{1,6})\s+(.+?)\s*#*\s*$", re.MULTILINE)
+    counts: dict[str, int] = {}
+    anchors: set[str] = set()
+    text = path.read_text(encoding="utf-8")
+    for match in heading_re.finditer(text):
+        base = markdown_anchor(match.group(2))
+        if not base:
+            continue
+        count = counts.get(base, 0)
+        counts[base] = count + 1
+        anchors.add(base if count == 0 else f"{base}-{count}")
+    return anchors
 
 
 def check_evals() -> list[str]:
@@ -81,26 +111,45 @@ def check_evals() -> list[str]:
 
 
 def check_links() -> list[str]:
-    """Check that internal markdown links point to existing files."""
+    """Check that internal markdown links point to existing files and anchors."""
     md_files = sorted(ROOT.rglob("*.md"))
     md_files = [p for p in md_files if ".git" not in p.parts]
 
     link_re = re.compile(
-        r"\[[^\]]*\]\((?!https?://|#|mailto:)([^)#]+?)(?:#[^)]*)?\)"
+        r"\[[^\]]*\]\((?!https?://|mailto:)([^)]+?)\)"
     )
     problems: list[str] = []
+    anchor_cache: dict[Path, set[str]] = {}
     for md in md_files:
         text = md.read_text(encoding="utf-8")
+        for char, label in ZERO_WIDTH_CHARS.items():
+            for line_no, line in enumerate(text.splitlines(), 1):
+                if char in line:
+                    problems.append(f"{md.relative_to(ROOT)}:{line_no}: contains {label}")
+
         for match in link_re.finditer(text):
-            target = match.group(1).strip()
-            if not target:
+            raw_target = match.group(1).strip()
+            if not raw_target:
                 continue
-            candidate = (md.parent / target).resolve()
+            target_path, _, anchor = raw_target.partition("#")
+            if not target_path and anchor:
+                candidate = md.resolve()
+            else:
+                candidate = (md.parent / target_path).resolve()
             if not candidate.exists():
-                problems.append(f"{md.relative_to(ROOT)}: broken link to {target}")
+                problems.append(f"{md.relative_to(ROOT)}: broken link to {raw_target}")
+                continue
+            if anchor:
+                anchor_cache.setdefault(candidate, anchors_for_markdown(candidate))
+                if anchor not in anchor_cache[candidate]:
+                    problems.append(
+                        f"{md.relative_to(ROOT)}: broken anchor in link to {raw_target}"
+                    )
 
     if not problems:
-        print(f"  internal links OK: scanned {len(md_files)} markdown files")
+        print(
+            f"  internal links and markdown hygiene OK: scanned {len(md_files)} markdown files"
+        )
     return problems
 
 

@@ -20,9 +20,9 @@ Briefly state what we will build or do. (Max 2 sentences).
 
 ## Step 1: [Action]
 Clear instruction.
-​```bash
+```bash
 # exact command
-​```
+```
 *Expected output:* [Show exactly what they should see].
 
 ## Step 2: [Action]

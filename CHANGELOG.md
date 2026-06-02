@@ -7,6 +7,23 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+### Review follow-up fixes
+
+#### Changed
+
+- `scripts/export_rules.py`, `README.md`, and `README.zh-CN.md`: expanded the export helper from 9 rule-file targets across 8 assistants to 12 targets across 11 assistants by adding Gemini CLI (`GEMINI.md`), Continue (`.continue/rules/diataxis.md`), and Amazon Q Developer (`.amazonq/rules/diataxis.md`).
+- `assets/preview.svg`: refreshed the preview headline from a quote-heavy compass label to a clearer "Two questions, four forms" framing, removed decorative background circles, and replaced the long quote footer with the skill's practical classify-draft-link workflow.
+
+#### Fixed
+
+- `README.md` and `README.zh-CN.md`: clarified the difference between rule-file targets and distinct AI assistants, and added the cross-IDE integration section to the table of contents.
+- `README.md` and `README.zh-CN.md`: corrected the blueprint layering note so Diataxis has four core forms, with Quickstart described as a Tutorial sub-type rather than a fifth core form.
+- `evals/evals.json`: softened the large-system eval so it asks for an iterative first-pages plan and treats navigation as an emerging sketch, matching the "guide, not a plan" philosophy.
+- `references/doc-blueprints.md`: removed hidden zero-width characters from the tutorial code fence.
+- `CHANGELOG.md`: fixed the historical self-link to the SKILL.md anti-patterns section.
+- `scripts/check_local.py` and `.github/workflows/ci.yml`: extended Markdown validation to catch broken heading anchors and hidden zero-width characters, not just missing linked files.
+- `README.md` and `README.zh-CN.md`: updated the local development checklist so it matches the stronger Markdown anchor and zero-width-character validation.
+
 ### Compass guidance, FAQ sync, and Before/After visual
 
 #### Changed
@@ -107,7 +124,7 @@ First tagged release. Includes the four rounds of changes accumulated since the 
 - `SKILL.md`: frontmatter `description` is now trigger-only. Removed the 10-item doc-type enumeration and the trailing "apply the compass flexibly / work one page at a time" workflow guidance, both of which duplicated body content and hurt trigger matching.
 - `SKILL.md`: `Core idea` collapsed from a 4-type list into a single sentence that points at the compass and the classification guide.
 - `SKILL.md`: `Large documentation systems` softened. "Inputs to gather" is now a single prose paragraph (the table was reading as a checklist). "Reference map" was renamed to "Common artifact patterns (for reference only)" and prefixed with a "Do not treat this as a backlog. Only produce artifacts the compass calls for." warning.
-- `SKILL.md`: `Quality checks` no longer duplicates the Mixed-doc smell test. The Quality Checks section now opens by pointing at the canonical smell test in [Anti-patterns: what NOT to do](#anti-patterns-what-not-to-do) instead of repeating the same checklist inline. Net: 478 -> 444 lines.
+- `SKILL.md`: `Quality checks` no longer duplicates the Mixed-doc smell test. The Quality Checks section now opens by pointing at the canonical smell test in [Anti-patterns: what NOT to do](SKILL.md#anti-patterns-what-not-to-do) instead of repeating the same checklist inline. Net: 478 -> 444 lines.
 - `README.md` and `README.zh-CN.md`: the `Quick decision tree` ASCII art now correctly shows Explanation as a sibling of Reference (same indentation as the other root branches), not as a sub-branch.
 - `README.zh-CN.md`: the compass table header changed from "那么它一定属于" to "那么它归入" to soften the mandatory tone and stay consistent with the workflow philosophy.
 

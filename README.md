@@ -20,7 +20,7 @@
 ## Preview
 
 <p align="center">
-  <img src="assets/preview.svg" alt="Diataxis Docs Skill preview" width="100%">
+  <img src="assets/preview.svg" alt="Diataxis Docs Skill preview showing the four documentation forms" width="100%">
 </p>
 
 ```text
@@ -49,6 +49,7 @@ Understand why            Explanation           Context and tradeoffs
 - [Design principles](#design-principles)
 - [How this skill differs from generic writing help](#how-this-skill-differs-from-generic-writing-help)
 - [Local development](#local-development)
+- [Universal AI IDE Integration](#universal-ai-ide-integration)
 - [FAQ](#faq)
 - [Sources](#sources)
 - [Contributing](#contributing)
@@ -345,7 +346,7 @@ The skill includes practical blueprints for:
 | Glossary | Project-specific terms and definitions |
 | Release notes | User-facing change summaries |
 
-The first five rows (Tutorial, How-to, Reference, Explanation, Quickstart) are the core Diataxis forms. The last four (README, Troubleshooting, Glossary, Release notes) are adjacent documentation types mapped to the closest Diataxis form via the Good Docs Project templates — see [`references/template-map.md`](references/template-map.md) for the full mapping.
+The first four rows (Tutorial, How-to, Reference, Explanation) are the core Diataxis forms. Quickstart is a Tutorial sub-type optimized for first success. The last four rows (README, Troubleshooting, Glossary, Release notes) are adjacent documentation types mapped to the closest Diataxis form via the Good Docs Project templates — see [`references/template-map.md`](references/template-map.md) for the full mapping.
 
 For larger systems, the skill can also help plan:
 
@@ -397,7 +398,8 @@ The script validates:
 
 - `evals/evals.json` is valid JSON, has the required top-level fields, and each eval has `id`, `category`, `prompt`, `expected_output`, and `files`.
 - All eval IDs are unique and categories are from the known list.
-- All internal markdown links point to existing files.
+- Internal markdown links point to existing files and heading anchors.
+- Markdown files do not contain hidden zero-width characters.
 - All required files (skill, references, examples, commands, CI) are present.
 
 CI is defined in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) and runs on every push and pull request to `master`.
@@ -408,7 +410,7 @@ CI is defined in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) and runs
 
 While this repository is structured specifically as an Opencode skill, the core Diataxis guidance in `SKILL.md` is portable to other AI coding assistants, though each tool has its own conventions and you may want to adapt the file format to fit your stack.
 
-The modern AI coding ecosystem is fragmented. To help you enforce Diátaxis standards across your team's preferred tools, we provide a universal export script that automatically writes the Diataxis rules to the standard rule-file path for **9 major AI assistants**:
+The modern AI coding ecosystem is fragmented. To help you enforce Diátaxis standards across your team's preferred tools, we provide a universal export script that automatically writes the Diataxis rules to **12 standard rule-file targets across 11 major AI assistants**:
 
 | AI Tool | Target File / Path |
 | :--- | :--- |
@@ -419,6 +421,9 @@ The modern AI coding ecosystem is fragmented. To help you enforce Diátaxis stan
 | **Claude Code** | `CLAUDE.md` |
 | **OpenAI Codex** | `AGENTS.md` |
 | **Aider** | `CONVENTIONS.md` |
+| **Gemini CLI** | `GEMINI.md` |
+| **Continue** | `.continue/rules/diataxis.md` |
+| **Amazon Q Developer** | `.amazonq/rules/diataxis.md` |
 
 Run the helper script to generate the files for your specific stack:
 
