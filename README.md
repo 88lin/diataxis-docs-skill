@@ -408,7 +408,7 @@ CI is defined in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) and runs
 
 While this repository is structured specifically as an Opencode skill, the core Diataxis guidance in `SKILL.md` is portable to other AI coding assistants, though each tool has its own conventions and you may want to adapt the file format to fit your stack.
 
-The modern AI coding ecosystem is fragmented. To help you enforce Diátaxis standards across your team's preferred tools, we provide a universal export script that automatically writes the Diataxis rules to the standard rule-file path for **9 major AI assistants**:
+The modern AI coding ecosystem is fragmented. To help you enforce Diátaxis standards across your team's preferred tools, we provide a universal export script that automatically writes the Diataxis rules to the standard rule-file path for **8 major AI assistants (9 target paths)**:
 
 | AI Tool | Target File / Path |
 | :--- | :--- |
