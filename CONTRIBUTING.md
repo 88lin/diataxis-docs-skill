@@ -34,8 +34,8 @@ python scripts/check_local.py
 The script runs three checks locally and mirrors the CI workflow exactly:
 
 - **Validate evals.json** — JSON is well-formed, every eval has the required fields (`id`, `category`, `prompt`, `expected_output`, `files`), every `id` is unique, every `category` is in the whitelist, and prompts/expected outputs are non-trivial.
-- **Check internal links** — every relative Markdown link points to a file that exists.
-- **Verify structure** — all required files and example files are present.
+- **Check internal links** — every relative Markdown link points to a file and heading anchor that exists, and Markdown files do not contain hidden zero-width characters.
+- **Verify structure** — all required files and example files are present, including `scripts/export_rules.py` (the universal export script for AI IDE integration).
 
 CI runs the same checks on every push to `master` and on every pull request, so a passing local run is the fastest way to keep CI green.
 

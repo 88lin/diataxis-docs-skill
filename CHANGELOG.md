@@ -22,6 +22,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - `references/doc-blueprints.md`: removed hidden zero-width characters from the tutorial code fence.
 - `CHANGELOG.md`: fixed the historical self-link to the SKILL.md anti-patterns section.
 - `scripts/check_local.py` and `.github/workflows/ci.yml`: extended Markdown validation to catch broken heading anchors and hidden zero-width characters, not just missing linked files.
+- `.github/workflows/ci.yml` and `CONTRIBUTING.md`: restored `scripts/export_rules.py` as an explicitly required project file and documented that requirement in local validation guidance.
 - `README.md` and `README.zh-CN.md`: updated the local development checklist so it matches the stronger Markdown anchor and zero-width-character validation.
 
 ### Compass guidance, FAQ sync, and Before/After visual
