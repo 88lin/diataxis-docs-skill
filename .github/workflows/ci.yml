@@ -142,7 +142,7 @@ jobs:
           set -e
           for f in SKILL.md README.md README.zh-CN.md LICENSE CHANGELOG.md CONTRIBUTING.md \
                    evals/evals.json references/doc-blueprints.md references/reader-analysis.md \
-                   references/template-map.md assets/preview.svg; do
+                   references/template-map.md assets/preview.svg scripts/export_rules.py; do
             if [ ! -f "$f" ]; then
               echo "Missing required file: $f"
               exit 1

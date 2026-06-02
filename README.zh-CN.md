@@ -416,7 +416,7 @@ CI 定义在 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)，对 `maste
 
 虽然这个仓库本身是按 Opencode skill 的结构组织的，但 `SKILL.md` 里的核心 Diataxis 指导可以移植到其它 AI 编程助手——不过每个工具都有自己的约定，你可能需要按所选工具的格式做一点适配。
 
-现代 AI 编程生态很碎片化。为了让你能在团队偏好的工具里贯彻 Diátaxis 标准，我们提供了一个通用导出脚本，自动把 Diataxis 规则写到 **9 个主流 AI 助手**的标准 rules 文件路径：
+现代 AI 编程生态很碎片化。为了让你能在团队偏好的工具里贯彻 Diátaxis 标准，我们提供了一个通用导出脚本，自动把 Diataxis 规则写到 **8 个主流 AI 助手（9 个目标路径）**的标准 rules 文件路径：
 
 | AI 工具 | 目标文件 / 路径 |
 | :--- | :--- |
