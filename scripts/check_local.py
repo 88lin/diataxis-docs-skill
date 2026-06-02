@@ -8,7 +8,9 @@ Usage:
 """
 
 import json
+import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -166,6 +168,7 @@ def check_structure() -> list[str]:
         "references/doc-blueprints.md",
         "references/reader-analysis.md",
         "references/template-map.md",
+        "references/zh-cn-anti-patterns.md",
         "assets/preview.svg",
         "examples/messy-to-diataxis/README.md",
         "examples/messy-to-diataxis/before.md",
@@ -179,6 +182,8 @@ def check_structure() -> list[str]:
         ".opencode/commands/docs-audit.md",
         ".opencode/commands/docs-quickstart.md",
         "scripts/export_rules.py",
+        "scripts/audit_docs.py",
+        "tests/test_audit_docs.py",
     ]
     problems = [f"missing: {p}" for p in required if not (ROOT / p).is_file()]
     if not problems:
@@ -235,6 +240,22 @@ def check_skill_frontmatter() -> list[str]:
     return problems
 
 
+def check_audit_docs_tests() -> list[str]:
+    """Run the audit_docs.py unit tests."""
+    result = subprocess.run(
+        [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py"],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+    )
+    if result.returncode != 0:
+        output = (result.stdout + result.stderr).strip()
+        return [f"audit_docs.py tests failed:\n{output}"]
+    print("  audit_docs.py tests OK")
+    return []
+
+
 def main() -> int:
     print("Running local checks...")
     all_problems: list[str] = []
@@ -243,6 +264,7 @@ def main() -> int:
         ("links", check_links),
         ("structure", check_structure),
         ("frontmatter", check_skill_frontmatter),
+        ("audit-docs-tests", check_audit_docs_tests),
     ]:
         all_problems.extend(fn())
 

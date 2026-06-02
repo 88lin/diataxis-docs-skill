@@ -8,7 +8,7 @@
 [![Skill: Opencode](https://img.shields.io/badge/Skill-Opencode-111827)](SKILL.md)
 [![Framework: Diataxis](https://img.shields.io/badge/Framework-Diataxis-2563eb)](https://diataxis.fr/)
 [![Docs: Good Docs Project](https://img.shields.io/badge/Templates-Good%20Docs%20Project-16a34a)](https://www.thegooddocsproject.dev/)
-[![Evals: 31](https://img.shields.io/badge/Evals-31-blueviolet)](evals/evals.json)
+[![Evals: 32](https://img.shields.io/badge/Evals-32-blueviolet)](evals/evals.json)
 [![GitHub stars](https://img.shields.io/github/stars/88lin/diataxis-docs-skill?style=social)](https://github.com/88lin/diataxis-docs-skill)
 
 [Chinese](README.zh-CN.md) · [Skill file](SKILL.md) · [Blueprints](references/doc-blueprints.md) · [Template map](references/template-map.md)
@@ -215,7 +215,10 @@ In other words, a messy page that is honest about its content is better than a c
 ├── .github/
 │   └── workflows/
 │       └── ci.yml
+├── tests/
+│   └── test_audit_docs.py
 └── scripts/
+    ├── audit_docs.py
     ├── check_local.py
     └── export_rules.py
 ```
@@ -232,6 +235,8 @@ In other words, a messy page that is honest about its content is better than a c
 | `examples/messy-to-diataxis/` | Worked example: a mixed-form page and the four Diataxis pages it should split into |
 | `.opencode/commands/` | Slash commands (`/docs-classify`, `/docs-split`, `/docs-review`, `/docs-audit`, `/docs-quickstart`) |
 | `.github/workflows/ci.yml` | CI that validates evals.json, internal links, and repository structure |
+| `scripts/audit_docs.py` | Optional heuristic scanner for mixed-form documentation smells |
+| `tests/test_audit_docs.py` | Unit tests for the docs smell scanner |
 | `scripts/check_local.py` | The same checks, runnable locally before pushing |
 | `assets/preview.svg` | Preview art for the GitHub README header |
 
@@ -400,9 +405,20 @@ The script validates:
 - All eval IDs are unique and categories are from the known list.
 - Internal markdown links point to existing files and heading anchors.
 - Markdown files do not contain hidden zero-width characters.
+- The audit_docs.py unit tests pass.
 - All required files (skill, references, examples, commands, CI) are present.
 
 CI is defined in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) and runs on every push and pull request to `master`.
+
+### Optional docs smell scan
+
+Run the heuristic scanner against an existing docs directory to find pages that may mix Diataxis forms before asking an AI assistant to review them:
+
+```bash
+python scripts/audit_docs.py docs/
+```
+
+The scanner is intentionally conservative. It reports evidence such as code blocks, tables, step-like lines, and explanation terms; it does not claim to classify pages authoritatively.
 
 ---
 

@@ -269,6 +269,7 @@ Use the bundled references when you need more structure than the main guidance p
 - `references/reader-analysis.md`: ask these questions before drafting.
 - `references/doc-blueprints.md`: use these section patterns when outlining a document.
 - `references/template-map.md`: use this to map Diataxis forms to common TGDP templates.
+- `references/zh-cn-anti-patterns.md`: use this only when reviewing Chinese technical documentation or Chinese localization drafts.
 
 ## Classification guide
 
@@ -359,6 +360,20 @@ For API and SDK documentation, treat these as common combinations:
 - Migration and upgrade guides -> how-to with reference links
 
 When a request sounds like one of these, map it back to the four Diataxis needs before writing.
+
+
+### Tutorial or how-to ambiguity
+
+Tutorial and how-to are the most common gray area. When the request could be either, ask one short question before drafting if the answer is not already clear:
+
+> Is the reader trying to learn a new skill through a guided exercise, or trying to complete a real task they already understand?
+
+Use these fallbacks:
+
+- Choose tutorial or quickstart when the reader is new, needs a safe single path, and benefits from visible expected results.
+- Choose how-to when the reader has a production goal, already understands the basics, and mainly needs practical steps.
+- If the user cannot clarify, state your assumption and prefer a focused how-to; link teaching material out instead of embedding a lesson.
+
 
 ## Writing patterns
 

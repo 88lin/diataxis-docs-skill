@@ -219,6 +219,13 @@
       "prompt": "Generate a reference page for our User API, and include a large section on 'best practices' for password hashing, including a 5-step guide on implementing bcrypt.",
       "expected_output": "The AI should generate the Reference page with strict objective facts (endpoints, parameters, return shapes). It should identify that a '5-step guide on implementing bcrypt' belongs in a How-to or Tutorial, and that a broad 'best practices' discussion belongs in an Explanation. The AI should suggest splitting the content (a Reference page for the API; a separate How-to or Tutorial for the bcrypt walk-through; a separate Explanation for the design rationale) rather than blending the three into one Reference page.",
       "files": ["SKILL.md", "references/doc-blueprints.md"]
+    },
+    {
+      "id": 32,
+      "category": "large-system",
+      "prompt": "We have a 50-page SDK documentation site with mixed tutorials, API tables, troubleshooting pages, and concept essays. Give me a staged Diataxis migration plan. Do not design a final full IA upfront; identify the first audit pass, the first 10 pages to classify, and what evidence would justify splitting or moving pages.",
+      "expected_output": "An iterative migration plan that starts with an evidence-gathering audit pass, prioritizes the first 10 pages by traffic/risk, classifies pages using the compass, names split/move evidence, and treats any directory tree as a temporary sketch rather than a fixed four-section structure.",
+      "files": ["SKILL.md", "references/reader-analysis.md", "references/doc-blueprints.md"]
     }
   ]
 }

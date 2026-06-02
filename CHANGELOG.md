@@ -9,9 +9,17 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Review follow-up fixes
 
+#### Added
+
+- `scripts/audit_docs.py`: added a pure Python heuristic scanner that flags documentation pages with mixed-form smell signals such as step-like lines, reference tables, code blocks, and explanation terms.
+- `references/zh-cn-anti-patterns.md`: added Chinese technical documentation smell signals for Chinese-first docs and localization review.
+- `evals/evals.json`: added a large-system migration eval for a 50-page SDK documentation site, focused on staged audit and iterative migration rather than a fixed IA.
+- `README.md` and `README.zh-CN.md`: bumped the Evals badge from 31 to 32.
+
 #### Changed
 
 - `scripts/export_rules.py`, `README.md`, and `README.zh-CN.md`: expanded the export helper from 9 rule-file targets across 8 assistants to 12 targets across 11 assistants by adding Gemini CLI (`GEMINI.md`), Continue (`.continue/rules/diataxis.md`), and Amazon Q Developer (`.amazonq/rules/diataxis.md`).
+- `SKILL.md` and `references/reader-analysis.md`: added a tutorial-vs-how-to ambiguity fallback that asks one clarifying question and defaults to a focused how-to only when the user cannot clarify.
 - `assets/preview.svg`: refreshed the preview headline from a quote-heavy compass label to a clearer "Two questions, four forms" framing, removed decorative background circles, and replaced the long quote footer with the skill's practical classify-draft-link workflow.
 
 #### Fixed
@@ -21,7 +29,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - `evals/evals.json`: softened the large-system eval so it asks for an iterative first-pages plan and treats navigation as an emerging sketch, matching the "guide, not a plan" philosophy.
 - `references/doc-blueprints.md`: removed hidden zero-width characters from the tutorial code fence.
 - `CHANGELOG.md`: fixed the historical self-link to the SKILL.md anti-patterns section.
-- `scripts/check_local.py` and `.github/workflows/ci.yml`: extended Markdown validation to catch broken heading anchors and hidden zero-width characters, not just missing linked files.
+- `scripts/check_local.py` and `.github/workflows/ci.yml`: extended Markdown validation to catch broken heading anchors and hidden zero-width characters, and now run the audit_docs.py unit tests.
 - `.github/workflows/ci.yml` and `CONTRIBUTING.md`: restored `scripts/export_rules.py` as an explicitly required project file and documented that requirement in local validation guidance.
 - `README.md` and `README.zh-CN.md`: updated the local development checklist so it matches the stronger Markdown anchor and zero-width-character validation.
 

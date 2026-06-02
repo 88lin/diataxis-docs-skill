@@ -177,12 +177,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
       - name: Check required files
         run: |
           set -e
           for f in SKILL.md README.md README.zh-CN.md LICENSE CHANGELOG.md CONTRIBUTING.md \
                    evals/evals.json references/doc-blueprints.md references/reader-analysis.md \
-                   references/template-map.md assets/preview.svg scripts/export_rules.py; do
+                   references/template-map.md references/zh-cn-anti-patterns.md assets/preview.svg \
+                   scripts/export_rules.py scripts/audit_docs.py \
+                   tests/test_audit_docs.py; do
             if [ ! -f "$f" ]; then
               echo "Missing required file: $f"
               exit 1
@@ -223,6 +230,9 @@ jobs:
             head -n 5 "$f" | grep -q "^description:" || { echo "$f: missing description in frontmatter"; exit 1; }
           done
           echo "Command files OK"
+
+      - name: Run audit_docs.py unit tests
+        run: python -m unittest discover -s tests -p 'test_*.py'
 
       - name: Check SKILL.md frontmatter
         run: |
