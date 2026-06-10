@@ -14,30 +14,37 @@ do not yet exist (such as .github/ or .cursor/rules/) are
 created on demand.
 
 Usage:
+    # From this repository, export into this repository:
     python scripts/export_rules.py
+
+    # From another project, export this skill's rules into that project:
+    python /path/to/diataxis-docs-skill/scripts/export_rules.py
 """
-import os
+from pathlib import Path
 
-SKILL_PATH = "SKILL.md"
+SOURCE_ROOT = Path(__file__).resolve().parent.parent
+TARGET_ROOT = Path.cwd()
+SKILL_PATH = SOURCE_ROOT / "SKILL.md"
 
-# Mapping of AI Tool -> Target Rule File Path
-TARGETS = [
-    ("Cursor (Legacy)", ".cursorrules"),
-    ("Cursor (New Rules)", ".cursor/rules/diataxis.md"),
-    ("Cline", ".clinerules"),
-    ("Roo Code", ".roo/rules/diataxis.md"),
-    ("Windsurf", ".windsurfrules"),
-    ("GitHub Copilot", ".github/copilot-instructions.md"),
-    ("Claude Code", "CLAUDE.md"),
-    ("OpenAI Codex", "AGENTS.md"),
-    ("Aider", "CONVENTIONS.md"),
-    ("Gemini CLI", "GEMINI.md"),
-    ("Continue", ".continue/rules/diataxis.md"),
-    ("Amazon Q Developer", ".amazonq/rules/diataxis.md"),
+# Mapping of AI Tool -> Target Rule File Path, relative to the project that
+# should receive the exported rule files. Run from that target project root.
+TARGETS: list[tuple[str, Path]] = [
+    ("Cursor (Legacy)", Path(".cursorrules")),
+    ("Cursor (New Rules)", Path(".cursor/rules/diataxis.md")),
+    ("Cline", Path(".clinerules")),
+    ("Roo Code", Path(".roo/rules/diataxis.md")),
+    ("Windsurf", Path(".windsurfrules")),
+    ("GitHub Copilot", Path(".github/copilot-instructions.md")),
+    ("Claude Code", Path("CLAUDE.md")),
+    ("OpenAI Codex", Path("AGENTS.md")),
+    ("Aider", Path("CONVENTIONS.md")),
+    ("Gemini CLI", Path("GEMINI.md")),
+    ("Continue", Path(".continue/rules/diataxis.md")),
+    ("Amazon Q Developer", Path(".amazonq/rules/diataxis.md")),
 ]
 
 
-def strip_frontmatter(content):
+def strip_frontmatter(content: str) -> str:
     """Remove the leading Opencode YAML frontmatter from SKILL.md."""
     if content.startswith("---"):
         parts = content.split("---", 2)
@@ -46,14 +53,12 @@ def strip_frontmatter(content):
     return content
 
 
-def export():
-    if not os.path.exists(SKILL_PATH):
+def export() -> None:
+    if not SKILL_PATH.exists():
         print(f"Error: {SKILL_PATH} not found.")
-        print("Run this script from the repository root.")
         return
 
-    with open(SKILL_PATH, "r", encoding="utf-8") as f:
-        raw_content = f.read()
+    raw_content = SKILL_PATH.read_text(encoding="utf-8")
 
     body_content = strip_frontmatter(raw_content)
 
@@ -70,21 +75,20 @@ def export():
 
     final_content = preamble + body_content
 
-    print("Exporting Diataxis rules for various AI coding assistants...\n")
+    print("Exporting Diataxis rules for various AI coding assistants...")
+    print(f"Target project: {TARGET_ROOT}\n")
 
     exported_count = 0
-    for name, path in TARGETS:
-        if os.path.exists(path):
-            print(f"Skipping {name:<18} ({path}) - File already exists.")
+    for name, relative_path in TARGETS:
+        path = TARGET_ROOT / relative_path
+        display_path = relative_path.as_posix()
+        if path.exists():
+            print(f"Skipping {name:<18} ({display_path}) - File already exists.")
             continue
 
-        dir_name = os.path.dirname(path)
-        if dir_name and not os.path.exists(dir_name):
-            os.makedirs(dir_name, exist_ok=True)
-
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(final_content)
-        print(f"Exported {name:<18} -> {path}")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(final_content, encoding="utf-8")
+        print(f"Exported {name:<18} -> {display_path}")
         exported_count += 1
 
     print(f"\nDone! Exported {exported_count} new rule files.")

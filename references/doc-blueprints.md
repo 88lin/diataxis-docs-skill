@@ -40,53 +40,111 @@ Rules:
 
 ## How-to blueprint
 
-- Title that states the task
-- Problem or goal
-- Before you begin
-- Steps
-- Results or verification
-- Troubleshooting or notes, if needed
-- See also
+**Goal:** Help a competent reader complete one real task.
+
+```markdown
+# [Task-oriented title, e.g., Configure SAML single sign-on]
+
+## Goal
+State the task and the desired result in 1-2 sentences.
+
+## Before you begin
+- Required access, tools, accounts, or configuration.
+- Assumed knowledge. Do not teach it here.
+
+## Steps
+
+### 1. [Action]
+Do the next concrete action.
+
+### 2. [Action]
+Continue until the task is complete.
+
+## Verify the result
+Show how the reader knows the task worked.
+
+## Troubleshooting
+Only include issues that block this task. Link deeper explanations elsewhere.
+
+## See also
+- [Reference page]
+- [Explanation page]
+```
 
 Rules:
 
 - One task per page.
 - Assume competence.
 - Keep the path short and practical.
+- Link concepts and reference data instead of teaching them inline.
 
 ## Reference blueprint
 
-- Title
-- Brief description
-- Terminology or scope, if needed
-- Structured entries or sections
-- Tables, lists, or schemas
-- Commands, flags, parameters, values, or limits
-- Examples
-- Related reference links
+**Goal:** Let the reader look up exact facts quickly.
+
+```markdown
+# [Thing being described]
+
+Brief neutral description of the thing and its scope.
+
+## Syntax or shape
+Show the command, object, endpoint, schema, or file format.
+
+## Fields / parameters / options
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `<name>` | `<type>` | yes/no | Exact meaning. |
+
+## Values and limits
+List allowed values, defaults, limits, status codes, or constraints.
+
+## Examples
+Show minimal valid examples of input and output.
+
+## Related reference
+- [Related entry]
+```
 
 Rules:
 
 - Be neutral.
-- Describe only.
+- Describe only; do not instruct.
 - Follow the structure of the thing described.
+- Keep entries parallel and complete.
 
 ## Explanation blueprint
 
-- Title that can be read as "About ..."
-- Short overview
-- Background
-- Why it matters
-- Conceptual discussion
-- Alternatives or tradeoffs
-- Implications
-- Related topics
+**Goal:** Help the reader understand one concept, design decision, or tradeoff.
+
+```markdown
+# About [concept]
+
+## Overview
+Frame the concept and why it matters.
+
+## Background
+Give only the context needed to understand this concept.
+
+## How it works
+Explain relationships, mechanisms, or mental models.
+
+## Tradeoffs and alternatives
+Compare approaches and explain the consequences.
+
+## Implications
+Say what this means for users, maintainers, or system design.
+
+## Related topics
+- [Tutorial, how-to, or reference link]
+```
 
 Rules:
 
 - Explain the why.
 - Connect ideas.
 - Keep it bounded.
+- Do not include step-by-step procedures.
 
 ## Quickstart blueprint
 

@@ -7,6 +7,19 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+### Validation and portability hardening
+
+#### Added
+
+- `scripts/check_local.py` and `.github/workflows/ci.yml`: added a version-consistency check so `SKILL.md`, `evals/evals.json`, and `CHANGELOG.md` stay in sync.
+- `README.md` and `README.zh-CN.md`: added a Claude Code installation path and clarified that `.opencode/commands/` are Opencode-specific while `SKILL.md` is the portable core.
+
+#### Changed
+
+- `references/doc-blueprints.md`: expanded the how-to, reference, and explanation blueprints into concrete Markdown skeletons, matching the existing tutorial skeleton.
+- `scripts/export_rules.py`: now reads `SKILL.md` from the skill repository but writes rule files into the current working directory, making it safer and more useful when exporting into other projects.
+- `README.md`, `README.zh-CN.md`, and `CONTRIBUTING.md`: documented the stronger version-consistency validation and the clarified export behavior.
+
 ### Review follow-up fixes
 
 #### Added

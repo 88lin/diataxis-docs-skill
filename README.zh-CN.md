@@ -274,6 +274,18 @@ git clone https://github.com/88lin/diataxis-docs-skill.git ~/.config/opencode/sk
 
 保存后重启 Opencode。
 
+### 方式三：作为 Claude Code skill 使用
+
+Claude Code 会从 `~/.claude/skills/<skill-name>/` 加载 skill，并使用同一个 `SKILL.md` 作为入口。可以把本仓库克隆或复制到那里：
+
+```bash
+git clone https://github.com/88lin/diataxis-docs-skill.git ~/.claude/skills/diataxis-docs
+```
+
+Claude Code 通常会自动检测新增或修改过的 skills。如果这是你第一次创建 `~/.claude/skills/`，或者 skill 没有出现，再重启 Claude Code 让 skill registry 重新加载。
+
+> 注意：`.opencode/commands/` 目录里是 Opencode 的斜杠命令 prompt。核心 skill 指令在 `SKILL.md` 中，可以迁移到其它工具；命令发现方式取决于具体宿主工具。
+
 ---
 
 ## 示例提问
@@ -415,6 +427,7 @@ python scripts/check_local.py
 - Markdown 文件里没有隐藏的零宽字符。
 - audit_docs.py 的单元测试通过。
 - 必需文件（skill 主体、references、examples、commands、CI）都存在。
+- `SKILL.md`、`evals/evals.json` 和 `CHANGELOG.md` 的当前版本一致。
 
 CI 定义在 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)，对 `master` 分支的每次 push 和 PR 都会跑。
 
@@ -449,13 +462,17 @@ python scripts/audit_docs.py docs/
 | **Continue** | `.continue/rules/diataxis.md` |
 | **Amazon Q Developer** | `.amazonq/rules/diataxis.md` |
 
-按你团队使用的工具栈跑脚本即可：
+在需要接收 rules 文件的项目目录下运行这个脚本：
 
 ```bash
+# 在本仓库内运行，会导出到本仓库：
 python scripts/export_rules.py
+
+# 在其它项目中运行，会把这个 skill 的规则导出到当前项目：
+python /path/to/diataxis-docs-skill/scripts/export_rules.py
 ```
 
-*注：脚本对已有项目是安全的——会自动创建必要的隐藏目录（比如 `.github/`），但**绝不覆盖**已有的 rules 文件。*
+*注：脚本会从这个 skill 仓库读取 `SKILL.md`，并把 rules 文件写入当前工作目录。它会自动创建必要的隐藏目录（比如 `.github/`），但**绝不覆盖**已有的 rules 文件。*
 
 ### 工具适配说明
 

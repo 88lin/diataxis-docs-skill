@@ -240,6 +240,40 @@ def check_skill_frontmatter() -> list[str]:
     return problems
 
 
+def check_version_consistency() -> list[str]:
+    """Check that SKILL.md, evals.json, and CHANGELOG.md agree on version."""
+    problems: list[str] = []
+
+    skill_text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+    skill_match = re.search(r"^version:\s*([^\s]+)\s*$", skill_text, re.MULTILINE)
+    skill_version = skill_match.group(1).strip('"\'') if skill_match else ""
+
+    evals_path = ROOT / "evals" / "evals.json"
+    evals_data = json.loads(evals_path.read_text(encoding="utf-8"))
+    evals_version = str(evals_data.get("version", "")).strip()
+
+    changelog_text = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    released_versions = set(re.findall(r"^## \[([^\]]+)\]", changelog_text, re.MULTILINE))
+
+    if not skill_version:
+        problems.append("SKILL.md: version is missing")
+    if not evals_version:
+        problems.append("evals/evals.json: top-level version is missing")
+    if skill_version and evals_version and skill_version != evals_version:
+        problems.append(
+            f"version mismatch: SKILL.md has {skill_version!r}, "
+            f"evals/evals.json has {evals_version!r}"
+        )
+    if skill_version and skill_version not in released_versions:
+        problems.append(
+            f"CHANGELOG.md: missing release heading for version {skill_version!r}"
+        )
+
+    if not problems:
+        print(f"  version consistency OK: {skill_version}")
+    return problems
+
+
 def check_audit_docs_tests() -> list[str]:
     """Run the audit_docs.py unit tests."""
     result = subprocess.run(
@@ -264,6 +298,7 @@ def main() -> int:
         ("links", check_links),
         ("structure", check_structure),
         ("frontmatter", check_skill_frontmatter),
+        ("version-consistency", check_version_consistency),
         ("audit-docs-tests", check_audit_docs_tests),
     ]:
         all_problems.extend(fn())

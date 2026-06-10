@@ -266,3 +266,42 @@ jobs:
               sys.exit(1)
           print("SKILL.md frontmatter OK")
           PY
+
+      - name: Check version consistency
+        run: |
+          set -e
+          python - <<'PY'
+          import json
+          import re
+          import sys
+          from pathlib import Path
+
+          skill_text = Path("SKILL.md").read_text(encoding="utf-8")
+          skill_match = re.search(r"^version:\s*([^\s]+)\s*$", skill_text, re.MULTILINE)
+          skill_version = skill_match.group(1).strip('"\'') if skill_match else ""
+
+          evals_data = json.loads(Path("evals/evals.json").read_text(encoding="utf-8"))
+          evals_version = str(evals_data.get("version", "")).strip()
+
+          changelog_text = Path("CHANGELOG.md").read_text(encoding="utf-8")
+          released_versions = set(re.findall(r"^## \[([^\]]+)\]", changelog_text, re.MULTILINE))
+
+          problems = []
+          if not skill_version:
+              problems.append("SKILL.md: version is missing")
+          if not evals_version:
+              problems.append("evals/evals.json: top-level version is missing")
+          if skill_version and evals_version and skill_version != evals_version:
+              problems.append(
+                  f"version mismatch: SKILL.md has {skill_version!r}, "
+                  f"evals/evals.json has {evals_version!r}"
+              )
+          if skill_version and skill_version not in released_versions:
+              problems.append(f"CHANGELOG.md: missing release heading for version {skill_version!r}")
+
+          if problems:
+              for problem in problems:
+                  print(problem)
+              sys.exit(1)
+          print(f"Version consistency OK: {skill_version}")
+          PY

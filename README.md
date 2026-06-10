@@ -266,6 +266,18 @@ Add the folder path to your `opencode.json`:
 
 Then restart Opencode.
 
+### Option 3: use it as a Claude Code skill
+
+Claude Code skills are loaded from `~/.claude/skills/<skill-name>/` and use the same `SKILL.md` entry point. Clone or copy this repository there:
+
+```bash
+git clone https://github.com/88lin/diataxis-docs-skill.git ~/.claude/skills/diataxis-docs
+```
+
+Claude Code usually detects new or changed skills automatically. If this is the first time you created `~/.claude/skills/`, or if the skill does not appear, restart Claude Code so the skill registry reloads.
+
+> Note: the `.opencode/commands/` directory contains Opencode slash-command prompts. The core skill instructions are in `SKILL.md` and are portable; command discovery depends on the host tool.
+
 ---
 
 ## Example prompts
@@ -407,6 +419,7 @@ The script validates:
 - Markdown files do not contain hidden zero-width characters.
 - The audit_docs.py unit tests pass.
 - All required files (skill, references, examples, commands, CI) are present.
+- `SKILL.md`, `evals/evals.json`, and `CHANGELOG.md` agree on the current version.
 
 CI is defined in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) and runs on every push and pull request to `master`.
 
@@ -441,13 +454,17 @@ The modern AI coding ecosystem is fragmented. To help you enforce Diátaxis stan
 | **Continue** | `.continue/rules/diataxis.md` |
 | **Amazon Q Developer** | `.amazonq/rules/diataxis.md` |
 
-Run the helper script to generate the files for your specific stack:
+Run the helper script from the project that should receive the rule files:
 
 ```bash
+# From this repository, export into this repository:
 python scripts/export_rules.py
+
+# From another project, export this skill's rules into that project:
+python /path/to/diataxis-docs-skill/scripts/export_rules.py
 ```
 
-*Note: The script is safe to run in existing projects. It will automatically create necessary hidden directories (like `.github/`) but will **never overwrite** existing rule files.*
+*Note: The script reads `SKILL.md` from this skill repository and writes rule files into the current working directory. It will automatically create necessary hidden directories (like `.github/`) but will **never overwrite** existing rule files.*
 
 ### Tool-specific notes
 
