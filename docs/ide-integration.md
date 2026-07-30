@@ -1,0 +1,100 @@
+# Export the guidance to other AI assistants
+
+This repository is packaged as an OpenCode skill, but the guidance in `SKILL.md` is portable. [`scripts/export_rules.py`](../scripts/export_rules.py) writes it to the rule-file path each assistant reads, with the frontmatter that tool needs.
+
+## Before you start
+
+Read [Context cost](#context-cost) first. Ten of the thirteen targets load into every request in the project, and the full guidance costs roughly 5,200 tokens each time.
+
+## List the targets
+
+```bash
+python scripts/export_rules.py --list
+```
+
+13 rule files across 11 assistants:
+
+| Key | Tool | Path | Always-on |
+| --- | --- | --- | --- |
+| `cursor` | Cursor | `.cursor/rules/diataxis.mdc` | no |
+| `cursor-legacy` | Cursor (legacy) | `.cursorrules` | yes |
+| `cline` | Cline | `.clinerules` | yes |
+| `roo` | Roo Code | `.roo/rules/diataxis.md` | yes |
+| `windsurf` | Windsurf | `.windsurf/rules/diataxis.md` | no |
+| `windsurf-legacy` | Windsurf (legacy) | `.windsurfrules` | yes |
+| `copilot` | GitHub Copilot | `.github/copilot-instructions.md` | yes |
+| `claude` | Claude Code | `CLAUDE.md` | yes |
+| `codex` | OpenAI Codex | `AGENTS.md` | yes |
+| `aider` | Aider | `CONVENTIONS.md` | yes |
+| `gemini` | Gemini CLI | `GEMINI.md` | yes |
+| `continue` | Continue | `.continue/rules/diataxis.md` | no |
+| `amazonq` | Amazon Q Developer | `.amazonq/rules/diataxis.md` | yes |
+
+## Preview before writing
+
+`--dry-run` reports what would happen and writes nothing:
+
+```bash
+python /path/to/diataxis-docs-skill/scripts/export_rules.py --target . --dry-run
+```
+
+## Export
+
+Run from the project that should receive the rule files, or point `--target` at it:
+
+```bash
+# Everything, into the current project
+python /path/to/diataxis-docs-skill/scripts/export_rules.py
+
+# Only the tools your team uses, compact form
+python /path/to/diataxis-docs-skill/scripts/export_rules.py --only claude --only cursor --compact
+```
+
+Existing files are never overwritten unless you pass `--force`.
+
+## Options
+
+| Option | Effect |
+| --- | --- |
+| `--target DIR` | Project to export into. Defaults to the current directory. |
+| `--only KEY` | Export one target. Repeat for several. |
+| `--list` | Print the target table and exit. |
+| `--dry-run` | Report planned writes without touching the filesystem. |
+| `--force` | Overwrite existing rule files. |
+| `--compact` | Export five sections instead of the whole guide. |
+
+## Context cost
+
+An always-on rule file is prepended to every request in that project. The full guidance is about 20,900 characters, roughly 5,200 tokens per request.
+
+`--compact` exports only the compass, the quick decision tree, the non-trigger list, the anti-patterns, and the quality checks — about 9,400 characters, roughly 2,300 tokens. That is enough for the assistant to classify a request correctly and to avoid the common failure modes.
+
+Use the full export for the three targets that load conditionally (`cursor`, `windsurf`, `continue`), and `--compact` for the rest.
+
+## Tool-specific notes
+
+**Cursor.** Project rules must use the `.mdc` extension; a plain `.md` file in `.cursor/rules` is ignored by the rules system. The script writes `.cursor/rules/diataxis.mdc` with `description` and `alwaysApply: false`, which makes it an agent-requested rule: Cursor reads the description and pulls the rule in when the task looks documentation-related. Do not run the legacy `.cursorrules` target at the same time.
+
+**Windsurf.** Workspace rules are capped at 12,000 characters per file. The full guidance exceeds that, so use `--compact` for Windsurf. The script prints a warning when a target exceeds its documented limit.
+
+**Roo Code.** Every file in `.roo/rules/` is loaded on every request, so this target is effectively always-on even though it lives in a rules directory.
+
+**Continue.** The script writes `name`, `description`, and `alwaysApply: false`, which lets the agent decide when to pull the rule in.
+
+**Aider.** Writing `CONVENTIONS.md` is only half the job. Aider does not read it until you add it to `.aider.conf.yml`:
+
+```yaml
+read:
+  - CONVENTIONS.md
+```
+
+## Keep exports out of version control
+
+The exported files are derived from `SKILL.md`. This repository's `.gitignore` excludes them so a local export never lands in a commit. In your own project, decide whether to commit them: committing shares the rules with your team, and ignoring them keeps a single source of truth.
+
+## Re-export after an update
+
+```bash
+git -C /path/to/diataxis-docs-skill pull
+python /path/to/diataxis-docs-skill/scripts/export_rules.py --target . --force
+```
