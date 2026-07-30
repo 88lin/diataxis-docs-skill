@@ -1,99 +1,313 @@
 #!/usr/bin/env python3
-"""Universal AI IDE Rules Exporter for Diataxis.
+"""Export SKILL.md as rule files for AI coding assistants.
 
-Exports SKILL.md to 12 rule-file targets across 11 major AI coding
-assistants (Cursor, Cline, Roo Code, Windsurf, GitHub Copilot,
-Claude Code, OpenAI Codex, Aider, Gemini CLI, Continue, Amazon Q
-Developer). Reads SKILL.md, strips the Opencode-specific frontmatter,
-prepends a gentle preamble aligned with the
-"guide, not a plan" philosophy, and writes the body to the
-standard rule-file path for each tool.
+Writes the Diataxis guide to the rule-file path each assistant reads, adding
+the frontmatter that tool requires so the exported file is actually loaded.
 
-Existing files are never overwritten. Parent directories that
-do not yet exist (such as .github/ or .cursor/rules/) are
-created on demand.
+Two things are worth knowing before you run this:
+
+1.  Several targets are *always-on* context. Cline, Roo Code, Copilot, Claude
+    Code, Codex, Aider, Gemini CLI, and Amazon Q load their rule file into
+    every request in the project. Exporting the full SKILL.md there costs
+    roughly 5k tokens per request. Use --compact for those.
+2.  Tool-specific formats are not interchangeable. Cursor ignores plain .md
+    files in .cursor/rules (they must be .mdc), and Windsurf workspace rules
+    are capped at 12,000 characters. This script writes the correct extension
+    and warns when a file exceeds a documented limit.
 
 Usage:
-    # From this repository, export into this repository:
-    python scripts/export_rules.py
-
-    # From another project, export this skill's rules into that project:
-    python /path/to/diataxis-docs-skill/scripts/export_rules.py
+    python scripts/export_rules.py --list
+    python scripts/export_rules.py --dry-run
+    python scripts/export_rules.py --only claude --only cursor --compact
+    python scripts/export_rules.py --target ../my-project --force
 """
+
+from __future__ import annotations
+
+import argparse
+import re
+import sys
+from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Sequence
 
 SOURCE_ROOT = Path(__file__).resolve().parent.parent
-TARGET_ROOT = Path.cwd()
 SKILL_PATH = SOURCE_ROOT / "SKILL.md"
 
-# Mapping of AI Tool -> Target Rule File Path, relative to the project that
-# should receive the exported rule files. Run from that target project root.
-TARGETS: list[tuple[str, Path]] = [
-    ("Cursor (Legacy)", Path(".cursorrules")),
-    ("Cursor (New Rules)", Path(".cursor/rules/diataxis.md")),
-    ("Cline", Path(".clinerules")),
-    ("Roo Code", Path(".roo/rules/diataxis.md")),
-    ("Windsurf", Path(".windsurfrules")),
-    ("GitHub Copilot", Path(".github/copilot-instructions.md")),
-    ("Claude Code", Path("CLAUDE.md")),
-    ("OpenAI Codex", Path("AGENTS.md")),
-    ("Aider", Path("CONVENTIONS.md")),
-    ("Gemini CLI", Path("GEMINI.md")),
-    ("Continue", Path(".continue/rules/diataxis.md")),
-    ("Amazon Q Developer", Path(".amazonq/rules/diataxis.md")),
+FRONTMATTER_RE = re.compile(r"\A---[ \t]*\r?\n.*?\r?\n---[ \t]*(?:\r?\n|\Z)", re.DOTALL)
+
+RULE_DESCRIPTION = (
+    "Diataxis documentation guide: classify a docs request as tutorial, how-to, "
+    "reference, or explanation, and write it in the right form."
+)
+
+# Sections kept by --compact, matched on the H2 heading text.
+COMPACT_SECTIONS = [
+    "The Diataxis compass",
+    "Quick decision tree",
+    "When NOT to use this skill",
+    "Anti-patterns: what NOT to do",
+    "Quality checks",
+]
+
+PREAMBLE = (
+    "# Diataxis Documentation Guide\n"
+    "\n"
+    "A systematic approach to technical documentation based on the Diataxis "
+    "framework. Use it to classify what the reader needs and structure "
+    "documentation accordingly, as a guide rather than a rigid template.\n"
+    "\n"
+    "---\n"
+    "\n"
+)
+
+
+@dataclass(frozen=True)
+class Target:
+    """One assistant's rule file."""
+
+    key: str
+    name: str
+    path: Path
+    frontmatter: dict[str, str] = field(default_factory=dict)
+    char_limit: int | None = None
+    always_on: bool = True
+    note: str = ""
+
+
+# Ordered by tool. `always_on` marks targets whose content enters every request
+# in the project, which is where --compact matters most.
+TARGETS: list[Target] = [
+    Target(
+        key="cursor",
+        name="Cursor",
+        path=Path(".cursor/rules/diataxis.mdc"),
+        frontmatter={"description": RULE_DESCRIPTION, "alwaysApply": "false"},
+        always_on=False,
+        note="Must be .mdc; Cursor ignores plain .md files in .cursor/rules.",
+    ),
+    Target(
+        key="cursor-legacy",
+        name="Cursor (legacy)",
+        path=Path(".cursorrules"),
+        note="Deprecated by Cursor. Do not use alongside .cursor/rules.",
+    ),
+    Target(key="cline", name="Cline", path=Path(".clinerules")),
+    Target(
+        key="roo",
+        name="Roo Code",
+        path=Path(".roo/rules/diataxis.md"),
+        note="Roo loads every file in .roo/rules, so this is always-on context.",
+    ),
+    Target(
+        key="windsurf",
+        name="Windsurf",
+        path=Path(".windsurf/rules/diataxis.md"),
+        frontmatter={"trigger": "model_decision", "description": RULE_DESCRIPTION},
+        char_limit=12000,
+        always_on=False,
+        note="Workspace rules are capped at 12,000 characters.",
+    ),
+    Target(
+        key="windsurf-legacy",
+        name="Windsurf (legacy)",
+        path=Path(".windsurfrules"),
+        char_limit=6000,
+        note="Legacy single-file format; prefer .windsurf/rules.",
+    ),
+    Target(key="copilot", name="GitHub Copilot", path=Path(".github/copilot-instructions.md")),
+    Target(key="claude", name="Claude Code", path=Path("CLAUDE.md")),
+    Target(key="codex", name="OpenAI Codex", path=Path("AGENTS.md")),
+    Target(key="aider", name="Aider", path=Path("CONVENTIONS.md")),
+    Target(key="gemini", name="Gemini CLI", path=Path("GEMINI.md")),
+    Target(
+        key="continue",
+        name="Continue",
+        path=Path(".continue/rules/diataxis.md"),
+        frontmatter={
+            "name": "Diataxis Documentation Guide",
+            "description": RULE_DESCRIPTION,
+            "alwaysApply": "false",
+        },
+        always_on=False,
+    ),
+    Target(key="amazonq", name="Amazon Q Developer", path=Path(".amazonq/rules/diataxis.md")),
 ]
 
 
 def strip_frontmatter(content: str) -> str:
-    """Remove the leading Opencode YAML frontmatter from SKILL.md."""
-    if content.startswith("---"):
-        parts = content.split("---", 2)
-        if len(parts) >= 3:
-            return parts[2].strip()
-    return content
+    """Remove a leading YAML frontmatter block.
+
+    Uses an anchored regex rather than a naive split on '---', which would be
+    broken by a thematic break or a table separator in the body.
+    """
+    return FRONTMATTER_RE.sub("", content, count=1).strip()
 
 
-def export() -> None:
-    if not SKILL_PATH.exists():
-        print(f"Error: {SKILL_PATH} not found.")
-        return
+def extract_sections(body: str, headings: Sequence[str]) -> tuple[str, list[str]]:
+    """Return the requested H2 sections in document order, plus any missing ones."""
+    lines = body.splitlines()
+    wanted = {heading.strip().casefold(): heading for heading in headings}
+    found: set[str] = set()
+    collected: list[str] = []
+    keeping = False
 
-    raw_content = SKILL_PATH.read_text(encoding="utf-8")
+    for line in lines:
+        if line.startswith("## "):
+            title = line[3:].strip().casefold()
+            keeping = title in wanted
+            if keeping:
+                found.add(title)
+        elif line.startswith("# "):
+            keeping = False
+        if keeping:
+            collected.append(line)
 
-    body_content = strip_frontmatter(raw_content)
+    missing = [wanted[key] for key in wanted if key not in found]
+    return "\n".join(collected).strip(), sorted(missing)
 
-    preamble = (
-        "# Diataxis Documentation Guide\n"
-        "This document outlines a systematic approach to technical documentation "
-        "based on the Diataxis framework. Use it as a guide to help classify user "
-        "needs and structure documentation organically, rather than as a rigid "
-        "template.\n"
-        "\n"
-        "---\n"
-        "\n"
+
+def render_frontmatter(fields: dict[str, str]) -> str:
+    if not fields:
+        return ""
+    lines = ["---"]
+    for key, value in fields.items():
+        needs_quotes = any(char in value for char in ":#") and not value.startswith('"')
+        lines.append(f'{key}: "{value}"' if needs_quotes else f"{key}: {value}")
+    lines.append("---")
+    return "\n".join(lines) + "\n\n"
+
+
+def build_content(target: Target, body: str) -> str:
+    return render_frontmatter(target.frontmatter) + PREAMBLE + body + "\n"
+
+
+def approx_tokens(text: str) -> int:
+    """Very rough token estimate for context-cost reporting."""
+    return len(text) // 4
+
+
+def select_targets(keys: Sequence[str]) -> tuple[list[Target], list[str]]:
+    if not keys:
+        return list(TARGETS), []
+    by_key = {target.key: target for target in TARGETS}
+    selected = [by_key[key] for key in keys if key in by_key]
+    unknown = [key for key in keys if key not in by_key]
+    return selected, unknown
+
+
+def print_target_table() -> None:
+    width = max(len(target.key) for target in TARGETS)
+    print(f"{len(TARGETS)} rule-file targets across 11 assistants:\n")
+    print(f"{'KEY'.ljust(width)}  {'TOOL'.ljust(20)}  {'ALWAYS-ON'.ljust(9)}  PATH")
+    for target in TARGETS:
+        always = "yes" if target.always_on else "no"
+        print(f"{target.key.ljust(width)}  {target.name.ljust(20)}  {always.ljust(9)}  {target.path.as_posix()}")
+    print("\nAlways-on targets enter every request in the project. Use --compact for those.")
+
+
+def parse_args(argv: Sequence[str]) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Export SKILL.md as rule files for AI coding assistants.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
+    parser.add_argument("--target", type=Path, default=Path.cwd(), help="Project to export into (default: cwd)")
+    parser.add_argument("--only", action="append", default=[], metavar="KEY", help="Export one target key. Repeatable.")
+    parser.add_argument("--list", action="store_true", help="List target keys and paths, then exit")
+    parser.add_argument("--dry-run", action="store_true", help="Report what would be written without writing")
+    parser.add_argument("--force", action="store_true", help="Overwrite existing rule files")
+    parser.add_argument(
+        "--compact",
+        action="store_true",
+        help="Export only the compass, decision tree, non-triggers, anti-patterns, and quality checks",
+    )
+    return parser.parse_args(argv)
 
-    final_content = preamble + body_content
 
-    print("Exporting Diataxis rules for various AI coding assistants...")
-    print(f"Target project: {TARGET_ROOT}\n")
+def main(argv: Sequence[str] | None = None) -> int:
+    args = parse_args(list(argv) if argv is not None else sys.argv[1:])
 
-    exported_count = 0
-    for name, relative_path in TARGETS:
-        path = TARGET_ROOT / relative_path
-        display_path = relative_path.as_posix()
-        if path.exists():
-            print(f"Skipping {name:<18} ({display_path}) - File already exists.")
+    if args.list:
+        print_target_table()
+        return 0
+
+    targets, unknown = select_targets(args.only)
+    if unknown:
+        print(f"Error: unknown target key(s): {', '.join(unknown)}", file=sys.stderr)
+        print(f"Known keys: {', '.join(t.key for t in TARGETS)}", file=sys.stderr)
+        return 1
+
+    if not SKILL_PATH.is_file():
+        print(f"Error: {SKILL_PATH} not found.", file=sys.stderr)
+        return 1
+
+    body = strip_frontmatter(SKILL_PATH.read_text(encoding="utf-8"))
+    if args.compact:
+        body, missing = extract_sections(body, COMPACT_SECTIONS)
+        if missing:
+            print(f"Error: --compact could not find section(s): {', '.join(missing)}", file=sys.stderr)
+            return 1
+        if not body:
+            print("Error: --compact produced an empty document.", file=sys.stderr)
+            return 1
+
+    target_root = args.target.resolve()
+    if not target_root.is_dir():
+        print(f"Error: target directory not found: {target_root}", file=sys.stderr)
+        return 1
+
+    mode = "Planning" if args.dry_run else "Exporting"
+    print(f"{mode} Diataxis rules ({'compact' if args.compact else 'full'}) into {target_root}\n")
+
+    written = 0
+    skipped = 0
+    failed = 0
+
+    for target in targets:
+        content = build_content(target, body)
+        path = target_root / target.path
+        display = target.path.as_posix()
+        label = f"{target.name:<19} {display}"
+
+        if target.char_limit and len(content) > target.char_limit:
+            print(f"  WARN  {label} - {len(content)} chars exceeds the {target.char_limit} limit; use --compact")
+
+        if path.exists() and not args.force:
+            print(f"  SKIP  {label} - exists (use --force to overwrite)")
+            skipped += 1
             continue
 
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(final_content, encoding="utf-8")
-        print(f"Exported {name:<18} -> {display_path}")
-        exported_count += 1
+        if args.dry_run:
+            action = "would overwrite" if path.exists() else "would write"
+            print(f"  PLAN  {label} - {action}, {len(content)} chars")
+            written += 1
+            continue
 
-    print(f"\nDone! Exported {exported_count} new rule files.")
-    print("Diataxis is a guide, not a plan. Feel free to edit these files to fit your workflow.")
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(content, encoding="utf-8")
+        except OSError as error:
+            print(f"  FAIL  {label} - {error}", file=sys.stderr)
+            failed += 1
+            continue
+
+        action = "overwrote" if args.force else "wrote"
+        print(f"  OK    {label} - {action}, {len(content)} chars")
+        written += 1
+
+    verb = "would write" if args.dry_run else "wrote"
+    print(f"\n{verb} {written}, skipped {skipped}, failed {failed}.")
+
+    always_on = [t for t in targets if t.always_on]
+    if always_on and not args.compact:
+        cost = approx_tokens(build_content(always_on[0], body))
+        print(
+            f"Note: {len(always_on)} of these targets load into every request. "
+            f"That is roughly {cost} tokens per request each. Re-run with --compact to shrink them."
+        )
+
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":
-    export()
+    raise SystemExit(main())
