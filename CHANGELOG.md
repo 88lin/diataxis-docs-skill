@@ -5,126 +5,69 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.2.0] - 2026-07-31
 
-### Validation and portability hardening
+Documentation-structure release. The repository now follows its own advice: a
+short entry README with a bilingual `docs/` tree, a slimmer `SKILL.md`, and
+validation scripts that are unit-tested instead of duplicated inside CI.
 
-#### Added
+### Removed
 
-- `scripts/check_local.py` and `.github/workflows/ci.yml`: added a version-consistency check so `SKILL.md`, `evals/evals.json`, and `CHANGELOG.md` stay in sync.
-- `README.md` and `README.zh-CN.md`: added a Claude Code installation path and clarified that `.opencode/commands/` are Opencode-specific while `SKILL.md` is the portable core.
+- **Breaking.** `README.md` and `README.zh-CN.md`: dropped the "Option 2" install method that used a `{"skills": {"paths": [...]}}` block in `opencode.json`. OpenCode has no such config key, so that method never worked. Cloning into a `diataxis-docs` directory is now the only documented layout.
+- **Breaking.** `SKILL.md`: removed the top-level `version` frontmatter field. It is not part of the skill spec and is silently ignored by the runtime; the value now lives under `metadata.version`.
+- `.github/workflows/ci.yml`: removed roughly 11 KB of inline Python that re-implemented `scripts/check_local.py`. The two copies had already drifted apart.
+- `SKILL.md`: removed the `Core idea`, `Template selection heuristic`, `Writing patterns`, and `Practical output pattern` sections. Each restated guidance that already appeared elsewhere in the file; the unique content was merged into the sections that kept it.
 
-#### Changed
+### Added
 
-- `references/doc-blueprints.md`: expanded the how-to, reference, and explanation blueprints into concrete Markdown skeletons, matching the existing tutorial skeleton.
-- `scripts/export_rules.py`: now reads `SKILL.md` from the skill repository but writes rule files into the current working directory, making it safer and more useful when exporting into other projects.
-- `README.md`, `README.zh-CN.md`, and `CONTRIBUTING.md`: documented the stronger version-consistency validation and the clarified export behavior.
+- `docs/` and `docs/zh-CN/`: five task-scoped pages per language covering installation, slash commands, IDE integration, development, and FAQ. Both trees are kept in sync by a new parity check.
+- `scripts/audit_docs.py`: `--fail-on {none,medium,high}` for CI gating and a repeatable `--exclude GLOB` for files that are legitimately mixed-form, such as the changelog.
+- `scripts/export_rules.py`: `--list`, `--dry-run`, `--force`, `--only KEY`, `--target DIR`, and `--compact`. `--compact` exports five decision-critical sections instead of the whole body.
+- `scripts/export_rules.py`: a Windsurf modern-format target (`.windsurf/rules/diataxis.md`), bringing the exporter to 13 rule files across 11 assistants.
+- `tests/test_check_local.py`: unit tests for frontmatter parsing, name and description validation, install-path scanning, anchor resolution, and the repository's own metadata.
+- `.gitignore`: ignores Python build artefacts and every rule file `export_rules.py` can write, so exporting into this repository no longer dirties the tree.
+- `references/template-map.md`: an `Artifact to compass cell` table, moved out of `SKILL.md`.
+- `evals/evals.json`: a top-level `categories` array listing the 11 categories the 32 evals cover.
+- `scripts/check_local.py` and `.github/workflows/ci.yml`: version-consistency check keeping `SKILL.md`, `evals/evals.json`, and `CHANGELOG.md` in agreement.
+- `scripts/audit_docs.py`: heuristic scanner flagging pages with mixed-form signals (step-like lines, reference tables, code blocks, explanation terms).
+- `references/zh-cn-anti-patterns.md`: Chinese-language documentation smell signals for Chinese-first docs and localization review.
+- `evals/evals.json`: a large-system migration eval for a 50-page SDK site, plus two anti-pattern-avoidance evals (a Quickstart on OAuth2, and a Reference page smuggling a 5-step guide).
+- `references/doc-blueprints.md`: how-to, reference, and explanation blueprints expanded into concrete Markdown skeletons, matching the tutorial skeleton.
 
-### Review follow-up fixes
+### Changed
 
-#### Added
+- **Breaking.** `scripts/export_rules.py`: the Cursor target is now `.cursor/rules/diataxis.mdc` with `description` and `alwaysApply: false` frontmatter. Cursor ignores plain `.md` files in `.cursor/rules`, so the previous `.md` output was never loaded. Delete any stale `.cursor/rules/diataxis.md` after upgrading.
+- **Breaking.** `scripts/audit_docs.py`: the JSON signal key `tables` is now `table_rows`, matching what it counts.
+- `README.md` and `README.zh-CN.md`: rewritten as entry pages of about 130 lines. The previous 550-line versions were the only pages in the repository that the bundled audit script rated high risk.
+- `SKILL.md`: cut from 463 to 413 lines by removing verbatim repetition. Every remaining topic now has exactly one home.
+- `scripts/check_local.py`: rewritten. It validates skill and command frontmatter against the fields OpenCode actually recognises, checks eval structure, resolves Markdown links and heading anchors including HTML `<img src>`, and enforces translation parity.
+- `scripts/check_local.py`: unknown frontmatter keys are a warning, not an error. Both OpenCode and Claude Code ignore unrecognised keys, so failing on them would break custom metadata.
+- `scripts/check_local.py`: command frontmatter no longer needs a `name`. OpenCode derives the command name from the filename; when `name` is present it must still match.
+- `.github/workflows/ci.yml`: rewritten as a single matrix job over Python 3.11 and 3.12, with a read-only token, ref-scoped concurrency, and manual dispatch.
+- `scripts/export_rules.py`: emits the frontmatter each target needs and warns when output exceeds a target's character limit (12,000 for modern Windsurf rules, 6,000 for legacy `.windsurfrules`).
+- `docs/ide-integration.md`: documents the resident-context cost. Ten of the 13 targets load on every request, roughly 5,200 tokens for a full export against roughly 2,300 for `--compact`.
+- `scripts/export_rules.py`: expanded from 2 targets to 9 (Cursor legacy and modern, Cline, Roo Code, Windsurf, Copilot, Claude Code, Codex, Aider), then to 12 with Gemini CLI, Continue, and Amazon Q Developer.
+- `scripts/export_rules.py`: reads `SKILL.md` from the skill repository but writes rule files into the target directory, so it is safe to run inside another project.
+- `SKILL.md` and `references/reader-analysis.md`: added a tutorial-versus-how-to fallback that asks one clarifying question and defaults to a focused how-to only when the user cannot answer.
+- `SKILL.md`: the compass section now separates the *compass* (two questions plus a truth table, a decision tool) from the *map* (the static 2x2 diagram on diataxis.fr, an orientation tool), and opens with the official guidance that the compass earns its keep when the work feels routine but the answer is not yet obvious.
+- `SKILL.md`: `Workflow philosophy` now carries the official organic metaphor and reads "one step at a time" as finish-and-ship, since a step that is never shipped is not an improvement.
+- `SKILL.md`: Tutorial guidance no longer asks for a stated learning outcome. The official tutorial page treats "In this tutorial you will learn…" as presumptuous, so the bullet is now "start with what the reader will do or build", and `learn` was dropped from the trigger keywords.
+- `SKILL.md`, `evals/evals.json`: the Explanation requirement to "commit to a perspective" is now "offers a point of view or insight". Context-laying explanations that frame a topic without taking a position are valid.
+- `assets/preview.svg`: redrawn as an actual compass with axis labels, the four forms in their correct cells, and the classify-draft-link workflow in the footer.
 
-- `scripts/audit_docs.py`: added a pure Python heuristic scanner that flags documentation pages with mixed-form smell signals such as step-like lines, reference tables, code blocks, and explanation terms.
-- `references/zh-cn-anti-patterns.md`: added Chinese technical documentation smell signals for Chinese-first docs and localization review.
-- `evals/evals.json`: added a large-system migration eval for a 50-page SDK documentation site, focused on staged audit and iterative migration rather than a fixed IA.
-- `README.md` and `README.zh-CN.md`: bumped the Evals badge from 31 to 32.
+### Fixed
 
-#### Changed
-
-- `scripts/export_rules.py`, `README.md`, and `README.zh-CN.md`: expanded the export helper from 9 rule-file targets across 8 assistants to 12 targets across 11 assistants by adding Gemini CLI (`GEMINI.md`), Continue (`.continue/rules/diataxis.md`), and Amazon Q Developer (`.amazonq/rules/diataxis.md`).
-- `SKILL.md` and `references/reader-analysis.md`: added a tutorial-vs-how-to ambiguity fallback that asks one clarifying question and defaults to a focused how-to only when the user cannot clarify.
-- `assets/preview.svg`: refreshed the preview headline from a quote-heavy compass label to a clearer "Two questions, four forms" framing, removed decorative background circles, and replaced the long quote footer with the skill's practical classify-draft-link workflow.
-
-#### Fixed
-
-- `README.md` and `README.zh-CN.md`: clarified the difference between rule-file targets and distinct AI assistants, and added the cross-IDE integration section to the table of contents.
-- `README.md` and `README.zh-CN.md`: corrected the blueprint layering note so Diataxis has four core forms, with Quickstart described as a Tutorial sub-type rather than a fifth core form.
-- `evals/evals.json`: softened the large-system eval so it asks for an iterative first-pages plan and treats navigation as an emerging sketch, matching the "guide, not a plan" philosophy.
-- `references/doc-blueprints.md`: removed hidden zero-width characters from the tutorial code fence.
-- `CHANGELOG.md`: fixed the historical self-link to the SKILL.md anti-patterns section.
-- `scripts/check_local.py` and `.github/workflows/ci.yml`: extended Markdown validation to catch broken heading anchors and hidden zero-width characters, and now run the audit_docs.py unit tests.
-- `.github/workflows/ci.yml` and `CONTRIBUTING.md`: restored `scripts/export_rules.py` as an explicitly required project file and documented that requirement in local validation guidance.
-- `README.md` and `README.zh-CN.md`: updated the local development checklist so it matches the stronger Markdown anchor and zero-width-character validation.
-
-### Compass guidance, FAQ sync, and Before/After visual
-
-#### Changed
-
-- `SKILL.md`: `Use the compass flexibly` now opens with the official "when to use the compass" guidance. The compass is most useful when the work feels routine and the answer is not yet clear, because intuition can give an immediate answer that is also wrong. This pulls in a piece of the official compass page that was previously implicit in the body.
-- `SKILL.md`: the compass section now distinguishes the **compass** (a decision tool: two questions + truth-table) from the **Diataxis map** (the static 2x2 quadrant view on diataxis.fr). The map is for orientation; the compass is for decisions; the two are not interchangeable.
-- `README.md` and `README.zh-CN.md`: the FAQ "How is the skill evaluated?" answer now reports 29 evals across 11 categories and names the nine coverage areas (classification, mixed-form detection, per-form writing, review, migration, large-system planning, adjacent types, anti-pattern avoidance, non-trigger). The old text claimed 14 evals across 6 categories and had drifted out of sync with the `Evals: 29` badge.
-- `README.md` and `README.zh-CN.md`: the `Why this exists` / `为什么要这个 Skill` section now closes with a compact before-and-after file tree showing the `examples/messy-to-diataxis/` split (one mixed-form page → four single-form pages), so a new reader can see concretely what the skill produces.
-- `scripts/check_local.py`: `check_skill_frontmatter()` now prints a soft warning when the SKILL.md `description` exceeds 60 words, and adds the word count to the existing OK line. The warning is intentionally not a hard error: the current description is 52 words, well under the budget, and contributors who push past 60 words should see the warning and trim it without the build failing.
-- `CHANGELOG.md`: the "Preview image refresh and tag normalization" block has been moved from `[Unreleased]` into `[0.1.0]` so the changelog matches the actual content of the v0.1.0 tag (it was previously listed under Unreleased even though that commit was the one the tag points to).
-
-### Compass, workflow, and tutorial fidelity fixes
-
-#### Changed
-
-- `SKILL.md`: the `Use the compass flexibly` paragraph is now closer to the official diataxis.fr wording. The double "you think that you think" was dropped (the rhetorical self-doubt is captured by the surrounding "— or the documentation in front of you seems to be —" interpolation), but the parenthetical that the compass also applies to existing documentation is now present, and the surrounding sentence reads as a more faithful gloss of the official page.
-- `SKILL.md`: the compass-vs-map paragraph no longer speculates about what the official source means by "use the map". It now just defines the term — the *map* is the static 2x2 quadrant diagram on diataxis.fr; the *compass* is the question-based decision tool in this skill — and leaves the "use the map" / "use the compass" rhetorical distinction to the official page itself.
-- `SKILL.md`: `Workflow philosophy` now includes the official "organic" metaphor ("the way cells form a tissue") and the "finish and ship" reading of "one step at a time". The first makes the inside-out growth pattern explicit; the second closes the loop on the "small, responsive improvements" point — a step that is never shipped is not an improvement.
-- `SKILL.md`: `Tutorial` no longer asks for "a clear learning outcome" (the official tutorial page is explicit that "In this tutorial you will learn …" is presumptuous and recommends "we will create and deploy …" framing). The bullet is now "start with what the reader will do or build".
-- `SKILL.md`: `Tutorial` "Good signs" no longer includes `learn` as a trigger keyword. The other signals (`try`, `first time`, `hands-on`, `intro`, `walkthrough`) are all about the reader's stance and stay.
-- `SKILL.md`: the `Explanation` anti-pattern "No opinion. An explanation that does not commit to a perspective is just a summary" is now "No point of view or insight. An explanation that neither offers a perspective nor helps the reader form a new understanding is just a summary." The original wording made committing to a perspective a hard requirement, which the official page does not. Context-laying explanations that offer a frame without taking a position are still valid.
-
-### Per-form final check alignment
-
-#### Fixed
-
-- `SKILL.md`: the `Per-form final check` Explanation line still said "the author commits to a perspective" — a direct contradiction of the softened anti-pattern above. It now says "the author offers a point of view or insight", matching the new anti-pattern exactly. Caught during a follow-up review of the same Explanation guidance.
-
-### Bilingual and reference sync
-
-#### Changed
-
-- `README.md` and `README.zh-CN.md`: the `Workflow philosophy` / `工作流哲学` section is now in sync with `SKILL.md`. The English `Work one step at a time` bullet now says "finish and ship each one before starting the next"; the Chinese `一次只做一步` bullet now says "每步做完就发布，再开始下一步". The English `Diataxis changes the structure of your documentation from the inside` bullet now says "allow the work to develop organically and the structure will emerge"; the Chinese `Diataxis 从内部改变文档结构` bullet now says "让工作有机生长，结构会自然浮现". The README is the entry page for most readers, and the missing "ship" wording was a real gap — a step that is never shipped is not an improvement, and the constraint should appear on the entry page.
-- `references/doc-blueprints.md`: dropped the redundant `Learning goal` field from the Tutorial blueprint. The blueprint still has `What you will build or do` (a second-person planning field that the writer fills in with the same wording they will use in the output), and `Learning goal` was a near-duplicate that used the "learning" word SKILL.md has been moving away from. One field, no "learning", no redundancy.
-- `SKILL.md`: the `Mixed-doc smell test` line "A 'How-to' that begins with a learning outcome statement" is now "A 'How-to' that begins with 'In this tutorial you will learn…' or similar tutorial-style framing". The signal is the same; the wording now uses a concrete verbatim phrase instead of an abstract term that no longer appears in the positive guidance of this skill.
-
-### Eval wording alignment
-
-#### Fixed
-
-- `evals/evals.json`: eval #8's `expected_output` still said "An explanation that commits to a perspective …" — the old hard-requirement wording that the SKILL.md anti-pattern and final check were softened away from. It now says "offers a point of view or insight", matching the new anti-pattern and final check exactly. Caught by a content sweep after the Round 6 softening. The eval was the only place outside the changelog that still used the old wording.
-
-### Cross-IDE helper, trap evals, and Tutorial blueprint refresh
-
-#### Added
-
-- `scripts/export_rules.py`: a helper that reads `SKILL.md`, strips the Opencode-specific frontmatter, and writes the body to `.cursorrules` and `.clinerules` in the current working directory. Existing files are not overwritten. A short preamble (aligned with the "use as a guide, not a plan" philosophy, not the previous "strictly adhering" framing) is prepended so the rules file reads as a guide rather than a directive. This makes the core Diataxis guidance usable in Cursor and Cline / Roo Code workflows without turning the diataxis-docs-skill repo into a multi-IDE project.
-- `evals/evals.json`: two new `anti-pattern-avoidance` evals (#30 Quickstart on OAuth2, #31 Reference page that smuggles a 5-step bcrypt guide plus a "best practices" section). Both expected outputs use the soft "the AI should suggest splitting" wording, consistent with the project's "use the compass flexibly" stance. IDs are integers (30, 31) to match the existing 1-29 sequence.
-- `README.md` and `README.zh-CN.md`: new `Helper for Cursor and Cline users` / `给 Cursor 和 Cline 用户的辅助脚本` section explaining the export script. The README explicitly notes that the diataxis-docs-skill repo itself is an Opencode skill; the script is a *helper* for users of other AI coding assistants, not a claim that the skill is universally applicable as-is.
-
-#### Changed
-
-- `references/doc-blueprints.md`: the `Tutorial blueprint` is now a concrete markdown skeleton (Action-oriented title, Introduction that states what the reader will build or do, Prerequisites, numbered Steps with an inline bash block and an `*Expected output*` callout, Summary that links to the How-to for real-world variations) wrapped in a `**Goal:** Make the user feel successful` framing. The previous bullet-list form is replaced, not appended, so the file reads as a usable skeleton instead of a checklist. The other blueprints (How-to, Reference, Explanation) keep their existing bullet-list form for now; the Tutorial change is the only one that needed the "what the user will build or do" fix to align with the rest of the skill.
-- `scripts/check_local.py`: the `check_structure()` required-files list now includes `scripts/export_rules.py` so the helper cannot be deleted without the build failing.
-
-### Universal AI IDE Integration (9 targets)
-
-#### Changed
-
-- `scripts/export_rules.py`: expanded from 2 targets to 9. The new list covers Cursor (legacy + new rules), Cline, Roo Code, Windsurf, GitHub Copilot, Claude Code, OpenAI Codex, and Aider. The script creates parent directories on demand (e.g., `.github/`, `.cursor/rules/`) with `exist_ok=True` to avoid a benign race when the directory was just created by another process. Existing rule files are still never overwritten; the script prints a skip message and moves on.
-- `README.md` and `README.zh-CN.md`: the `Helper for Cursor and Cline users` section is replaced with `Universal AI IDE Integration` / `跨 AI IDE 集成`. The "universally applicable" framing is softened to "portable to other AI coding assistants, though each tool has its own conventions and you may want to adapt the file format to fit your stack". The "automatically formats and places" wording is corrected to "automatically writes the Diataxis rules to the standard rule-file path" — the script does not actually format differently per tool, it writes the same body to each target. The new section closes with a `Tool-specific notes` / `工具适配说明` subsection that honestly documents the two cases where users have to do something after running the script: Cursor new rules and Roo Code work better with a `description:` YAML frontmatter that the script does not add, and Aider requires `CONVENTIONS.md` to be added to the `read:` list in `.aider.conf.yml` to be loaded.
-
-### README and Installation sync
-
-#### Fixed
-
-- `README.md` and `README.zh-CN.md`: the `Repository structure` tree was missing `scripts/export_rules.py` even though the script and its README section were added in the previous round. Added the missing line to both files' directory trees.
-- `README.md` and `README.zh-CN.md`: the `Installation` / `安装方式` `Option 2` JSON example used `/path/to/diataxis-docs-skill` while `Option 1` used `~/.config/opencode/skills/diataxis-docs`. The two paths disagreed; a contributor copy-pasting both would have ended up with a config that does not match the clone. Aligned the JSON example to use the same `~/.config/opencode/skills/diataxis-docs` path so the two options now agree end to end.
-- `README.md` and `README.zh-CN.md`: the FAQ "How is the skill evaluated?" answer still said "29 sample prompts" even though the suite has been 31 since the trap evals (#30, #31) were added. Changed to "over 30" / "30 多条" so the wording stays correct as the suite grows without becoming a maintenance trap on every new eval.
-
-#### Changed
-
-- `README.md` and `README.zh-CN.md`: the `Included blueprints` / 内置的文档骨架 section now has a one-line layering note after the table. The first 5 rows are the core Diataxis forms (Tutorial, How-to, Reference, Explanation, plus Quickstart as a Tutorial sub-type); the last 4 rows (README, Troubleshooting, Glossary, Release notes) are adjacent types mapped to the closest Diataxis form via the Good Docs Project templates in `references/template-map.md`. All 9 rows are kept (the file actually contains all 9 blueprint sections, so the original 9-row list was accurate — only the layering was missing). The README now mirrors the same core-vs-adjacent split that `references/template-map.md` already uses internally.
-
-### Evals badge count
-
-#### Fixed
-
-- `README.md` and `README.zh-CN.md`: the top-of-page `Evals` shields.io badge hard-coded the value `29` from the original suite size, but the suite has been `31` since the trap evals (#30 Quickstart on OAuth2, #31 Reference page that smuggles a 5-step bcrypt guide) were added. Updated both badges to `Evals-31-blueviolet`. The `over 30` / `30 多条` wording in the FAQ is already in place; this round only fixes the badge.
+- `scripts/audit_docs.py`: a line containing two or more pipe characters was counted as a table row, so shell pipelines inside code blocks inflated the reference signal. Tables now require a header row followed by a separator row, and fenced code blocks and frontmatter are excluded from prose signals.
+- `scripts/export_rules.py`: `strip_frontmatter()` used `content.split("---", 2)`, which truncated the body at the first thematic break in the document. It now matches the frontmatter delimiters as anchored line boundaries.
+- `scripts/export_rules.py`: write failures and unknown `--only` keys exited 0. They now exit 1.
+- `scripts/check_local.py`: the install-path scanner read `diataxis-docs-skill/scripts` as a `skills/scripts` install path and reported a false positive. The pattern now requires a word boundary before `skills/`.
+- `scripts/check_local.py`: frontmatter parsing no longer strips a `#` that appears inside a quoted value.
+- `SKILL.md`: the intent check referred to a "Diataxis decision tree" section that does not exist. It now points at the compass.
+- `references/doc-blueprints.md`: removed hidden zero-width characters from the tutorial code fence; `check_local.py` now catches them.
+- `scripts/check_local.py`: Markdown validation now catches broken heading anchors.
+- `README.md` and `README.zh-CN.md`: corrected the blueprint layering note so Diataxis has four core forms, with Quickstart as a tutorial sub-type rather than a fifth form.
+- `evals/evals.json`: the large-system eval now asks for an iterative first-pages plan and treats navigation as an emerging sketch, matching the guide-not-a-plan philosophy.
+- `README.md` and `README.zh-CN.md`: the two install options previously used different target paths, and the evals count drifted out of sync with its badge. Both are resolved by the rewrite.
 
 ## [0.1.0] - 2026-06-02
 

@@ -1,105 +1,175 @@
 {
   "skill_name": "diataxis-docs",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Sample evaluation prompts for checking whether the diataxis-docs skill behaves as expected. Each eval targets a specific decision the skill must make well: classification, mixed-form detection, per-form writing, review, large-system planning, migration, adjacent doc types, anti-pattern avoidance, and explicit non-trigger cases. The `files` field lists the references inside this repo that back the expected output. The `non-trigger` category is intentionally negative: the skill must decline or stay silent on these prompts. For `non-trigger` evals, `files` is empty because the skill must not read any reference files.",
+  "categories": [
+    "adjacent-types",
+    "anti-pattern-avoidance",
+    "classification",
+    "decision-framework",
+    "large-system",
+    "migration",
+    "mixed-form-detection",
+    "non-trigger",
+    "per-form-writing",
+    "review",
+    "single-page-classification"
+  ],
   "evals": [
     {
       "id": 1,
       "category": "classification",
       "prompt": "I need to rewrite our product docs because the tutorial, how-to steps, API reference, and background notes are all mixed together. Please organize the documentation using Diataxis and tell me what should go in each doc.",
       "expected_output": "A document strategy that separates tutorial, how-to, reference, and explanation content, with a clear classification rationale for each split.",
-      "files": ["SKILL.md", "references/template-map.md"]
+      "files": [
+        "SKILL.md",
+        "references/template-map.md"
+      ]
     },
     {
       "id": 2,
       "category": "per-form-writing",
       "prompt": "Can you help me write a README and a quickstart for a developer tool? The README should be the first impression, and the quickstart should get new users to a first success fast.",
       "expected_output": "A README/quickstart plan or draft that distinguishes entry-point content from a short first-success tutorial, and avoids putting tutorial content inside the README.",
-      "files": ["SKILL.md", "references/doc-blueprints.md", "references/template-map.md"]
+      "files": [
+        "SKILL.md",
+        "references/doc-blueprints.md",
+        "references/template-map.md"
+      ]
     },
     {
       "id": 3,
       "category": "decision-framework",
       "prompt": "We keep getting complaints that our docs pages are half explanation and half procedure. I need a repeatable framework for deciding whether a page should be reference, how-to, tutorial, or explanation.",
       "expected_output": "A reusable decision framework or skill-like guidance that classifies page types, lists the signals for each, and explains the differences clearly.",
-      "files": ["SKILL.md"]
+      "files": [
+        "SKILL.md"
+      ]
     },
     {
       "id": 4,
       "category": "single-page-classification",
       "prompt": "Here is a docs page from our project. It opens with a 'Why we built it this way' section, then a long parameter table, then a step-by-step 'Getting started' section, then a 'Design decisions' appendix. What document type should this be, and how would you split it?",
       "expected_output": "A diagnosis that the page mixes at least three Diataxis forms, a proposal to split it into the right documents, and a short outline for each split piece.",
-      "files": ["SKILL.md", "references/doc-blueprints.md"]
+      "files": [
+        "SKILL.md",
+        "references/doc-blueprints.md"
+      ]
     },
     {
       "id": 5,
       "category": "mixed-form-detection",
       "prompt": "Review this draft page and tell me whether it mixes Diataxis forms. If it does, point to the specific sections that should be moved to other documents.",
       "expected_output": "A mixed-form review that names the offending sections, classifies each as a different Diataxis form, and proposes a concrete split rather than a rewrite.",
-      "files": ["SKILL.md", "examples/messy-to-diataxis/before.md", "examples/messy-to-diataxis/after/01-tutorial.md", "examples/messy-to-diataxis/after/02-how-to.md", "examples/messy-to-diataxis/after/03-reference.md", "examples/messy-to-diataxis/after/04-explanation.md"]
+      "files": [
+        "SKILL.md",
+        "examples/messy-to-diataxis/before.md",
+        "examples/messy-to-diataxis/after/01-tutorial.md",
+        "examples/messy-to-diataxis/after/02-how-to.md",
+        "examples/messy-to-diataxis/after/03-reference.md",
+        "examples/messy-to-diataxis/after/04-explanation.md"
+      ]
     },
     {
       "id": 6,
       "category": "per-form-writing",
       "prompt": "Write a how-to guide for configuring single sign-on with our platform. The reader is an experienced admin who already understands SAML basics. Keep it focused, no teaching, no conceptual background.",
       "expected_output": "A how-to that opens with the goal, assumes competence, uses a single linear sequence, and links to reference and explanation pages for the supporting material.",
-      "files": ["SKILL.md", "references/doc-blueprints.md"]
+      "files": [
+        "SKILL.md",
+        "references/doc-blueprints.md"
+      ]
     },
     {
       "id": 7,
       "category": "per-form-writing",
       "prompt": "Write a reference page for our REST API's /orders endpoint. Cover method, path, parameters, request body, response fields, status codes, and a minimal example. No narrative, no recommendations.",
       "expected_output": "A neutral, structured reference page that mirrors the endpoint's structure, includes parameter and response tables, and avoids imperative or persuasive language.",
-      "files": ["SKILL.md", "references/doc-blueprints.md", "references/template-map.md"]
+      "files": [
+        "SKILL.md",
+        "references/doc-blueprints.md",
+        "references/template-map.md"
+      ]
     },
     {
       "id": 8,
       "category": "per-form-writing",
       "prompt": "Write an explanation article about why we chose eventual consistency over strong consistency in our sync engine. The reader is a backend engineer who is evaluating whether to adopt the product.",
       "expected_output": "An explanation that offers a point of view or insight, discusses tradeoffs, history, and alternatives, and deliberately contains no step-by-step instructions.",
-      "files": ["SKILL.md", "references/doc-blueprints.md"]
+      "files": [
+        "SKILL.md",
+        "references/doc-blueprints.md"
+      ]
     },
     {
       "id": 9,
       "category": "per-form-writing",
       "prompt": "Write a troubleshooting guide for the top five errors our users hit when running our CLI. The reader is stuck and needs to fix the problem fast.",
       "expected_output": "A troubleshooting guide organized by symptom, with likely causes, concrete solutions, and verification steps. Explanatory content should be linked out, not inlined.",
-      "files": ["SKILL.md", "references/doc-blueprints.md", "references/template-map.md"]
+      "files": [
+        "SKILL.md",
+        "references/doc-blueprints.md",
+        "references/template-map.md"
+      ]
     },
     {
       "id": 10,
       "category": "review",
       "prompt": "Audit our existing documentation site. For each top-level page, classify it using Diataxis, flag pages that mix forms, and recommend a clean split. Output should be a structured report.",
       "expected_output": "A page-by-page audit with a Diataxis label, a mixed-form flag where applicable, and a recommended split or fix for each problem page.",
-      "files": ["SKILL.md", "references/reader-analysis.md"]
+      "files": [
+        "SKILL.md",
+        "references/reader-analysis.md"
+      ]
     },
     {
       "id": 11,
       "category": "large-system",
       "prompt": "We are launching a new SDK and need a complete documentation site. Plan the documentation system: getting started, how-tos, API reference, concepts, troubleshooting, release notes, and glossary. Audience ranges from first-time users to experienced platform engineers.",
       "expected_output": "An iterative documentation plan that maps each proposed artifact to a Diataxis form, lists the input questions to confirm with the user, identifies the smallest useful pages to write first, and treats any navigation structure as a sketch that can emerge as real content is created rather than a fixed four-section IA.",
-      "files": ["SKILL.md", "references/doc-blueprints.md", "references/reader-analysis.md"]
+      "files": [
+        "SKILL.md",
+        "references/doc-blueprints.md",
+        "references/reader-analysis.md"
+      ]
     },
     {
       "id": 12,
       "category": "migration",
       "prompt": "Our existing docs were written without a documentation framework. Help me migrate them to a Diataxis-based system. For each existing page, suggest a target form, a split plan if needed, and a migration order.",
       "expected_output": "A migration plan that prioritizes the most-trafficked pages first, lists a target Diataxis form for each, and identifies which pages must be split before they can be moved.",
-      "files": ["SKILL.md", "examples/messy-to-diataxis/before.md", "examples/messy-to-diataxis/after/01-tutorial.md", "examples/messy-to-diataxis/after/02-how-to.md", "examples/messy-to-diataxis/after/03-reference.md", "examples/messy-to-diataxis/after/04-explanation.md"]
+      "files": [
+        "SKILL.md",
+        "examples/messy-to-diataxis/before.md",
+        "examples/messy-to-diataxis/after/01-tutorial.md",
+        "examples/messy-to-diataxis/after/02-how-to.md",
+        "examples/messy-to-diataxis/after/03-reference.md",
+        "examples/messy-to-diataxis/after/04-explanation.md"
+      ]
     },
     {
       "id": 13,
       "category": "adjacent-types",
       "prompt": "Draft release notes for version 2.0 of our product. The notes should be user-facing, list new features, breaking changes, deprecations, and known issues. No marketing language, no internal jargon.",
       "expected_output": "Release notes organized by category (new, improved, fixed, breaking, deprecated, known issues), each item stating change and impact in plain language.",
-      "files": ["references/doc-blueprints.md", "references/template-map.md"]
+      "files": [
+        "references/doc-blueprints.md",
+        "references/template-map.md"
+      ]
     },
     {
       "id": 14,
       "category": "anti-pattern-avoidance",
       "prompt": "I wrote a single mega-page that tries to teach new users, list every CLI flag, explain the architecture, and walk through deployment. I am worried it mixes Diataxis forms. Refactor it for me.",
       "expected_output": "A refactor plan that splits the page into the correct Diataxis forms, with a short outline for each new document and a recommended navigation order between them.",
-      "files": ["SKILL.md", "examples/messy-to-diataxis/before.md", "examples/messy-to-diataxis/after/01-tutorial.md", "examples/messy-to-diataxis/after/02-how-to.md", "examples/messy-to-diataxis/after/03-reference.md", "examples/messy-to-diataxis/after/04-explanation.md"]
+      "files": [
+        "SKILL.md",
+        "examples/messy-to-diataxis/before.md",
+        "examples/messy-to-diataxis/after/01-tutorial.md",
+        "examples/messy-to-diataxis/after/02-how-to.md",
+        "examples/messy-to-diataxis/after/03-reference.md",
+        "examples/messy-to-diataxis/after/04-explanation.md"
+      ]
     },
     {
       "id": 15,
@@ -134,98 +204,159 @@
       "category": "decision-framework",
       "prompt": "Give my docs team a one-page checklist they can run during review to decide whether a draft page is tutorial, how-to, reference, or explanation. Each check should be one sentence and there should be no more than ten items.",
       "expected_output": "A compact checklist, around 6-10 items, where each item is a single diagnostic question that maps cleanly to one of the four Diataxis forms. The checklist should reject the 'mixed' answer and require a split.",
-      "files": ["SKILL.md"]
+      "files": [
+        "SKILL.md"
+      ]
     },
     {
       "id": 20,
       "category": "single-page-classification",
       "prompt": "I have a single Markdown file with these top-level sections in order: 'Background', 'Install', 'API methods', 'Design notes'. Without rewriting the file, tell me which sections are in the right form and which should be moved, and propose where each should go.",
       "expected_output": "A section-by-section triage: a one-line Diataxis label per section, a flag for any section that mixes forms, and a concrete 'move X to page Y' recommendation for each problem section. No rewrite of the original page.",
-      "files": ["SKILL.md", "examples/messy-to-diataxis/before.md", "examples/messy-to-diataxis/after/01-tutorial.md", "examples/messy-to-diataxis/after/02-how-to.md", "examples/messy-to-diataxis/after/03-reference.md", "examples/messy-to-diataxis/after/04-explanation.md"]
+      "files": [
+        "SKILL.md",
+        "examples/messy-to-diataxis/before.md",
+        "examples/messy-to-diataxis/after/01-tutorial.md",
+        "examples/messy-to-diataxis/after/02-how-to.md",
+        "examples/messy-to-diataxis/after/03-reference.md",
+        "examples/messy-to-diataxis/after/04-explanation.md"
+      ]
     },
     {
       "id": 21,
       "category": "mixed-form-detection",
       "prompt": "Here is our 'Quickstart' page. The first three sections are clean, but there is also a 'Configuration reference' subsection buried inside it, and a 'Why we made these choices' subsection at the bottom. Diagnose what should move and where.",
       "expected_output": "A diagnosis that names the two offending subsections, labels each as the correct Diataxis form (reference and explanation respectively), and proposes a concrete split that keeps the Quickstart purely a tutorial.",
-      "files": ["SKILL.md", "examples/messy-to-diataxis/before.md", "examples/messy-to-diataxis/after/01-tutorial.md", "examples/messy-to-diataxis/after/02-how-to.md", "examples/messy-to-diataxis/after/03-reference.md", "examples/messy-to-diataxis/after/04-explanation.md"]
+      "files": [
+        "SKILL.md",
+        "examples/messy-to-diataxis/before.md",
+        "examples/messy-to-diataxis/after/01-tutorial.md",
+        "examples/messy-to-diataxis/after/02-how-to.md",
+        "examples/messy-to-diataxis/after/03-reference.md",
+        "examples/messy-to-diataxis/after/04-explanation.md"
+      ]
     },
     {
       "id": 22,
       "category": "review",
       "prompt": "Here is a listing of our /docs directory. Give me a one-paragraph summary of the documentation system's biggest structural problem, then a prioritised fix list ordered by traffic. Do not rewrite any individual page.",
       "expected_output": "A two-part review: a short diagnosis paragraph that names the dominant failure mode (for example, 'most top-level pages are mixed-form tutorials that hide the reference'), followed by a numbered list of fix-level recommendations, each tied to a specific page or group of pages.",
-      "files": ["SKILL.md"]
+      "files": [
+        "SKILL.md"
+      ]
     },
     {
       "id": 23,
       "category": "large-system",
       "prompt": "We have an API with 80 endpoints and 12 product surfaces. We currently have zero documentation. Tell me the smallest set of pages we should write first, in what order, and which existing endpoints can share a single how-to. Do not produce a full IA.",
       "expected_output": "A minimal-viable-docs plan: a numbered list of the smallest page set that lets a new user go from zero to first success, an explicit ordering, and a short note on which endpoints can be grouped under one how-to to keep the count down. The plan should stay well under 10 pages.",
-      "files": ["SKILL.md", "references/reader-analysis.md"]
+      "files": [
+        "SKILL.md",
+        "references/reader-analysis.md"
+      ]
     },
     {
       "id": 24,
       "category": "adjacent-types",
       "prompt": "Write a CHANGELOG entry for v1.4.0. We added a 'rate_limit' config flag, deprecated 'legacy_auth', and fixed a memory leak in the sync worker. Use the Keep-a-Changelog section order and keep each item to one bullet.",
       "expected_output": "A single Keep-a-Changelog entry that places items under Added, Deprecated, and Fixed, in that order, with one short bullet each. No marketing prose, no links to a marketing page, and no mixing of release notes language into the changelog.",
-      "files": ["references/doc-blueprints.md", "references/template-map.md"]
+      "files": [
+        "references/doc-blueprints.md",
+        "references/template-map.md"
+      ]
     },
     {
       "id": 25,
       "category": "anti-pattern-avoidance",
       "prompt": "Our new developer guide has 'Quickstart', then 'Tutorial', then 'Configuration' (mostly a parameter table), then 'Architecture' (a long prose essay). Identify the specific anti-patterns and propose a fix without rewriting the guide.",
       "expected_output": "A diagnostic answer that names each anti-pattern by its real name (for example, 'hidden reference in how-to', 'architecture essay in a guide that should be explanation'), and a fix-level plan that says which sections to move or split. No rewrite of the original guide.",
-      "files": ["SKILL.md", "examples/messy-to-diataxis/before.md", "examples/messy-to-diataxis/after/01-tutorial.md", "examples/messy-to-diataxis/after/02-how-to.md", "examples/messy-to-diataxis/after/03-reference.md", "examples/messy-to-diataxis/after/04-explanation.md"]
+      "files": [
+        "SKILL.md",
+        "examples/messy-to-diataxis/before.md",
+        "examples/messy-to-diataxis/after/01-tutorial.md",
+        "examples/messy-to-diataxis/after/02-how-to.md",
+        "examples/messy-to-diataxis/after/03-reference.md",
+        "examples/messy-to-diataxis/after/04-explanation.md"
+      ]
     },
     {
       "id": 26,
       "category": "classification",
       "prompt": "We have four pages: a 'Hello world' walkthrough, a 'How to deploy to production' checklist, an 'API parameters' table page, and a 'Why we picked Postgres' essay. For each, give the Diataxis form and one reason. Be terse.",
       "expected_output": "Four short lines, one per page, each with the form (tutorial, how-to, reference, explanation) and a one-sentence reason. No splitting suggestions because the pages are already single-form.",
-      "files": ["SKILL.md", "references/template-map.md"]
+      "files": [
+        "SKILL.md",
+        "references/template-map.md"
+      ]
     },
     {
       "id": 27,
       "category": "migration",
       "prompt": "Our existing docs are 60 Markdown files in a single /docs folder, none of them tagged by form. Give me a 5-step migration plan that does not require re-reading every file at once.",
       "expected_output": "A 5-step iterative plan, for example: (1) rank pages by traffic, (2) classify only the top 10, (3) split the mixed ones, (4) tag and link, (5) repeat. The plan should be honest about doing this in waves, not all at once.",
-      "files": ["SKILL.md", "examples/messy-to-diataxis/before.md", "examples/messy-to-diataxis/after/01-tutorial.md", "examples/messy-to-diataxis/after/02-how-to.md", "examples/messy-to-diataxis/after/03-reference.md", "examples/messy-to-diataxis/after/04-explanation.md"]
+      "files": [
+        "SKILL.md",
+        "examples/messy-to-diataxis/before.md",
+        "examples/messy-to-diataxis/after/01-tutorial.md",
+        "examples/messy-to-diataxis/after/02-how-to.md",
+        "examples/messy-to-diataxis/after/03-reference.md",
+        "examples/messy-to-diataxis/after/04-explanation.md"
+      ]
     },
     {
       "id": 28,
       "category": "classification",
       "prompt": "Glossary pages are often the most contested form in a docs site. Where does a glossary belong in Diataxis, and what is the trade-off of placing it under reference versus explanation?",
       "expected_output": "A position that places glossary primarily under reference (cognition + application: the reader is working and needs to look up a term), names the trade-off (entries that carry design history bleed into explanation), and ends with a one-sentence practical rule for when to split a glossary entry into a separate explanation page.",
-      "files": ["SKILL.md", "references/template-map.md"]
+      "files": [
+        "SKILL.md",
+        "references/template-map.md"
+      ]
     },
     {
       "id": 29,
       "category": "mixed-form-detection",
       "prompt": "Here is our 'Authentication' guide. It is 1 200 lines and contains install steps, a token-table reference, a 'Why we chose OAuth 2' section, and a 'Common errors' subsection. Without rewriting, give me a section-by-section diagnosis and propose where each offending section should move.",
       "expected_output": "A section-by-section triage: a one-line Diataxis label per section, an explicit mixed-form flag for the page overall, and a concrete 'move X to page Y' recommendation for each section that is in the wrong form. No rewrite of the original page.",
-      "files": ["SKILL.md", "examples/messy-to-diataxis/before.md", "examples/messy-to-diataxis/after/01-tutorial.md", "examples/messy-to-diataxis/after/02-how-to.md", "examples/messy-to-diataxis/after/03-reference.md", "examples/messy-to-diataxis/after/04-explanation.md"]
+      "files": [
+        "SKILL.md",
+        "examples/messy-to-diataxis/before.md",
+        "examples/messy-to-diataxis/after/01-tutorial.md",
+        "examples/messy-to-diataxis/after/02-how-to.md",
+        "examples/messy-to-diataxis/after/03-reference.md",
+        "examples/messy-to-diataxis/after/04-explanation.md"
+      ]
     },
     {
       "id": 30,
       "category": "anti-pattern-avoidance",
       "prompt": "Write a quickstart on configuring OAuth2 with our SDK.",
       "expected_output": "The AI should recognize that a Quickstart is a sub-type of Tutorial (the shortest path to first success) and that OAuth2 configuration has too many prerequisites (domain, callback URLs, scopes) and identity-provider branches to fit a single linear 'happy path'. The AI should suggest scoping the page down (for example, 'Quickstart: OAuth2 with Google') or restructuring it as a How-to for a specific production scenario, rather than forcing a single Tutorial to cover all branches.",
-      "files": ["SKILL.md", "references/doc-blueprints.md"]
+      "files": [
+        "SKILL.md",
+        "references/doc-blueprints.md"
+      ]
     },
     {
       "id": 31,
       "category": "anti-pattern-avoidance",
       "prompt": "Generate a reference page for our User API, and include a large section on 'best practices' for password hashing, including a 5-step guide on implementing bcrypt.",
       "expected_output": "The AI should generate the Reference page with strict objective facts (endpoints, parameters, return shapes). It should identify that a '5-step guide on implementing bcrypt' belongs in a How-to or Tutorial, and that a broad 'best practices' discussion belongs in an Explanation. The AI should suggest splitting the content (a Reference page for the API; a separate How-to or Tutorial for the bcrypt walk-through; a separate Explanation for the design rationale) rather than blending the three into one Reference page.",
-      "files": ["SKILL.md", "references/doc-blueprints.md"]
+      "files": [
+        "SKILL.md",
+        "references/doc-blueprints.md"
+      ]
     },
     {
       "id": 32,
       "category": "large-system",
       "prompt": "We have a 50-page SDK documentation site with mixed tutorials, API tables, troubleshooting pages, and concept essays. Give me a staged Diataxis migration plan. Do not design a final full IA upfront; identify the first audit pass, the first 10 pages to classify, and what evidence would justify splitting or moving pages.",
       "expected_output": "An iterative migration plan that starts with an evidence-gathering audit pass, prioritizes the first 10 pages by traffic/risk, classifies pages using the compass, names split/move evidence, and treats any directory tree as a temporary sketch rather than a fixed four-section structure.",
-      "files": ["SKILL.md", "references/reader-analysis.md", "references/doc-blueprints.md"]
+      "files": [
+        "SKILL.md",
+        "references/reader-analysis.md",
+        "references/doc-blueprints.md"
+      ]
     }
   ]
 }
