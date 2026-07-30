@@ -1,20 +1,18 @@
 ---
 name: diataxis-docs
-version: 0.1.0
 description: "Apply the Diataxis compass to write, restructure, split, classify, review, audit, or migrate technical documentation. Trigger on requests like write docs, organize docs, fix docs, split this page, classify this docs page, audit our docs site, migrate to Diataxis, review this draft, or design a documentation system for an SDK or API."
+license: MIT
+metadata:
+  version: "0.2.0"
 ---
 
 # Diataxis Documentation Skill
 
 Use this skill to turn a documentation request into the right document type, with the right level of detail, for the right reader.
 
-## Core idea
-
-Diataxis separates documentation by two questions — action or cognition, and acquiring or applying skill — and yields four primary forms: tutorial, how-to, reference, explanation. See the compass below for the canonical tool, and [Classification guide](#classification-guide) for the per-form writing details.
-
 ## The Diataxis compass
 
-The compass is Diataxis's main classification tool. It reduces a two-dimensional problem to two questions and yields a single answer.
+Diataxis separates documentation by two questions — action or cognition, and acquiring or applying skill — and yields four primary forms: tutorial, how-to, reference, explanation. The compass is its main classification tool: it reduces a two-dimensional problem to two questions and yields a single answer. See [Classification guide](#classification-guide) for the per-form writing details.
 
 | If the content… | …and serves the user's… | …then it must belong to… |
 | --- | --- | --- |
@@ -69,7 +67,17 @@ What is the reader trying to do right now?
 └── Trying to understand why or how it works?            → Explanation
 ```
 
-If the request hits more than one branch, split it into multiple documents rather than blending them. The same questions can be applied to existing pages: when a page's content disagrees with its current form, the page needs to be moved, not relabelled.
+If the request hits more than one branch, split it into multiple documents rather than blending them.
+
+### Request phrasing shortcuts
+
+If the user asks for:
+
+- "a guide for my new users" -> tutorial or quickstart
+- "how to do X" -> how-to
+- "what does this field/command mean" -> reference
+- "why is it designed this way" -> explanation
+- "a single document system for docs" -> use Diataxis to split the system into the right document types
 
 ## When to use this skill
 
@@ -117,10 +125,11 @@ If the request spans multiple needs, split it into multiple documents rather tha
 
 For most requests, follow this order:
 
-1. Clarify the document type, audience, goal, and scope if they are not obvious.
-2. Propose or infer the outline for that document type.
-3. Write the document in Markdown using the right blueprint.
-4. If the request is actually a mixed documentation system, split it into companion docs instead of one large page.
+1. Run the diagnosis above: reader, reader state, user need, form, and what to exclude.
+2. Clarify the document type, audience, goal, and scope if they are still not obvious.
+3. Propose or infer the outline for that document type.
+4. Write the document in Markdown using the right blueprint, or produce a doc plan in the chosen form.
+5. If the request is actually a mixed documentation system, split it into companion docs instead of one large page.
 
 Do not force a long approval loop for every task. Use a short clarification loop only when the user has not given enough information.
 
@@ -239,19 +248,7 @@ Before starting, confirm what you actually need: source material (API spec, sour
 
 ### Common artifact patterns (for reference only)
 
-Do not treat this as a backlog. Only produce artifacts the compass calls for.
-
-| Artifact | Compass cell | Purpose |
-| --- | --- | --- |
-| Getting started path or quickstart | action + acquisition (tutorial) | First success for a new user |
-| How-to guide collection | action + application (how-to) | One task per page, assumes competence |
-| API, CLI, config, or schema reference | cognition + application (reference) | Neutral, structured facts |
-| Concept, architecture, and design articles | cognition + acquisition (explanation) | Why and how it works, tradeoffs |
-| Troubleshooting | action + application (how-to) | Symptom → cause → solution |
-| Glossary | cognition + application (reference) | Project-specific terms |
-| Release notes and changelog | cognition + application (reference) | What changed and why it matters |
-| Style guide | meta | Team rules for consistent writing |
-| Sample apps and runnable examples | action + acquisition (tutorial) or cognition + application (reference) | Validate the system end to end |
+Do not treat artifact lists as a backlog. Only produce artifacts the compass calls for. For the artifact-to-form mapping, including the compass cell for each artifact, see [`references/template-map.md`](references/template-map.md).
 
 ### Per-platform notes
 
@@ -280,10 +277,10 @@ Use when the reader needs a guided learning experience.
 Write it as a safe, structured lesson:
 
 - start with what the reader will do or build
-- use a single path
+- use a single, stable, predictable path
 - keep steps concrete and sequential
-- show expected results early and often
-- minimize explanation
+- write in second person and show expected results early and often
+- minimize explanation; no comprehensive background sections
 - avoid options and digressions
 
 Good signs:
@@ -301,8 +298,9 @@ Write it as practical directions:
 - assume basic competence
 - cover one task or problem
 - keep the sequence logical and short
+- use conditional imperatives ("If you want X, do Y") where helpful
 - include warnings and alternate paths only when needed
-- do not teach concepts
+- do not teach concepts; put supporting material in links, not inline essays
 
 Good signs:
 
@@ -315,8 +313,9 @@ Use when the reader needs exact facts.
 
 Write it as neutral technical description:
 
-- organize by the structure of the thing described
-- keep language factual and concise
+- mirror the structure of the thing described
+- keep language factual, concise, and consistent across entries
+- prefer tables, lists, and schemas over prose
 - include parameters, values, limits, fields, commands, return values, examples
 - avoid instructions, teaching, and discussion
 
@@ -330,10 +329,11 @@ Use when the reader needs understanding.
 
 Write it as context-rich discussion:
 
-- explain why something exists
+- explain why something exists and provide the context around it
 - connect related ideas
-- discuss tradeoffs, history, and alternatives
+- discuss tradeoffs, history, alternatives, and implications
 - allow perspective and judgment
+- keep the scope bounded to one concept or topic
 - keep it separate from procedural guidance
 
 Good signs:
@@ -375,45 +375,6 @@ Use these fallbacks:
 - If the user cannot clarify, state your assumption and prefer a focused how-to; link teaching material out instead of embedding a lesson.
 
 
-## Writing patterns
-
-### For tutorials
-
-- Use second-person or inclusive language where appropriate.
-- Keep the path stable and predictable.
-- Avoid comprehensive background sections.
-- Give the user visible progress.
-
-### For how-tos
-
-- Start with the objective.
-- Use conditional imperatives where helpful.
-- Keep to one goal per page.
-- Put supporting material in links, not inline essays.
-
-### For reference
-
-- Mirror the product structure.
-- Prefer tables, lists, and schemas.
-- Be explicit and consistent.
-
-### For explanation
-
-- Make connections.
-- Provide context.
-- Discuss alternatives and implications.
-- Keep the scope bounded to one concept or topic.
-
-## Template selection heuristic
-
-If the user asks for:
-
-- "a guide for my new users" -> tutorial or quickstart
-- "how to do X" -> how-to
-- "what does this field/command mean" -> reference
-- "why is it designed this way" -> explanation
-- "a single document system for docs" -> use Diataxis to split the system into the right document types
-
 ## Quality checks
 
 Before finishing, run both the **intent check** and the **smell test** (see [Mixed-doc smell test](#mixed-doc-smell-test) above for the full list of signals).
@@ -421,7 +382,7 @@ Before finishing, run both the **intent check** and the **smell test** (see [Mix
 ### Intent check
 
 - Did I identify the reader and their state before drafting?
-- Did I classify the content using the Diataxis decision tree first?
+- Did I classify the content using the Diataxis compass first?
 - Did I write for the reader's actual state, not the author's mental model?
 - Did I keep the document focused on one need?
 - Did I avoid unnecessary structure at the top level?
@@ -450,14 +411,3 @@ Use these as the primary source material behind this skill:
 - https://www.thegooddocsproject.dev/template/
 
 This skill distills those sources into a practical documentation workflow.
-
-## Practical output pattern
-
-When the user asks you to write documentation, start with a short diagnosis first:
-
-- What is the reader trying to do?
-- What state are they in?
-- Which document type is this?
-- What should be excluded?
-
-Then write the document, or produce a doc plan, in the chosen form.
