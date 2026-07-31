@@ -4,6 +4,7 @@ Each test feeds a deliberately wrong input to one check and asserts the check
 reports it. Without these, a validator can silently stop validating.
 """
 
+import json
 import sys
 import tempfile
 import unittest
@@ -185,6 +186,97 @@ class CommandFrontmatterTests(unittest.TestCase):
             self.write_command(root, "agent: build\n")
             problems = check_local.check_commands(root)
             self.assertTrue(any("required by this repository" in problem for problem in problems), problems)
+
+
+class EvalsValidationTests(unittest.TestCase):
+    def run_fixture(self, value: object) -> list[str]:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "evals").mkdir()
+            (root / "evals" / "evals.json").write_text(
+                json.dumps(value), encoding="utf-8"
+            )
+            previous_root = check_local.ROOT
+            check_local.ROOT = root
+            try:
+                return check_local.check_evals()
+            finally:
+                check_local.ROOT = previous_root
+
+    def test_non_object_root_reports_error(self) -> None:
+        problems = self.run_fixture([])
+        self.assertTrue(
+            any("top-level value must be a JSON object" in problem for problem in problems)
+        )
+
+    def test_non_object_eval_reports_error(self) -> None:
+        problems = self.run_fixture(
+            {"skill_name": "x", "version": "1", "categories": ["review"], "evals": [1]}
+        )
+        self.assertTrue(any("eval[0] must be a JSON object" in problem for problem in problems))
+
+    def test_wrong_eval_field_types_report_errors_without_traceback(self) -> None:
+        problems = self.run_fixture(
+            {
+                "skill_name": "x",
+                "version": "1",
+                "categories": ["review"],
+                "evals": [
+                    {
+                        "id": [1],
+                        "category": {"name": "review"},
+                        "prompt": 1,
+                        "expected_output": 2,
+                        "files": "SKILL.md",
+                    }
+                ],
+            }
+        )
+        joined = "\n".join(problems)
+        self.assertIn("id must be a string or integer", joined)
+        self.assertIn("category must be a non-empty string", joined)
+        self.assertIn("prompt must be a string", joined)
+        self.assertIn("expected_output must be a string", joined)
+        self.assertIn("files must be a list", joined)
+
+    def test_file_entries_must_be_strings_and_exist(self) -> None:
+        problems = self.run_fixture(
+            {
+                "skill_name": "x",
+                "version": "1",
+                "categories": ["review"],
+                "evals": [
+                    {
+                        "id": 1,
+                        "category": "review",
+                        "prompt": "A sufficiently long prompt.",
+                        "expected_output": "A sufficiently long output.",
+                        "files": [1, "missing.md"],
+                    }
+                ],
+            }
+        )
+        joined = "\n".join(problems)
+        self.assertIn("files[0] must be a non-empty string", joined)
+        self.assertIn("references missing file: missing.md", joined)
+
+
+class MarkdownScanTests(unittest.TestCase):
+    def test_dependency_and_build_markdown_are_ignored(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "README.md").write_text("# Project\n", encoding="utf-8")
+            for directory in ("node_modules/pkg", "build/site", ".git"):
+                path = root / directory
+                path.mkdir(parents=True)
+                (path / "README.md").write_text("# Dependency\n", encoding="utf-8")
+            previous_root = check_local.ROOT
+            check_local.ROOT = root
+            try:
+                files = check_local.markdown_files()
+            finally:
+                check_local.ROOT = previous_root
+        self.assertEqual([path.relative_to(root).as_posix() for path in files], ["README.md"])
 
 
 class AnchorTests(unittest.TestCase):

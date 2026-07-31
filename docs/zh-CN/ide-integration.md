@@ -4,7 +4,7 @@
 
 ## 开始之前
 
-先读 [上下文成本](#上下文成本)。12 个目标里有 9 个会注入到项目的每一次请求，完整指导每次约 5,200 tokens。
+先读 [上下文成本](#上下文成本)。默认选中的 11 个目标里有 8 个会注入到项目的每一次请求；可选的旧版 Cursor 目标会把常驻目标总数增加到 9 个。
 
 ## 列出所有目标
 
@@ -12,22 +12,22 @@
 python scripts/export_rules.py --list
 ```
 
-覆盖 11 个助手的 12 个规则文件：
+覆盖 11 个助手的 12 个规则文件目标（默认选择其中 11 个）：
 
-| Key | 工具 | 路径 | 常驻 |
-| --- | --- | --- | --- |
-| `cursor` | Cursor | `.cursor/rules/diataxis.mdc` | 否 |
-| `cursor-legacy` | Cursor（旧格式） | `.cursorrules` | 是 |
-| `cline` | Cline | `.clinerules` | 是 |
-| `roo` | Roo Code | `.roo/rules/diataxis.md` | 是 |
-| `windsurf` | Windsurf | `.windsurf/rules/diataxis.md` | 否 |
-| `copilot` | GitHub Copilot | `.github/copilot-instructions.md` | 是 |
-| `claude` | Claude Code | `CLAUDE.md` | 是 |
-| `codex` | OpenAI Codex | `AGENTS.md` | 是 |
-| `aider` | Aider | `CONVENTIONS.md` | 是 |
-| `gemini` | Gemini CLI | `GEMINI.md` | 是 |
-| `continue` | Continue | `.continue/rules/diataxis.md` | 否 |
-| `amazonq` | Amazon Q Developer | `.amazonq/rules/diataxis.md` | 是 |
+| Key | 工具 | 路径 | 默认 | 常驻 |
+| --- | --- | --- | --- | --- |
+| `cursor` | Cursor | `.cursor/rules/diataxis.mdc` | 是 | 否 |
+| `cursor-legacy` | Cursor（旧格式） | `.cursorrules` | 否 | 是 |
+| `cline` | Cline | `.clinerules/diataxis.md` | 是 | 是 |
+| `roo` | Roo Code | `.roo/rules/diataxis.md` | 是 | 是 |
+| `windsurf` | Windsurf | `.windsurf/rules/diataxis.md` | 是 | 否 |
+| `copilot` | GitHub Copilot | `.github/copilot-instructions.md` | 是 | 是 |
+| `claude` | Claude Code | `CLAUDE.md` | 是 | 是 |
+| `codex` | OpenAI Codex | `AGENTS.md` | 是 | 是 |
+| `aider` | Aider | `CONVENTIONS.md` | 是 | 是 |
+| `gemini` | Gemini CLI | `GEMINI.md` | 是 | 是 |
+| `continue` | Continue | `.continue/rules/diataxis.md` | 是 | 否 |
+| `amazonq` | Amazon Q Developer | `.amazonq/rules/diataxis.md` | 是 | 是 |
 
 ## 先预览再写入
 
@@ -42,7 +42,8 @@ python /path/to/diataxis-docs-skill/scripts/export_rules.py --target . --dry-run
 在需要接收规则文件的项目里运行，或者用 `--target` 指向它：
 
 ```bash
-# 全部导出到当前项目
+# 全部导出到当前项目。完整指导超过 Windsurf 平台上限时，
+# 该目标会自动改用精简版。
 python /path/to/diataxis-docs-skill/scripts/export_rules.py
 
 # 只导出团队在用的工具，并使用精简版
@@ -68,13 +69,15 @@ python /path/to/diataxis-docs-skill/scripts/export_rules.py --only claude --only
 
 `--compact` 只导出罗盘、快速决策树、不适用场景清单、反模式和质量检查——约 9,400 字符，约 2,300 tokens。这些内容足以让助手正确判定请求类型并避开常见的失败模式。
 
-对三个按需加载的目标（`cursor`、`windsurf`、`continue`）用完整导出，其余用 `--compact`。
+默认选中的 11 个目标里有 8 个是常驻上下文；选择可选的旧版 Cursor 目标后，常驻目标会增加到 9 个。三个按需加载的目标是 `cursor`、`windsurf` 和 `continue`，但 Windsurf 的完整输出超过上限时会自动收到精简版。其余目标建议使用 `--compact`。
 
 ## 各工具注意事项
 
-**Cursor.** 项目规则必须使用 `.mdc` 扩展名；放在 `.cursor/rules` 里的普通 `.md` 文件会被规则系统忽略。脚本写入的是 `.cursor/rules/diataxis.mdc`，并带上 `description` 和 `alwaysApply: false`，让它成为一条 agent-requested 规则：Cursor 读取 description，在任务看起来与文档相关时把规则拉进来。不要同时启用旧的 `.cursorrules` 目标。
+**Cursor.** 项目规则必须使用 `.mdc` 扩展名；放在 `.cursor/rules` 里的普通 `.md` 文件会被规则系统忽略。脚本写入的是 `.cursor/rules/diataxis.mdc`，并带上 `description` 和 `alwaysApply: false`，让它成为一条 agent-requested 规则：Cursor 读取 description，在任务看起来与文档相关时把规则拉进来。默认只选择现代目标；只有旧版 Cursor 环境才显式使用 `--only cursor-legacy`，两个目标不能同时选择。
 
-**Windsurf.** workspace 规则单文件上限 12,000 字符。完整指导超过这个上限，所以 Windsurf 请用 `--compact`。目标超过其已知上限时脚本会打印 WARN。脚本不再提供旧版 `.windsurfrules` 目标：它的 6,000 字符上限连精简版也容纳不下，因此不存在有效导出模式。请删除旧版本曾生成的 `.windsurfrules`。
+**Cline.** workspace 规则位于 `.clinerules/` 目录。导出器会写入 `.clinerules/diataxis.md`；单个 `.clinerules` 文件不是当前的目录格式。
+
+**Windsurf.** workspace 规则单文件上限 12,000 字符。完整指导超过这个上限，所以导出器会为该目标自动改用精简版；需要所有目标都使用相同精简内容时再显式传 `--compact`。脚本不再提供旧版 `.windsurfrules` 目标：它的 6,000 字符上限连精简版也容纳不下，因此不存在有效导出模式。请删除旧版本曾生成的 `.windsurfrules`。
 
 **Roo Code.** `.roo/rules/` 下的每个文件都会在每次请求时加载，所以这个目标虽然位于规则目录里，实际上仍是常驻上下文。
 

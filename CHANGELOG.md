@@ -40,14 +40,14 @@ validation scripts that are unit-tested instead of duplicated inside CI.
 - **Breaking.** `scripts/export_rules.py`: the Cursor target is now `.cursor/rules/diataxis.mdc` with `description` and `alwaysApply: false` frontmatter. Cursor ignores plain `.md` files in `.cursor/rules`, so the previous `.md` output was never loaded. Delete any stale `.cursor/rules/diataxis.md` after upgrading.
 - **Breaking.** `scripts/audit_docs.py`: the JSON signal key `tables` is now `table_rows`, matching what it counts.
 - `README.md` and `README.zh-CN.md`: rewritten as entry pages of about 130 lines. The previous 550-line versions were the only pages in the repository that the bundled audit script rated high risk.
-- `README.md`, `README.zh-CN.md`, and the installation and FAQ pages: document both automatic discovery and the supported OpenCode `skills.paths` setting. Both methods keep the checkout directory aligned with the `diataxis-docs` frontmatter name.
+- `README.md`, `README.zh-CN.md`, and the installation and FAQ pages: document only OpenCode's supported project and global skill directories; the previously documented `skills.paths` setting does not exist.
 - `SKILL.md`: cut from 463 to 413 lines by removing verbatim repetition. Every remaining topic now has exactly one home.
 - `scripts/check_local.py`: rewritten. It validates skill and command frontmatter against the fields OpenCode actually recognises, checks eval structure, resolves Markdown links and heading anchors including HTML `<img src>`, and enforces translation parity.
 - `scripts/check_local.py`: unknown frontmatter keys are a warning, not an error. Both OpenCode and Claude Code ignore unrecognised keys, so failing on them would break custom metadata.
 - `scripts/check_local.py` and `.opencode/commands/`: command names now come only from file names. The recognised frontmatter fields match OpenCode's schema (`description`, `agent`, `model`, `variant`, `subtask`), while `description` remains a documented repository convention.
 - `.github/workflows/ci.yml`: rewritten as a single matrix job over Python 3.11 and 3.12, with a read-only token, ref-scoped concurrency, and manual dispatch.
-- `scripts/export_rules.py`: emits the frontmatter each target needs and warns when output exceeds the 12,000-character limit for modern Windsurf workspace rules.
-- `docs/ide-integration.md`: documents the resident-context cost. Nine of the 12 targets load on every request, roughly 5,200 tokens for a full export against roughly 2,300 for `--compact`.
+- `scripts/export_rules.py`: emits the frontmatter each target needs, falls back to compact output for an over-limit modern Windsurf workspace rule, and fails if even compact output cannot fit.
+- `docs/ide-integration.md`: documents the resident-context cost. Eight of the 11 default targets load on every request, roughly 5,200 tokens for a full export against roughly 2,300 for `--compact`.
 - `scripts/export_rules.py`: expanded from 2 targets to 9 (Cursor legacy and modern, Cline, Roo Code, Windsurf, Copilot, Claude Code, Codex, Aider), then to 12 with Gemini CLI, Continue, and Amazon Q Developer.
 - `scripts/export_rules.py`: reads `SKILL.md` from the skill repository but writes rule files into the target directory, so it is safe to run inside another project.
 - `SKILL.md` and `references/reader-analysis.md`: added a tutorial-versus-how-to fallback that asks one clarifying question and defaults to a focused how-to only when the user cannot answer.
@@ -69,6 +69,10 @@ validation scripts that are unit-tested instead of duplicated inside CI.
 - `SKILL.md`: the intent check referred to a "Diataxis decision tree" section that does not exist. It now points at the compass.
 - `references/doc-blueprints.md`: removed hidden zero-width characters from the tutorial code fence; `check_local.py` now catches them.
 - `scripts/check_local.py`: Markdown validation now catches broken heading anchors.
+- `scripts/check_local.py`: malformed `evals.json` values now produce actionable validation errors instead of tracebacks, and installed dependency/build Markdown is excluded from the repository link scan.
+- `scripts/audit_docs.py`: an explicit directory named `site` or `build` is no longer mistaken for an excluded nested directory.
+- `scripts/export_rules.py`: Cline exports now use `.clinerules/diataxis.md`; the legacy Cursor target is opt-in and mutually exclusive with modern Cursor; Windsurf falls back to a compact export before writing when its 12,000-character limit would be exceeded.
+- `docs/installation.md` and `docs/commands.md`: explain that OpenCode slash commands must be copied into a project or global command directory after installing the Skill.
 - `README.md` and `README.zh-CN.md`: corrected the blueprint layering note so Diataxis has four core forms, with Quickstart as a tutorial sub-type rather than a fifth form.
 - `evals/evals.json`: the large-system eval now asks for an iterative first-pages plan and treats navigation as an emerging sketch, matching the guide-not-a-plan philosophy.
 - `README.md` and `README.zh-CN.md`: the two install options previously used different target paths, and the evals count drifted out of sync with its badge. Both are resolved by the rewrite.

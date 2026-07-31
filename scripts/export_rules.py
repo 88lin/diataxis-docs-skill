@@ -12,8 +12,9 @@ Two things are worth knowing before you run this:
     there costs roughly 5k tokens per request. Use --compact for those.
 2.  Tool-specific formats are not interchangeable. Cursor ignores plain .md
     files in .cursor/rules (they must be .mdc), and Windsurf workspace rules
-    are capped at 12,000 characters. This script writes the correct extension
-    and warns when a file exceeds a documented limit.
+    are capped at 12,000 characters. This script writes the correct extension,
+    falls back to the compact guide when a target limit requires it, and fails
+    rather than writing an unusable file when even compact output is too large.
 
 Usage:
     python scripts/export_rules.py --list
@@ -75,6 +76,7 @@ class Target:
     char_limit: int | None = None
     always_on: bool = True
     note: str = ""
+    default: bool = True
 
 
 # Ordered by tool. `always_on` marks targets whose content enters every request
@@ -92,9 +94,15 @@ TARGETS: list[Target] = [
         key="cursor-legacy",
         name="Cursor (legacy)",
         path=Path(".cursorrules"),
+        default=False,
         note="Deprecated by Cursor. Do not use alongside .cursor/rules.",
     ),
-    Target(key="cline", name="Cline", path=Path(".clinerules")),
+    Target(
+        key="cline",
+        name="Cline",
+        path=Path(".clinerules/diataxis.md"),
+        note="Cline reads Markdown and text files from the .clinerules/ directory.",
+    ),
     Target(
         key="roo",
         name="Roo Code",
@@ -243,20 +251,36 @@ def approx_tokens(text: str) -> int:
 
 def select_targets(keys: Sequence[str]) -> tuple[list[Target], list[str]]:
     if not keys:
-        return list(TARGETS), []
+        return [target for target in TARGETS if target.default], []
     by_key = {target.key: target for target in TARGETS}
-    selected = [by_key[key] for key in keys if key in by_key]
+    selected: list[Target] = []
+    seen: set[str] = set()
+    for key in keys:
+        if key in by_key and key not in seen:
+            selected.append(by_key[key])
+            seen.add(key)
     unknown = [key for key in keys if key not in by_key]
     return selected, unknown
 
 
 def print_target_table() -> None:
     width = max(len(target.key) for target in TARGETS)
-    print(f"{len(TARGETS)} rule-file targets across 11 assistants:\n")
-    print(f"{'KEY'.ljust(width)}  {'TOOL'.ljust(20)}  {'ALWAYS-ON'.ljust(9)}  PATH")
+    default_count = sum(target.default for target in TARGETS)
+    print(
+        f"{len(TARGETS)} rule-file targets across 11 assistants "
+        f"({default_count} selected by default):\n"
+    )
+    print(
+        f"{'KEY'.ljust(width)}  {'TOOL'.ljust(20)}  "
+        f"{'DEFAULT'.ljust(7)}  {'ALWAYS-ON'.ljust(9)}  PATH"
+    )
     for target in TARGETS:
+        default = "yes" if target.default else "no"
         always = "yes" if target.always_on else "no"
-        print(f"{target.key.ljust(width)}  {target.name.ljust(20)}  {always.ljust(9)}  {target.path.as_posix()}")
+        print(
+            f"{target.key.ljust(width)}  {target.name.ljust(20)}  "
+            f"{default.ljust(7)}  {always.ljust(9)}  {target.path.as_posix()}"
+        )
     print("\nAlways-on targets enter every request in the project. Use --compact for those.")
 
 
@@ -291,20 +315,32 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"Known keys: {', '.join(t.key for t in TARGETS)}", file=sys.stderr)
         return 1
 
+    selected_keys = {target.key for target in targets}
+    if {"cursor", "cursor-legacy"}.issubset(selected_keys):
+        print(
+            "Error: cursor and cursor-legacy are mutually exclusive; "
+            "choose one target.",
+            file=sys.stderr,
+        )
+        return 1
+
     if not SKILL_PATH.is_file():
         print(f"Error: {SKILL_PATH} not found.", file=sys.stderr)
         return 1
 
-    body = strip_frontmatter(SKILL_PATH.read_text(encoding="utf-8"))
-    if args.compact:
-        body, missing = extract_sections(body, COMPACT_SECTIONS)
+    full_body = strip_frontmatter(SKILL_PATH.read_text(encoding="utf-8"))
+    compact_body: str | None = None
+    if args.compact or any(target.char_limit for target in targets):
+        compact_body, missing = extract_sections(full_body, COMPACT_SECTIONS)
         if missing:
             print(f"Error: --compact could not find section(s): {', '.join(missing)}", file=sys.stderr)
             return 1
-        if not body:
+        if not compact_body:
             print("Error: --compact produced an empty document.", file=sys.stderr)
             return 1
-    body = rewrite_export_links(body)
+    body = rewrite_export_links(full_body)
+    if compact_body is not None:
+        compact_body = rewrite_export_links(compact_body)
 
     target_root = args.target.resolve()
     if not target_root.is_dir():
@@ -319,13 +355,39 @@ def main(argv: Sequence[str] | None = None) -> int:
     failed = 0
 
     for target in targets:
-        content = build_content(target, body)
+        source_body = compact_body if args.compact and compact_body is not None else body
+        content = build_content(target, source_body)
         path = target_root / target.path
         display = target.path.as_posix()
         label = f"{target.name:<19} {display}"
 
         if target.char_limit and len(content) > target.char_limit:
-            print(f"  WARN  {label} - {len(content)} chars exceeds the {target.char_limit} limit; use --compact")
+            if not args.compact and compact_body is not None:
+                compact_content = build_content(target, compact_body)
+                if len(compact_content) <= target.char_limit:
+                    print(
+                        f"  INFO  {label} - full output is {len(content)} chars; "
+                        f"using compact output ({len(compact_content)} chars) "
+                        f"to fit the {target.char_limit} limit"
+                    )
+                    content = compact_content
+                else:
+                    print(
+                        f"  FAIL  {label} - full output is {len(content)} chars and "
+                        f"compact output is {len(compact_content)} chars; both exceed "
+                        f"the {target.char_limit} limit",
+                        file=sys.stderr,
+                    )
+                    failed += 1
+                    continue
+            if len(content) > target.char_limit:
+                print(
+                    f"  FAIL  {label} - {len(content)} chars exceeds the "
+                    f"{target.char_limit} limit",
+                    file=sys.stderr,
+                )
+                failed += 1
+                continue
 
         if path.exists() and not args.force:
             print(f"  SKIP  {label} - exists (use --force to overwrite)")

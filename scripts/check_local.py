@@ -62,6 +62,21 @@ ZERO_WIDTH_CHARS = {
     "\ufeff": "U+FEFF ZERO WIDTH NO-BREAK SPACE",
 }
 
+# Markdown shipped by installed dependencies or build tools is not part of the
+# repository contract. Excluding these directories keeps local validation
+# equivalent to the clean checkout used by CI.
+MARKDOWN_SKIP_DIRS = {
+    ".git",
+    "node_modules",
+    "dist",
+    "build",
+    ".venv",
+    "venv",
+    "__pycache__",
+    ".next",
+    "site",
+}
+
 REQUIRED_FILES = [
     "SKILL.md",
     "README.md",
@@ -213,8 +228,13 @@ def anchors_for_markdown(path: Path) -> set[str]:
 
 
 def markdown_files() -> list[Path]:
-    files = sorted(ROOT.rglob("*.md"))
-    return [p for p in files if ".git" not in p.parts]
+    files: list[Path] = []
+    for path in sorted(ROOT.rglob("*.md")):
+        relative = path.relative_to(ROOT)
+        if any(part in MARKDOWN_SKIP_DIRS for part in relative.parts[:-1]):
+            continue
+        files.append(path)
+    return files
 
 
 # --------------------------------------------------------------------------
@@ -372,19 +392,33 @@ def check_evals() -> list[str]:
     path = ROOT / "evals" / "evals.json"
     problems: list[str] = []
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        raw = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        return [f"evals.json could not be read: {exc}"]
+    try:
+        data = json.loads(raw)
     except json.JSONDecodeError as exc:
         return [f"evals.json is not valid JSON: {exc}"]
+
+    if not isinstance(data, dict):
+        return ["evals.json: top-level value must be a JSON object"]
 
     required_top = {"skill_name", "version", "categories", "evals"}
     missing = required_top - set(data.keys())
     if missing:
         problems.append(f"evals.json: missing top-level fields: {sorted(missing)}")
 
-    known_categories = data.get("categories", [])
-    if not isinstance(known_categories, list) or not known_categories:
+    known_categories_value = data.get("categories", [])
+    if not isinstance(known_categories_value, list) or not known_categories_value:
         problems.append("evals.json: 'categories' must be a non-empty list")
+        known_categories: list[str] = []
+    else:
         known_categories = []
+        for i, category in enumerate(known_categories_value):
+            if not isinstance(category, str) or not category.strip():
+                problems.append(f"evals.json: categories[{i}] must be a non-empty string")
+            else:
+                known_categories.append(category)
 
     evals = data.get("evals", [])
     if not isinstance(evals, list):
@@ -393,37 +427,81 @@ def check_evals() -> list[str]:
         return problems + ["evals.json: 'evals' must not be empty"]
 
     required_per_eval = {"id", "category", "prompt", "expected_output", "files"}
-    seen_ids: set[object] = set()
+    seen_ids: set[str | int] = set()
     for i, ev in enumerate(evals):
+        if not isinstance(ev, dict):
+            problems.append(f"evals.json: eval[{i}] must be a JSON object")
+            continue
+
+        label = ev.get("id", i)
         for field in sorted(required_per_eval):
             if field not in ev:
                 problems.append(f"evals.json: eval[{i}] missing field: {field}")
+
         if "id" in ev:
-            if ev["id"] in seen_ids:
-                problems.append(f"evals.json: duplicate id: {ev['id']}")
-            seen_ids.add(ev["id"])
-        if "category" in ev and known_categories and ev["category"] not in known_categories:
-            problems.append(
-                f"evals.json: eval[{ev.get('id', i)}] unknown category: {ev['category']!r}"
-            )
-        if "prompt" in ev and len(ev["prompt"].strip()) < 10:
-            problems.append(f"evals.json: eval[{ev.get('id', i)}] prompt is too short")
-        if "expected_output" in ev and len(ev["expected_output"].strip()) < 10:
-            problems.append(
-                f"evals.json: eval[{ev.get('id', i)}] expected_output is too short"
-            )
-        for referenced in ev.get("files", []):
-            if not (ROOT / referenced).exists():
+            eval_id = ev["id"]
+            if isinstance(eval_id, bool) or not isinstance(eval_id, (str, int)):
                 problems.append(
-                    f"evals.json: eval[{ev.get('id', i)}] references missing file: {referenced}"
+                    f"evals.json: eval[{i}] id must be a string or integer"
+                )
+            elif isinstance(eval_id, str) and not eval_id.strip():
+                problems.append(f"evals.json: eval[{i}] id must not be empty")
+            elif eval_id in seen_ids:
+                problems.append(f"evals.json: duplicate id: {eval_id}")
+            else:
+                seen_ids.add(eval_id)
+
+        category = ev.get("category")
+        if "category" in ev:
+            if not isinstance(category, str) or not category.strip():
+                problems.append(f"evals.json: eval[{i}] category must be a non-empty string")
+            elif known_categories and category not in known_categories:
+                problems.append(
+                    f"evals.json: eval[{label}] unknown category: {category!r}"
                 )
 
-    unused = sorted(set(known_categories) - {e.get("category") for e in evals})
+        prompt = ev.get("prompt")
+        if "prompt" in ev:
+            if not isinstance(prompt, str):
+                problems.append(f"evals.json: eval[{label}] prompt must be a string")
+            elif len(prompt.strip()) < 10:
+                problems.append(f"evals.json: eval[{label}] prompt is too short")
+
+        expected_output = ev.get("expected_output")
+        if "expected_output" in ev:
+            if not isinstance(expected_output, str):
+                problems.append(
+                    f"evals.json: eval[{label}] expected_output must be a string"
+                )
+            elif len(expected_output.strip()) < 10:
+                problems.append(f"evals.json: eval[{label}] expected_output is too short")
+
+        files = ev.get("files")
+        if "files" in ev:
+            if not isinstance(files, list):
+                problems.append(f"evals.json: eval[{label}] files must be a list")
+            else:
+                for file_index, referenced in enumerate(files):
+                    if not isinstance(referenced, str) or not referenced.strip():
+                        problems.append(
+                            f"evals.json: eval[{label}] files[{file_index}] must be a non-empty string"
+                        )
+                    elif not (ROOT / referenced).exists():
+                        problems.append(
+                            f"evals.json: eval[{label}] references missing file: {referenced}"
+                        )
+
+    used_categories = {
+        ev.get("category")
+        for ev in evals
+        if isinstance(ev, dict) and isinstance(ev.get("category"), str)
+    }
+    unused = sorted(set(known_categories) - used_categories)
     if unused:
         warn(f"evals.json: categories declared but unused: {unused}")
 
     if not problems:
-        used = {e["category"] for e in evals if "category" in e}
+        used = used_categories
         print(f"  evals.json OK: {len(evals)} evals across {len(used)} categories")
     return problems
 
@@ -511,10 +589,18 @@ def check_version_consistency(fields: dict[str, object]) -> list[str]:
                 "move it under 'metadata:'"
             )
 
-    evals_data = json.loads((ROOT / "evals" / "evals.json").read_text(encoding="utf-8"))
+    try:
+        evals_data = json.loads((ROOT / "evals" / "evals.json").read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        return [f"evals.json could not be read for version check: {exc}"]
+    if not isinstance(evals_data, dict):
+        return ["evals.json: top-level value must be a JSON object for version check"]
     evals_version = str(evals_data.get("version", "")).strip()
 
-    changelog_text = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    try:
+        changelog_text = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        return [f"CHANGELOG.md could not be read for version check: {exc}"]
     released = set(re.findall(r"^## \[([^\]]+)\]", changelog_text, re.MULTILINE))
 
     if not skill_version:

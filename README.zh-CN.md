@@ -42,20 +42,14 @@ git clone https://github.com/88lin/diataxis-docs-skill.git \
   ~/.config/opencode/skills/diataxis-docs
 ```
 
-也可以把 checkout 放在其他位置，再通过 `opencode.json` 注册：
+如果只为一个项目安装，请在该项目根目录运行：
 
 ```bash
-git clone https://github.com/88lin/diataxis-docs-skill.git ~/src/diataxis-docs
+git clone https://github.com/88lin/diataxis-docs-skill.git \
+  .opencode/skills/diataxis-docs
 ```
 
-```jsonc
-{
-  "$schema": "https://opencode.ai/config.json",
-  "skills": { "paths": ["~/src/diataxis-docs"] }
-}
-```
-
-`skills.paths` 会增加 OpenCode 扫描 Skill 的目录。无论采用哪种方式，存放 `SKILL.md` 的目录都**必须**命名为 `diataxis-docs`，与 Skill frontmatter 里的 `name` 一致。安装后重启 OpenCode。
+OpenCode 不支持用 `skills.paths` 扫描任意 checkout。无论采用上面哪种受支持的位置，存放 `SKILL.md` 的目录都**必须**命名为 `diataxis-docs`，与 Skill frontmatter 里的 `name` 一致。安装后重启 OpenCode。
 
 Claude Code 的装法、验证步骤和排错见[安装 Skill](docs/zh-CN/installation.md)。
 
@@ -81,6 +75,8 @@ Claude Code 的装法、验证步骤和排错见[安装 Skill](docs/zh-CN/instal
 | `/docs-quickstart` | 一条通往首次成功的最短路径 |
 
 完整输出结构见[斜杠命令](docs/zh-CN/commands.md)。
+
+命令文件需要单独安装：OpenCode 不会发现 Skill checkout 内部嵌套的 `.opencode/commands/`。具体步骤见[安装 Skill](docs/zh-CN/installation.md#安装斜杠命令)。
 
 ## 看它实际怎么工作
 
@@ -116,7 +112,7 @@ python scripts/export_rules.py --list
 python scripts/export_rules.py --target . --compact
 ```
 
-12 个目标里有 9 个是常驻上下文，每次请求都会被加载，所以 `--compact` 很重要。详见 [AI IDE 集成](docs/zh-CN/ide-integration.md)。
+默认选中的 11 个目标里有 8 个是常驻上下文，每次请求都会被加载，所以 `--compact` 很重要。可选的旧版 Cursor 目标默认不会导出。详见 [AI IDE 集成](docs/zh-CN/ide-integration.md)。
 
 ## 设计原则
 

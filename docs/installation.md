@@ -13,40 +13,58 @@ You need `git` and one of the following hosts:
 
 > **The directory that contains `SKILL.md` must be named `diataxis-docs`.**
 >
-> OpenCode requires the frontmatter `name` to match the containing directory. This repository is called `diataxis-docs-skill`, but the skill is named `diataxis-docs`. A plain `git clone` keeps the repository name, so the skill will not load — and neither OpenCode nor Claude Code prints an error when this happens. Every command below passes the target directory explicitly for this reason.
+> OpenCode requires the frontmatter `name` to match the containing directory. This repository is called `diataxis-docs-skill`, but the skill is named `diataxis-docs`. A plain `git clone` keeps the repository name, so OpenCode will not load the skill. Every command below passes the target directory explicitly for this reason.
 
 ## Install into OpenCode
 
-### Use OpenCode's discovered skill directory
+### Install globally
 
 ```bash
 git clone https://github.com/88lin/diataxis-docs-skill.git \
   ~/.config/opencode/skills/diataxis-docs
 ```
 
-### Register a checkout elsewhere
+### Install for one project
 
-Clone the repository into a directory whose name still matches the skill:
+Run this from the project root:
 
 ```bash
 git clone https://github.com/88lin/diataxis-docs-skill.git \
-  ~/src/diataxis-docs
+  .opencode/skills/diataxis-docs
 ```
 
-Add that directory to the `opencode.json` that applies to your project:
-
-```jsonc
-{
-  "$schema": "https://opencode.ai/config.json",
-  "skills": {
-    "paths": ["~/src/diataxis-docs"]
-  }
-}
-```
-
-`skills.paths` is a supported OpenCode setting for additional directories to scan for skills. Use it when you want to keep the checkout outside a built-in skill directory; it does not remove the directory-name requirement.
+OpenCode discovers skills only in its documented project and global skill directories (including the Claude- and agent-compatible directories). It does not support a `skills.paths` setting for arbitrary checkouts. If you keep the repository elsewhere, copy or link it into one of those discovered directories.
 
 Restart OpenCode after either method so the skill list reloads.
+
+### Install the slash commands
+
+Installing the skill does **not** install its five slash commands. OpenCode discovers commands only from `.opencode/commands/` in the current project or `~/.config/opencode/commands/` globally; it does not scan the `.opencode/commands/` directory nested inside an installed skill.
+
+For the global installation above:
+
+```bash
+mkdir -p ~/.config/opencode/commands
+cp ~/.config/opencode/skills/diataxis-docs/.opencode/commands/*.md \
+  ~/.config/opencode/commands/
+```
+
+For a project-local installation:
+
+```bash
+mkdir -p .opencode/commands
+cp .opencode/skills/diataxis-docs/.opencode/commands/*.md \
+  .opencode/commands/
+```
+
+PowerShell users can install the commands globally with:
+
+```powershell
+New-Item -ItemType Directory -Force "$HOME/.config/opencode/commands" | Out-Null
+Copy-Item "$HOME/.config/opencode/skills/diataxis-docs/.opencode/commands/*.md" "$HOME/.config/opencode/commands/"
+```
+
+These are copies, so repeat the command after updating the skill. Review an existing `docs-*.md` command before replacing it if you already use the same command name.
 
 ## Install into Claude Code
 
@@ -59,7 +77,7 @@ git clone https://github.com/88lin/diataxis-docs-skill.git \
 
 Claude Code usually detects new skills automatically. Restart it if this is the first skill you have installed, or if the skill does not appear.
 
-The `.opencode/commands/` directory in this repository holds OpenCode slash-command prompts. The skill instructions in `SKILL.md` are portable, but slash-command discovery is host-specific — see [Slash commands](commands.md).
+The skill instructions in `SKILL.md` are portable, but slash-command discovery is host-specific. Claude Code does not load the OpenCode commands; see [Slash commands](commands.md).
 
 ## Verify the install
 
@@ -67,7 +85,7 @@ Set `SKILL_DIR` to the checkout you installed, then check that the directory nam
 
 ```bash
 SKILL_DIR=~/.config/opencode/skills/diataxis-docs
-# For the skills.paths example above, use: SKILL_DIR=~/src/diataxis-docs
+# For a project-local install, use: SKILL_DIR=.opencode/skills/diataxis-docs
 basename "$SKILL_DIR"
 head -2 "$SKILL_DIR/SKILL.md"
 ```
@@ -88,7 +106,7 @@ A loaded skill answers with a Diataxis form — tutorial, how-to, reference, or 
 git -C /path/to/diataxis-docs pull
 ```
 
-Restart the host tool afterwards.
+Restart the host tool afterwards. If you copied the OpenCode slash commands, repeat the copy command so their prompts stay in sync.
 
 ## Uninstall
 
@@ -96,17 +114,18 @@ Restart the host tool afterwards.
 rm -rf /path/to/diataxis-docs
 ```
 
-If you installed through `skills.paths`, also remove that entry from `opencode.json`.
+If you copied the OpenCode slash commands, remove the five `docs-*.md` files from the command directory as well, after checking that they are the copies from this skill.
 
 ## Troubleshoot
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
 | The skill never triggers | Directory name is not `diataxis-docs` | Rename the directory, then restart the host |
-| The skill never triggers | `skills.paths` points at the wrong or missing directory | Point it at the `diataxis-docs` checkout directory that directly contains `SKILL.md`, then restart OpenCode |
 | The skill never triggers | Host was not restarted | Restart OpenCode or Claude Code |
 | `SKILL.md` not found | Cloned one directory too deep | The file must sit at `<skills-dir>/diataxis-docs/SKILL.md` |
-| Slash commands are missing | Host does not read `.opencode/commands/` | Use natural-language prompts, or copy the command bodies into your host's own command format |
+| Slash commands are missing in OpenCode | The skill checkout's nested `.opencode/commands/` is not a discovered command directory | Copy the files into the project's `.opencode/commands/` or global `~/.config/opencode/commands/`, then restart OpenCode |
+| Slash commands are stale after an update | Installed command files are copies | Repeat the command-copy step after pulling the skill update |
+| Slash commands are missing in another host | Command discovery is host-specific | Use natural-language prompts, or adapt the command bodies to that host's command format |
 
 ## Next steps
 

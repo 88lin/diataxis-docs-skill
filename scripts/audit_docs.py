@@ -163,7 +163,11 @@ def iter_markdown_files(root: Path, exclude: Sequence[str]) -> Iterable[Path]:
     for path in sorted(root.rglob("*")):
         if path.suffix.lower() not in {".md", ".mdx"}:
             continue
-        if any(part in SKIP_DIRS for part in path.parts):
+        # Compare only components below the requested scan root. Checking
+        # `path.parts` would incorrectly skip an explicit target whose own
+        # name (or an ancestor outside the target) is `site` or `build`.
+        relative = path.relative_to(root)
+        if any(part in SKIP_DIRS for part in relative.parts[:-1]):
             continue
         display_path = path.relative_to(base).as_posix()
         if is_excluded(display_path, exclude):

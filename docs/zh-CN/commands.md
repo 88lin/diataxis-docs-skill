@@ -72,6 +72,10 @@ Drafts 章节会给出拆分方案中每个页面的完整草稿，所以这是�
 
 每个命令正文里的 `$ARGUMENTS` 会被替换成你在命令名之后输入的全部内容。可以传路径、路径列表，或直接粘贴页面内容。
 
+## 让 OpenCode 发现这些命令
+
+本仓库 `.opencode/commands/` 里的文件是命令源文件。把仓库安装成 Skill 后，它们位于 Skill checkout 内部；但 OpenCode 只从当前项目的 `.opencode/commands/` 或全局 `~/.config/opencode/commands/` 发现命令。请按[安装斜杠命令](installation.md#安装斜杠命令)中的步骤，把文件复制到其中一个位置。
+
 ## 在 OpenCode 之外的宿主里
 
 斜杠命令的发现机制由宿主决定。Claude Code 会加载 `SKILL.md`，但不读 `.opencode/commands/`。在其他宿主里，要么用自然语言描述模式（"判断这个页面的类型，并指出混合形态"），要么把命令正文改写成该宿主自己的命令格式。

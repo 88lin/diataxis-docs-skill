@@ -72,6 +72,10 @@ Output sections: What you will build, Prerequisites, Steps, Next steps.
 
 Every command body substitutes `$ARGUMENTS` with everything you typed after the command name. Pass a path, a list of paths, or pasted page content.
 
+## Make the commands discoverable
+
+The files bundled under this repository's `.opencode/commands/` directory are command sources. Installing the repository as a skill places them inside the skill checkout, but OpenCode only discovers commands from the current project's `.opencode/commands/` or the global `~/.config/opencode/commands/`. Follow [Install the slash commands](installation.md#install-the-slash-commands) to copy them into one of those locations.
+
 ## Hosts other than OpenCode
 
 Slash-command discovery is host-specific. Claude Code loads `SKILL.md` but does not read `.opencode/commands/`. In other hosts, either describe the mode in natural language ("classify this page and flag mixed forms") or copy the command body into that host's own command format.

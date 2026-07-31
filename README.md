@@ -42,20 +42,14 @@ git clone https://github.com/88lin/diataxis-docs-skill.git \
   ~/.config/opencode/skills/diataxis-docs
 ```
 
-Or keep the checkout elsewhere and register it in `opencode.json`:
+For one project, run this from that project's root:
 
 ```bash
-git clone https://github.com/88lin/diataxis-docs-skill.git ~/src/diataxis-docs
+git clone https://github.com/88lin/diataxis-docs-skill.git \
+  .opencode/skills/diataxis-docs
 ```
 
-```jsonc
-{
-  "$schema": "https://opencode.ai/config.json",
-  "skills": { "paths": ["~/src/diataxis-docs"] }
-}
-```
-
-`skills.paths` adds directories for OpenCode to scan. With either method, the directory containing `SKILL.md` **must** be named `diataxis-docs` to match the skill's frontmatter `name`. Restart OpenCode afterwards.
+OpenCode has no `skills.paths` setting for arbitrary checkouts. With either supported location, the directory containing `SKILL.md` **must** be named `diataxis-docs` to match the skill's frontmatter `name`. Restart OpenCode afterwards.
 
 Claude Code, verification steps, and troubleshooting are in [Install the skill](docs/installation.md).
 
@@ -81,6 +75,8 @@ Or use a slash command for a specific mode:
 | `/docs-quickstart` | A short path to first success |
 
 Full output shapes: [Slash commands](docs/commands.md).
+
+The command files need a separate install step: OpenCode does not discover `.opencode/commands/` nested inside a skill checkout. See [Install the skill](docs/installation.md#install-the-slash-commands).
 
 ## See it work
 
@@ -116,7 +112,7 @@ python scripts/export_rules.py --list
 python scripts/export_rules.py --target . --compact
 ```
 
-Nine of the twelve targets load into every request, so `--compact` matters. See [AI IDE integration](docs/ide-integration.md).
+Eight of the eleven default targets load into every request, so `--compact` matters. The optional legacy Cursor target is excluded by default. See [AI IDE integration](docs/ide-integration.md).
 
 ## Design principles
 

@@ -65,6 +65,6 @@ Because it is a reference the model consults, not a page a person reads start to
 
 The same reasoning shapes the rule export for other assistants. See [Context cost](ide-integration.md#context-cost).
 
-## Can I install with `skills.paths`?
+## Can I install from an arbitrary checkout with `skills.paths`?
 
-Yes. `skills.paths` is a supported OpenCode setting that adds directories to the skill scan. Use it when the checkout lives outside a directory OpenCode discovers automatically. Point the entry at the checkout containing `SKILL.md`, keep that directory named `diataxis-docs` so it matches the frontmatter `name`, and restart OpenCode. Both installation methods are shown in [Install the skill](installation.md#install-into-opencode).
+No. OpenCode does not define a `skills.paths` configuration key. Put the checkout in a documented project or global skill directory, or expose an external checkout there with a copy or link. Keep the containing directory named `diataxis-docs` so it matches the frontmatter `name`. Supported installation locations are shown in [Install the skill](installation.md#install-into-opencode).

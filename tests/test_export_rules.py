@@ -34,6 +34,42 @@ class ExportRulesTests(unittest.TestCase):
         ]
         self.assertEqual(missing, [])
 
+    def test_default_selection_excludes_legacy_cursor(self) -> None:
+        selected, unknown = export_rules.select_targets([])
+        self.assertEqual(unknown, [])
+        keys = {target.key for target in selected}
+        self.assertIn("cursor", keys)
+        self.assertNotIn("cursor-legacy", keys)
+        self.assertEqual(len(selected), 11)
+
+    def test_cursor_targets_are_mutually_exclusive(self) -> None:
+        output = io.StringIO()
+        with redirect_stdout(output), redirect_stderr(output):
+            result = export_rules.main(
+                ["--target", tempfile.gettempdir(), "--only", "cursor", "--only", "cursor-legacy"]
+            )
+        self.assertEqual(result, 1)
+        self.assertIn("mutually exclusive", output.getvalue())
+
+    def test_cline_export_uses_rule_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.export(root, "cline")
+            self.assertTrue((root / ".clinerules").is_dir())
+            self.assertTrue((root / ".clinerules" / "diataxis.md").is_file())
+
+    def test_default_windsurf_export_falls_back_to_compact(self) -> None:
+        target = next(item for item in export_rules.TARGETS if item.key == "windsurf")
+        output = io.StringIO()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            with redirect_stdout(output), redirect_stderr(output):
+                result = export_rules.main(["--target", str(root), "--only", "windsurf"])
+            self.assertEqual(result, 0, output.getvalue())
+            content = (root / target.path).read_text(encoding="utf-8")
+        self.assertLessEqual(len(content), target.char_limit)
+        self.assertIn("using compact output", output.getvalue())
+
     def test_compact_export_has_no_dead_local_anchors(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             content = self.export(Path(tmp), "codex", compact=True)

@@ -4,7 +4,7 @@ This repository is packaged as an OpenCode skill, but the guidance in `SKILL.md`
 
 ## Before you start
 
-Read [Context cost](#context-cost) first. Nine of the twelve targets load into every request in the project, and the full guidance costs roughly 5,200 tokens each time.
+Read [Context cost](#context-cost) first. Eight of the eleven default targets load into every request in the project. The optional legacy Cursor target brings the total to nine always-on targets.
 
 ## List the targets
 
@@ -12,22 +12,22 @@ Read [Context cost](#context-cost) first. Nine of the twelve targets load into e
 python scripts/export_rules.py --list
 ```
 
-12 rule files across 11 assistants:
+12 rule-file targets across 11 assistants (11 selected by default):
 
-| Key | Tool | Path | Always-on |
-| --- | --- | --- | --- |
-| `cursor` | Cursor | `.cursor/rules/diataxis.mdc` | no |
-| `cursor-legacy` | Cursor (legacy) | `.cursorrules` | yes |
-| `cline` | Cline | `.clinerules` | yes |
-| `roo` | Roo Code | `.roo/rules/diataxis.md` | yes |
-| `windsurf` | Windsurf | `.windsurf/rules/diataxis.md` | no |
-| `copilot` | GitHub Copilot | `.github/copilot-instructions.md` | yes |
-| `claude` | Claude Code | `CLAUDE.md` | yes |
-| `codex` | OpenAI Codex | `AGENTS.md` | yes |
-| `aider` | Aider | `CONVENTIONS.md` | yes |
-| `gemini` | Gemini CLI | `GEMINI.md` | yes |
-| `continue` | Continue | `.continue/rules/diataxis.md` | no |
-| `amazonq` | Amazon Q Developer | `.amazonq/rules/diataxis.md` | yes |
+| Key | Tool | Path | Default | Always-on |
+| --- | --- | --- | --- | --- |
+| `cursor` | Cursor | `.cursor/rules/diataxis.mdc` | yes | no |
+| `cursor-legacy` | Cursor (legacy) | `.cursorrules` | no | yes |
+| `cline` | Cline | `.clinerules/diataxis.md` | yes | yes |
+| `roo` | Roo Code | `.roo/rules/diataxis.md` | yes | yes |
+| `windsurf` | Windsurf | `.windsurf/rules/diataxis.md` | yes | no |
+| `copilot` | GitHub Copilot | `.github/copilot-instructions.md` | yes | yes |
+| `claude` | Claude Code | `CLAUDE.md` | yes | yes |
+| `codex` | OpenAI Codex | `AGENTS.md` | yes | yes |
+| `aider` | Aider | `CONVENTIONS.md` | yes | yes |
+| `gemini` | Gemini CLI | `GEMINI.md` | yes | yes |
+| `continue` | Continue | `.continue/rules/diataxis.md` | yes | no |
+| `amazonq` | Amazon Q Developer | `.amazonq/rules/diataxis.md` | yes | yes |
 
 ## Preview before writing
 
@@ -42,7 +42,8 @@ python /path/to/diataxis-docs-skill/scripts/export_rules.py --target . --dry-run
 Run from the project that should receive the rule files, or point `--target` at it:
 
 ```bash
-# Everything, into the current project
+# Everything, into the current project. Windsurf automatically uses compact
+# output when the full guide would exceed its platform limit.
 python /path/to/diataxis-docs-skill/scripts/export_rules.py
 
 # Only the tools your team uses, compact form
@@ -68,13 +69,15 @@ An always-on rule file is prepended to every request in that project. The full g
 
 `--compact` exports only the compass, the quick decision tree, the non-trigger list, the anti-patterns, and the quality checks — about 9,400 characters, roughly 2,300 tokens. That is enough for the assistant to classify a request correctly and to avoid the common failure modes.
 
-Use the full export for the three targets that load conditionally (`cursor`, `windsurf`, `continue`), and `--compact` for the rest.
+Eight of the eleven default targets are always-on; the legacy Cursor target is optional and makes nine always-on targets when selected. Use the full export for the targets that load conditionally (`cursor`, `windsurf`, `continue`), keeping in mind that Windsurf automatically receives compact output when full output is over its limit. Use `--compact` for the rest.
 
 ## Tool-specific notes
 
-**Cursor.** Project rules must use the `.mdc` extension; a plain `.md` file in `.cursor/rules` is ignored by the rules system. The script writes `.cursor/rules/diataxis.mdc` with `description` and `alwaysApply: false`, which makes it an agent-requested rule: Cursor reads the description and pulls the rule in when the task looks documentation-related. Do not run the legacy `.cursorrules` target at the same time.
+**Cursor.** Project rules must use the `.mdc` extension; a plain `.md` file in `.cursor/rules` is ignored by the rules system. The script writes `.cursor/rules/diataxis.mdc` with `description` and `alwaysApply: false`, which makes it an agent-requested rule: Cursor reads the description and pulls the rule in when the task looks documentation-related. The modern target is selected by default. Use `--only cursor-legacy` only for an older Cursor setup, and never select both targets together.
 
-**Windsurf.** Workspace rules are capped at 12,000 characters per file. The full guidance exceeds that, so use `--compact` for Windsurf. The script prints a warning when a target exceeds its documented limit. The legacy `.windsurfrules` target is not offered: its 6,000-character limit is smaller than even the compact guide, so it has no valid export mode. Delete a stale `.windsurfrules` generated by an earlier version.
+**Cline.** Workspace rules live in the `.clinerules/` directory. The exporter writes `.clinerules/diataxis.md`; a single `.clinerules` file is not the current directory-based format.
+
+**Windsurf.** Workspace rules are capped at 12,000 characters per file. The full guidance exceeds that, so the exporter automatically falls back to the compact guide for this target; pass `--compact` when you want every target to use the same compact source. The legacy `.windsurfrules` target is not offered: its 6,000-character limit is smaller than even the compact guide, so it has no valid export mode. Delete a stale `.windsurfrules` generated by an earlier version.
 
 **Roo Code.** Every file in `.roo/rules/` is loaded on every request, so this target is effectively always-on even though it lives in a rules directory.
 

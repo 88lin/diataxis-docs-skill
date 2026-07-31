@@ -195,6 +195,24 @@ tool auth login
             self.assertEqual(report["pages_scanned"], 1)
             self.assertEqual(report["pages"][0]["path"], "guide.md")
 
+    def test_explicit_excluded_directory_name_is_still_scanned(self) -> None:
+        for directory_name in ("site", "build"):
+            with self.subTest(directory_name=directory_name), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp) / directory_name
+                self.write_file(root / "guide.md", "# Guide\n\nInstall the tool.\n")
+                report = json.loads(self.run_script(str(root), "--format", "json").stdout)
+                self.assertEqual(report["pages_scanned"], 1)
+                self.assertEqual(report["pages"][0]["path"], "guide.md")
+
+    def test_nested_excluded_directory_is_skipped(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write_file(root / "guide.md", "# Guide\n\nInstall the tool.\n")
+            self.write_file(root / "site" / "generated.md", "# Generated\n")
+            report = json.loads(self.run_script(str(root), "--format", "json").stdout)
+            self.assertEqual(report["pages_scanned"], 1)
+            self.assertEqual(report["pages"][0]["path"], "guide.md")
+
     def test_missing_target_returns_two(self) -> None:
         self.run_script("does/not/exist", expect_code=2)
 

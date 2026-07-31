@@ -65,6 +65,6 @@ Diataxis 的做法是在动笔之前先问两个问题：这段内容是指导�
 
 同样的道理也决定了导出到其他助手时的做法，见 [上下文成本](ide-integration.md#上下文成本)。
 
-## 可以通过 `skills.paths` 安装吗？
+## 可以通过 `skills.paths` 从任意 checkout 安装吗？
 
-可以。`skills.paths` 是 OpenCode 支持的配置项，用于增加 Skill 扫描目录。checkout 不在 OpenCode 默认扫描的目录中时，可以使用它。让条目指向包含 `SKILL.md` 的 checkout，并把该目录命名为 `diataxis-docs`，与 frontmatter 里的 `name` 保持一致，然后重启 OpenCode。两种安装方法都在[安装 Skill](installation.md#安装到-opencode)中。
+不可以。OpenCode 没有定义 `skills.paths` 配置项。请把 checkout 放进文档列出的项目级或全局 Skill 目录；也可以把其他位置的 checkout 复制或链接到这些目录。存放它的目录仍须命名为 `diataxis-docs`，与 frontmatter 里的 `name` 一致。支持的安装位置见[安装 Skill](installation.md#安装到-opencode)。
