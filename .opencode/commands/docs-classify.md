@@ -1,5 +1,4 @@
 ---
-name: docs-classify
 description: Classify a single documentation page using Diataxis. Use when the user pastes or references a page and asks what kind of document it should be.
 ---
 

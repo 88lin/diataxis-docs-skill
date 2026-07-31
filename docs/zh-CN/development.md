@@ -19,7 +19,7 @@ python scripts/check_local.py
 - `SKILL.md` frontmatter 是否符合 OpenCode Skill 规范：`name` 匹配 `^[a-z0-9]+(-[a-z0-9]+)*$`、`description` 不超过 1024 字符，并报告未被识别的字段
 - `SKILL.md` 正文不超过 500 行，超过 400 行时告警
 - 安装文档 clone 的目标目录名与 Skill 名一致
-- 斜杠命令的 frontmatter，以及其中的 `name`（若存在）与文件名一致
+- 斜杠命令 frontmatter 是否只使用 OpenCode 识别的字段，以及是否包含本仓库要求的 `description`
 - `evals/evals.json` 的结构、id 唯一性、分类合法性，以及引用的文件确实存在
 - Markdown 内部链接、标题锚点和图片路径
 - 中英文档保持配对
@@ -35,6 +35,7 @@ python -m unittest discover -s tests -p 'test_*.py'
 
 - `tests/test_check_local.py` 给每项检查喂入故意写错的输入，断言它确实被抓出来。一个停止校验的校验器比没有校验器更糟。
 - `tests/test_audit_docs.py` 覆盖信号计数器、CLI 退出码和 `--exclude`。
+- `tests/test_export_rules.py` 会把精简版和完整版真实写入临时项目，再检查链接完整性与 Windsurf 字符上限。
 
 ## 扫描文档的混合形态气味
 
@@ -99,7 +100,7 @@ $ARGUMENTS
 ...
 ```
 
-只有 `description` 是必需的。OpenCode 识别 `name`、`description`、`agent`、`model`、`subtask`；校验脚本对其他字段告警，并在 `name` 与文件名不一致时报错。
+OpenCode 识别 `description`、`agent`、`model`、`variant`、`subtask`，命令名来自文件名。OpenCode 本身把 `description` 设为可选，但本仓库要求提供它，确保命令选择器里有清晰说明。校验脚本会对其他字段告警，包括 `name`。
 
 ## 修改 SKILL.md
 

@@ -17,12 +17,36 @@
 
 ## 安装到 OpenCode
 
+### 使用 OpenCode 默认扫描的 Skill 目录
+
 ```bash
 git clone https://github.com/88lin/diataxis-docs-skill.git \
   ~/.config/opencode/skills/diataxis-docs
 ```
 
-重启 OpenCode，让 Skill 列表重新加载。
+### 注册其他位置的 checkout
+
+把仓库克隆到其他位置，同时确保目录名仍与 Skill 名一致：
+
+```bash
+git clone https://github.com/88lin/diataxis-docs-skill.git \
+  ~/src/diataxis-docs
+```
+
+把该目录加入对当前项目生效的 `opencode.json`：
+
+```jsonc
+{
+  "$schema": "https://opencode.ai/config.json",
+  "skills": {
+    "paths": ["~/src/diataxis-docs"]
+  }
+}
+```
+
+`skills.paths` 是 OpenCode 支持的配置项，用于增加扫描 Skill 的目录。它适合把 checkout 放在默认 Skill 目录之外，但不会取消目录名要求。
+
+无论采用哪种方式，完成后都要重启 OpenCode，让 Skill 列表重新加载。
 
 ## 安装到 Claude Code
 
@@ -39,14 +63,16 @@ Claude Code 通常会自动发现新 Skill。如果这是你安装的第一个 S
 
 ## 验证安装
 
-确认目录名与 frontmatter 里的 name 一致：
+先把 `SKILL_DIR` 设为实际安装位置，再确认目录名与 frontmatter 里的 name 一致：
 
 ```bash
-ls -d ~/.config/opencode/skills/diataxis-docs
-head -2 ~/.config/opencode/skills/diataxis-docs/SKILL.md
+SKILL_DIR=~/.config/opencode/skills/diataxis-docs
+# 如果使用上面的 skills.paths 示例，则改为：SKILL_DIR=~/src/diataxis-docs
+basename "$SKILL_DIR"
+head -2 "$SKILL_DIR/SKILL.md"
 ```
 
-第二条命令必须输出 `---`，然后是 `name: diataxis-docs`。如果目录名和这个值不同，重命名目录。
+第一条命令必须输出 `diataxis-docs`；第二条必须输出 `---`，然后是 `name: diataxis-docs`。如果两个名称不同，重命名目录。
 
 然后向助手提一个应当触发 Skill 的问题：
 
@@ -59,7 +85,7 @@ Skill 已加载时，回答会给出一个 Diataxis 文档类型——教程、�
 ## 更新
 
 ```bash
-git -C ~/.config/opencode/skills/diataxis-docs pull
+git -C /path/to/diataxis-docs pull
 ```
 
 之后重启宿主工具。
@@ -67,14 +93,17 @@ git -C ~/.config/opencode/skills/diataxis-docs pull
 ## 卸载
 
 ```bash
-rm -rf ~/.config/opencode/skills/diataxis-docs
+rm -rf /path/to/diataxis-docs
 ```
+
+如果通过 `skills.paths` 安装，还要从 `opencode.json` 中删除对应条目。
 
 ## 排查问题
 
 | 现象 | 原因 | 处理 |
 | --- | --- | --- |
 | Skill 从不触发 | 目录名不是 `diataxis-docs` | 重命名目录，然后重启宿主 |
+| Skill 从不触发 | `skills.paths` 指向错误或不存在的目录 | 让它指向直接包含 `SKILL.md` 的 `diataxis-docs` checkout 目录，然后重启 OpenCode |
 | Skill 从不触发 | 没有重启宿主 | 重启 OpenCode 或 Claude Code |
 | 找不到 `SKILL.md` | clone 时多套了一层目录 | 该文件必须位于 `<skills 目录>/diataxis-docs/SKILL.md` |
 | 斜杠命令不存在 | 宿主不读 `.opencode/commands/` | 改用自然语言提问，或把命令正文改写成宿主自己的命令格式 |

@@ -156,6 +156,37 @@ class InstallPathTests(unittest.TestCase):
             self.assertIn("docs/zh-CN/installation.md", problems[0])
 
 
+class CommandFrontmatterTests(unittest.TestCase):
+    def setUp(self) -> None:
+        check_local.warnings.clear()
+
+    def write_command(self, root: Path, frontmatter: str) -> None:
+        path = root / ".opencode" / "commands" / "docs-test.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(f"---\n{frontmatter}---\n\nRun the command.\n", encoding="utf-8")
+
+    def test_variant_is_recognised(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write_command(root, "description: Test command.\nvariant: high\n")
+            self.assertEqual(check_local.check_commands(root), [])
+            self.assertEqual(check_local.warnings, [])
+
+    def test_name_is_unrecognised_but_only_warns(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write_command(root, "name: docs-test\ndescription: Test command.\n")
+            self.assertEqual(check_local.check_commands(root), [])
+            self.assertTrue(any("'name'" in warning for warning in check_local.warnings))
+
+    def test_description_is_required_by_repository_convention(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write_command(root, "agent: build\n")
+            problems = check_local.check_commands(root)
+            self.assertTrue(any("required by this repository" in problem for problem in problems), problems)
+
+
 class AnchorTests(unittest.TestCase):
     def test_markdown_anchor_slugifies_headings(self) -> None:
         self.assertEqual(check_local.markdown_anchor("Quick decision tree"), "quick-decision-tree")

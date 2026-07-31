@@ -1,5 +1,4 @@
 ---
-name: docs-quickstart
 description: Draft a quickstart for a developer tool, SDK, or service. Use when the user wants the shortest path to first success for a new user.
 ---
 

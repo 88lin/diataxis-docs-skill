@@ -42,7 +42,20 @@ git clone https://github.com/88lin/diataxis-docs-skill.git \
   ~/.config/opencode/skills/diataxis-docs
 ```
 
-目标目录**必须**命名为 `diataxis-docs`。OpenCode 会用目录名与 Skill frontmatter 里的 `name` 做匹配，不一致会静默加载失败，不报错。安装后重启 OpenCode。
+也可以把 checkout 放在其他位置，再通过 `opencode.json` 注册：
+
+```bash
+git clone https://github.com/88lin/diataxis-docs-skill.git ~/src/diataxis-docs
+```
+
+```jsonc
+{
+  "$schema": "https://opencode.ai/config.json",
+  "skills": { "paths": ["~/src/diataxis-docs"] }
+}
+```
+
+`skills.paths` 会增加 OpenCode 扫描 Skill 的目录。无论采用哪种方式，存放 `SKILL.md` 的目录都**必须**命名为 `diataxis-docs`，与 Skill frontmatter 里的 `name` 一致。安装后重启 OpenCode。
 
 Claude Code 的装法、验证步骤和排错见[安装 Skill](docs/zh-CN/installation.md)。
 
@@ -103,7 +116,7 @@ python scripts/export_rules.py --list
 python scripts/export_rules.py --target . --compact
 ```
 
-13 个目标里有 10 个是常驻上下文，每次请求都会被加载，所以 `--compact` 很重要。详见 [AI IDE 集成](docs/zh-CN/ide-integration.md)。
+12 个目标里有 9 个是常驻上下文，每次请求都会被加载，所以 `--compact` 很重要。详见 [AI IDE 集成](docs/zh-CN/ide-integration.md)。
 
 ## 设计原则
 

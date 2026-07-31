@@ -6,10 +6,10 @@ the frontmatter that tool requires so the exported file is actually loaded.
 
 Two things are worth knowing before you run this:
 
-1.  Several targets are *always-on* context. Cline, Roo Code, Copilot, Claude
-    Code, Codex, Aider, Gemini CLI, and Amazon Q load their rule file into
-    every request in the project. Exporting the full SKILL.md there costs
-    roughly 5k tokens per request. Use --compact for those.
+1.  Several targets are *always-on* context. Legacy Cursor, Cline, Roo Code,
+    Copilot, Claude Code, Codex, Aider, Gemini CLI, and Amazon Q load their
+    rule file into every request in the project. Exporting the full SKILL.md
+    there costs roughly 5k tokens per request. Use --compact for those.
 2.  Tool-specific formats are not interchangeable. Cursor ignores plain .md
     files in .cursor/rules (they must be .mdc), and Windsurf workspace rules
     are capped at 12,000 characters. This script writes the correct extension
@@ -33,8 +33,10 @@ from typing import Sequence
 
 SOURCE_ROOT = Path(__file__).resolve().parent.parent
 SKILL_PATH = SOURCE_ROOT / "SKILL.md"
+REPOSITORY_BLOB_BASE = "https://github.com/88lin/diataxis-docs-skill/blob/master/"
 
 FRONTMATTER_RE = re.compile(r"\A---[ \t]*\r?\n.*?\r?\n---[ \t]*(?:\r?\n|\Z)", re.DOTALL)
+MARKDOWN_LINK_RE = re.compile(r"(?<!!)\[([^\]]+)\]\(([^)]+)\)")
 
 RULE_DESCRIPTION = (
     "Diataxis documentation guide: classify a docs request as tutorial, how-to, "
@@ -108,13 +110,6 @@ TARGETS: list[Target] = [
         always_on=False,
         note="Workspace rules are capped at 12,000 characters.",
     ),
-    Target(
-        key="windsurf-legacy",
-        name="Windsurf (legacy)",
-        path=Path(".windsurfrules"),
-        char_limit=6000,
-        note="Legacy single-file format; prefer .windsurf/rules.",
-    ),
     Target(key="copilot", name="GitHub Copilot", path=Path(".github/copilot-instructions.md")),
     Target(key="claude", name="Claude Code", path=Path("CLAUDE.md")),
     Target(key="codex", name="OpenAI Codex", path=Path("AGENTS.md")),
@@ -165,6 +160,65 @@ def extract_sections(body: str, headings: Sequence[str]) -> tuple[str, list[str]
 
     missing = [wanted[key] for key in wanted if key not in found]
     return "\n".join(collected).strip(), sorted(missing)
+
+
+def markdown_anchor(text: str) -> str:
+    """Return the GitHub-style anchor used by headings in SKILL.md."""
+    text = re.sub(r"<[^>]+>", "", text)
+    text = text.replace("`", "").replace("*", "").replace("_", "").replace("~", "")
+    text = text.strip().lower()
+    text = re.sub(r"[^\w\u4e00-\u9fff\- ]+", "", text)
+    text = re.sub(r"\s+", "-", text)
+    return re.sub(r"-+", "-", text).strip("-")
+
+
+def heading_anchors(body: str) -> set[str]:
+    """Collect anchors present in an exported Markdown body."""
+    heading_re = re.compile(r"^#{1,6}\s+(.+?)\s*#*\s*$", re.MULTILINE)
+    counts: dict[str, int] = {}
+    anchors: set[str] = set()
+    for match in heading_re.finditer(body):
+        base = markdown_anchor(match.group(1))
+        if not base:
+            continue
+        count = counts.get(base, 0)
+        counts[base] = count + 1
+        anchors.add(base if count == 0 else f"{base}-{count}")
+    return anchors
+
+
+def rewrite_export_links(body: str) -> str:
+    """Make links valid after SKILL.md is exported outside this repository.
+
+    Repository-relative references become stable GitHub links. Local anchor
+    links are retained only when the exported subset contains that heading;
+    compact exports turn links to omitted sections into plain text.
+    """
+    anchors = heading_anchors(body)
+
+    def replace(match: re.Match[str]) -> str:
+        label = match.group(1)
+        target = match.group(2).strip()
+        if target.startswith("#"):
+            return match.group(0) if target[1:] in anchors else label
+        if re.match(r"^[a-z][a-z0-9+.-]*:", target, re.IGNORECASE):
+            return match.group(0)
+
+        path_text, separator, fragment = target.partition("#")
+        source_path = (SOURCE_ROOT / path_text).resolve()
+        try:
+            relative = source_path.relative_to(SOURCE_ROOT)
+        except ValueError:
+            return label
+        if not source_path.is_file():
+            return label
+
+        url = REPOSITORY_BLOB_BASE + relative.as_posix()
+        if separator:
+            url += f"#{fragment}"
+        return f"[{label}]({url})"
+
+    return MARKDOWN_LINK_RE.sub(replace, body)
 
 
 def render_frontmatter(fields: dict[str, str]) -> str:
@@ -250,6 +304,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         if not body:
             print("Error: --compact produced an empty document.", file=sys.stderr)
             return 1
+    body = rewrite_export_links(body)
 
     target_root = args.target.resolve()
     if not target_root.is_dir():

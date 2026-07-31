@@ -13,7 +13,7 @@ validation scripts that are unit-tested instead of duplicated inside CI.
 
 ### Removed
 
-- **Breaking.** `README.md` and `README.zh-CN.md`: dropped the "Option 2" install method that used a `{"skills": {"paths": [...]}}` block in `opencode.json`. OpenCode has no such config key, so that method never worked. Cloning into a `diataxis-docs` directory is now the only documented layout.
+- **Breaking.** `scripts/export_rules.py`: removed the legacy `.windsurfrules` target. Its 6,000-character ceiling cannot fit even the compact guide, so it had no valid export mode; use `.windsurf/rules/diataxis.md` with `--compact` and delete any stale `.windsurfrules` file.
 - **Breaking.** `SKILL.md`: removed the top-level `version` frontmatter field. It is not part of the skill spec and is silently ignored by the runtime; the value now lives under `metadata.version`.
 - `.github/workflows/ci.yml`: removed roughly 11 KB of inline Python that re-implemented `scripts/check_local.py`. The two copies had already drifted apart.
 - `SKILL.md`: removed the `Core idea`, `Template selection heuristic`, `Writing patterns`, and `Practical output pattern` sections. Each restated guidance that already appeared elsewhere in the file; the unique content was merged into the sections that kept it.
@@ -23,8 +23,9 @@ validation scripts that are unit-tested instead of duplicated inside CI.
 - `docs/` and `docs/zh-CN/`: five task-scoped pages per language covering installation, slash commands, IDE integration, development, and FAQ. Both trees are kept in sync by a new parity check.
 - `scripts/audit_docs.py`: `--fail-on {none,medium,high}` for CI gating and a repeatable `--exclude GLOB` for files that are legitimately mixed-form, such as the changelog.
 - `scripts/export_rules.py`: `--list`, `--dry-run`, `--force`, `--only KEY`, `--target DIR`, and `--compact`. `--compact` exports five decision-critical sections instead of the whole body.
-- `scripts/export_rules.py`: a Windsurf modern-format target (`.windsurf/rules/diataxis.md`), bringing the exporter to 13 rule files across 11 assistants.
+- `scripts/export_rules.py`: a Windsurf modern-format target (`.windsurf/rules/diataxis.md`); the exporter now writes 12 rule files across 11 assistants.
 - `tests/test_check_local.py`: unit tests for frontmatter parsing, name and description validation, install-path scanning, anchor resolution, and the repository's own metadata.
+- `tests/test_export_rules.py`: real compact and full exports into temporary projects, with regression coverage for dead anchors, repository-relative links, target availability, and Windsurf's 12,000-character limit.
 - `.gitignore`: ignores Python build artefacts and every rule file `export_rules.py` can write, so exporting into this repository no longer dirties the tree.
 - `references/template-map.md`: an `Artifact to compass cell` table, moved out of `SKILL.md`.
 - `evals/evals.json`: a top-level `categories` array listing the 11 categories the 32 evals cover.
@@ -39,13 +40,14 @@ validation scripts that are unit-tested instead of duplicated inside CI.
 - **Breaking.** `scripts/export_rules.py`: the Cursor target is now `.cursor/rules/diataxis.mdc` with `description` and `alwaysApply: false` frontmatter. Cursor ignores plain `.md` files in `.cursor/rules`, so the previous `.md` output was never loaded. Delete any stale `.cursor/rules/diataxis.md` after upgrading.
 - **Breaking.** `scripts/audit_docs.py`: the JSON signal key `tables` is now `table_rows`, matching what it counts.
 - `README.md` and `README.zh-CN.md`: rewritten as entry pages of about 130 lines. The previous 550-line versions were the only pages in the repository that the bundled audit script rated high risk.
+- `README.md`, `README.zh-CN.md`, and the installation and FAQ pages: document both automatic discovery and the supported OpenCode `skills.paths` setting. Both methods keep the checkout directory aligned with the `diataxis-docs` frontmatter name.
 - `SKILL.md`: cut from 463 to 413 lines by removing verbatim repetition. Every remaining topic now has exactly one home.
 - `scripts/check_local.py`: rewritten. It validates skill and command frontmatter against the fields OpenCode actually recognises, checks eval structure, resolves Markdown links and heading anchors including HTML `<img src>`, and enforces translation parity.
 - `scripts/check_local.py`: unknown frontmatter keys are a warning, not an error. Both OpenCode and Claude Code ignore unrecognised keys, so failing on them would break custom metadata.
-- `scripts/check_local.py`: command frontmatter no longer needs a `name`. OpenCode derives the command name from the filename; when `name` is present it must still match.
+- `scripts/check_local.py` and `.opencode/commands/`: command names now come only from file names. The recognised frontmatter fields match OpenCode's schema (`description`, `agent`, `model`, `variant`, `subtask`), while `description` remains a documented repository convention.
 - `.github/workflows/ci.yml`: rewritten as a single matrix job over Python 3.11 and 3.12, with a read-only token, ref-scoped concurrency, and manual dispatch.
-- `scripts/export_rules.py`: emits the frontmatter each target needs and warns when output exceeds a target's character limit (12,000 for modern Windsurf rules, 6,000 for legacy `.windsurfrules`).
-- `docs/ide-integration.md`: documents the resident-context cost. Ten of the 13 targets load on every request, roughly 5,200 tokens for a full export against roughly 2,300 for `--compact`.
+- `scripts/export_rules.py`: emits the frontmatter each target needs and warns when output exceeds the 12,000-character limit for modern Windsurf workspace rules.
+- `docs/ide-integration.md`: documents the resident-context cost. Nine of the 12 targets load on every request, roughly 5,200 tokens for a full export against roughly 2,300 for `--compact`.
 - `scripts/export_rules.py`: expanded from 2 targets to 9 (Cursor legacy and modern, Cline, Roo Code, Windsurf, Copilot, Claude Code, Codex, Aider), then to 12 with Gemini CLI, Continue, and Amazon Q Developer.
 - `scripts/export_rules.py`: reads `SKILL.md` from the skill repository but writes rule files into the target directory, so it is safe to run inside another project.
 - `SKILL.md` and `references/reader-analysis.md`: added a tutorial-versus-how-to fallback that asks one clarifying question and defaults to a focused how-to only when the user cannot answer.
@@ -60,6 +62,8 @@ validation scripts that are unit-tested instead of duplicated inside CI.
 - `scripts/audit_docs.py`: a line containing two or more pipe characters was counted as a table row, so shell pipelines inside code blocks inflated the reference signal. Tables now require a header row followed by a separator row, and fenced code blocks and frontmatter are excluded from prose signals.
 - `scripts/export_rules.py`: `strip_frontmatter()` used `content.split("---", 2)`, which truncated the body at the first thematic break in the document. It now matches the frontmatter delimiters as anchored line boundaries.
 - `scripts/export_rules.py`: write failures and unknown `--only` keys exited 0. They now exit 1.
+- `scripts/export_rules.py`: compact exports no longer retain links to sections they omit; an unavailable local anchor becomes plain text instead of a dead link.
+- `scripts/export_rules.py`: exported links to repository reference files now use stable GitHub URLs, so they resolve from nested rule directories and target projects.
 - `scripts/check_local.py`: the install-path scanner read `diataxis-docs-skill/scripts` as a `skills/scripts` install path and reported a false positive. The pattern now requires a word boundary before `skills/`.
 - `scripts/check_local.py`: frontmatter parsing no longer strips a `#` that appears inside a quoted value.
 - `SKILL.md`: the intent check referred to a "Diataxis decision tree" section that does not exist. It now points at the compass.

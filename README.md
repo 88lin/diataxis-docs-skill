@@ -42,7 +42,20 @@ git clone https://github.com/88lin/diataxis-docs-skill.git \
   ~/.config/opencode/skills/diataxis-docs
 ```
 
-The target directory **must** be named `diataxis-docs` — OpenCode matches it against the skill's frontmatter `name`, and a mismatch fails silently. Restart OpenCode afterwards.
+Or keep the checkout elsewhere and register it in `opencode.json`:
+
+```bash
+git clone https://github.com/88lin/diataxis-docs-skill.git ~/src/diataxis-docs
+```
+
+```jsonc
+{
+  "$schema": "https://opencode.ai/config.json",
+  "skills": { "paths": ["~/src/diataxis-docs"] }
+}
+```
+
+`skills.paths` adds directories for OpenCode to scan. With either method, the directory containing `SKILL.md` **must** be named `diataxis-docs` to match the skill's frontmatter `name`. Restart OpenCode afterwards.
 
 Claude Code, verification steps, and troubleshooting are in [Install the skill](docs/installation.md).
 
@@ -103,7 +116,7 @@ python scripts/export_rules.py --list
 python scripts/export_rules.py --target . --compact
 ```
 
-Ten of the thirteen targets load into every request, so `--compact` matters. See [AI IDE integration](docs/ide-integration.md).
+Nine of the twelve targets load into every request, so `--compact` matters. See [AI IDE integration](docs/ide-integration.md).
 
 ## Design principles
 

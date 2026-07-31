@@ -1,5 +1,4 @@
 ---
-name: docs-audit
 description: Audit a whole documentation site or docs directory. Use when the user wants a page-by-page Diataxis classification and a list of mixed-form pages.
 ---
 

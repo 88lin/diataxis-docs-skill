@@ -17,12 +17,36 @@ You need `git` and one of the following hosts:
 
 ## Install into OpenCode
 
+### Use OpenCode's discovered skill directory
+
 ```bash
 git clone https://github.com/88lin/diataxis-docs-skill.git \
   ~/.config/opencode/skills/diataxis-docs
 ```
 
-Restart OpenCode so the skill list reloads.
+### Register a checkout elsewhere
+
+Clone the repository into a directory whose name still matches the skill:
+
+```bash
+git clone https://github.com/88lin/diataxis-docs-skill.git \
+  ~/src/diataxis-docs
+```
+
+Add that directory to the `opencode.json` that applies to your project:
+
+```jsonc
+{
+  "$schema": "https://opencode.ai/config.json",
+  "skills": {
+    "paths": ["~/src/diataxis-docs"]
+  }
+}
+```
+
+`skills.paths` is a supported OpenCode setting for additional directories to scan for skills. Use it when you want to keep the checkout outside a built-in skill directory; it does not remove the directory-name requirement.
+
+Restart OpenCode after either method so the skill list reloads.
 
 ## Install into Claude Code
 
@@ -39,14 +63,16 @@ The `.opencode/commands/` directory in this repository holds OpenCode slash-comm
 
 ## Verify the install
 
-Check that the directory name and the frontmatter name agree:
+Set `SKILL_DIR` to the checkout you installed, then check that the directory name and frontmatter name agree:
 
 ```bash
-ls -d ~/.config/opencode/skills/diataxis-docs
-head -2 ~/.config/opencode/skills/diataxis-docs/SKILL.md
+SKILL_DIR=~/.config/opencode/skills/diataxis-docs
+# For the skills.paths example above, use: SKILL_DIR=~/src/diataxis-docs
+basename "$SKILL_DIR"
+head -2 "$SKILL_DIR/SKILL.md"
 ```
 
-The second command must print `---` followed by `name: diataxis-docs`. If the directory name differs from that value, rename the directory.
+The first command must print `diataxis-docs`; the second must print `---` followed by `name: diataxis-docs`. If the two names differ, rename the directory.
 
 Then ask your assistant a question that should trigger the skill:
 
@@ -59,7 +85,7 @@ A loaded skill answers with a Diataxis form — tutorial, how-to, reference, or 
 ## Update
 
 ```bash
-git -C ~/.config/opencode/skills/diataxis-docs pull
+git -C /path/to/diataxis-docs pull
 ```
 
 Restart the host tool afterwards.
@@ -67,14 +93,17 @@ Restart the host tool afterwards.
 ## Uninstall
 
 ```bash
-rm -rf ~/.config/opencode/skills/diataxis-docs
+rm -rf /path/to/diataxis-docs
 ```
+
+If you installed through `skills.paths`, also remove that entry from `opencode.json`.
 
 ## Troubleshoot
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
 | The skill never triggers | Directory name is not `diataxis-docs` | Rename the directory, then restart the host |
+| The skill never triggers | `skills.paths` points at the wrong or missing directory | Point it at the `diataxis-docs` checkout directory that directly contains `SKILL.md`, then restart OpenCode |
 | The skill never triggers | Host was not restarted | Restart OpenCode or Claude Code |
 | `SKILL.md` not found | Cloned one directory too deep | The file must sit at `<skills-dir>/diataxis-docs/SKILL.md` |
 | Slash commands are missing | Host does not read `.opencode/commands/` | Use natural-language prompts, or copy the command bodies into your host's own command format |

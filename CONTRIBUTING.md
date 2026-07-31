@@ -97,7 +97,7 @@ Slash commands live in `.opencode/commands/`. Each file is a small prompt templa
 Conventions:
 
 - Filename: `docs-<verb>.md`, lowercase, hyphen-separated. Use one of `classify`, `split`, `review`, `audit`, `quickstart`, or add a new verb that matches what the command actually does.
-- Frontmatter must include `name` and `description` on the first five lines. The CI workflow greps for this; if either is missing the build fails.
+- Frontmatter must include `description` on the first five lines; this is a repository convention so the command picker stays useful. OpenCode derives the command name from the file name and recognises only `description`, `agent`, `model`, `variant`, and `subtask` in command frontmatter.
 - The body should be a short system prompt that references the relevant section of `SKILL.md` rather than duplicating its content. The point of a slash command is to point the model at the right part of the skill, not to copy it.
 - If you add a new command, also add a row to the `Slash commands` / `斜杠命令` table in `README.md` and `README.zh-CN.md`.
 
@@ -111,11 +111,11 @@ Conventions:
 
 The skill uses a single source of truth for its version:
 
-- `SKILL.md` frontmatter `version: X.Y.Z`
+- `SKILL.md` frontmatter `metadata.version: X.Y.Z`
 - `evals/evals.json` top-level `version: X.Y.Z`
 - `CHANGELOG.md` `[X.Y.Z]` entry under a dated heading
 
-The three must match. If you change behaviour in a way that affects the contract with users, bump the version and add a CHANGELOG entry. Until a tagged release is cut, both files are at `0.1.0`.
+The three must match. If you change behaviour in a way that affects the contract with users, bump the version and add a CHANGELOG entry.
 
 ## Questions
 

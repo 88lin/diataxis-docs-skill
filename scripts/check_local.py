@@ -39,7 +39,9 @@ ROOT = Path(__file__).resolve().parent.parent
 RECOGNISED_SKILL_FIELDS = {"name", "description", "license", "compatibility", "metadata"}
 
 # https://opencode.ai/docs/commands/ - the command name comes from the file name.
-RECOGNISED_COMMAND_FIELDS = {"name", "description", "agent", "model", "subtask"}
+# `description` is optional in OpenCode, but required by this repository so the
+# command picker remains useful.
+RECOGNISED_COMMAND_FIELDS = {"description", "agent", "model", "variant", "subtask"}
 
 SKILL_NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 DESCRIPTION_MAX_CHARS = 1024
@@ -99,6 +101,7 @@ REQUIRED_FILES = [
     "scripts/check_local.py",
     "tests/test_audit_docs.py",
     "tests/test_check_local.py",
+    "tests/test_export_rules.py",
 ]
 
 warnings: list[str] = []
@@ -336,27 +339,25 @@ def check_install_paths(skill_name: str, root: Path | None = None) -> list[str]:
     return problems
 
 
-def check_commands() -> list[str]:
-    """Validate OpenCode slash command frontmatter."""
+def check_commands(root: Path | None = None) -> list[str]:
+    """Validate OpenCode slash command frontmatter and repository conventions."""
+    root = root or ROOT
     problems: list[str] = []
-    command_dir = ROOT / ".opencode" / "commands"
+    command_dir = root / ".opencode" / "commands"
     files = sorted(command_dir.glob("*.md"))
     if not files:
         return [".opencode/commands/: no command files found"]
     for path in files:
-        rel = path.relative_to(ROOT).as_posix()
+        rel = path.relative_to(root).as_posix()
         frontmatter, _ = split_frontmatter(path.read_text(encoding="utf-8"))
         if frontmatter is None:
             problems.append(f"{rel}: missing or unterminated YAML frontmatter block")
             continue
         fields = parse_simple_yaml(frontmatter)
         if not str(fields.get("description", "")).strip():
-            problems.append(f"{rel}: frontmatter missing or empty field: description")
-        name = str(fields.get("name", "")).strip()
-        if name and name != path.stem:
             problems.append(
-                f"{rel}: frontmatter name {name!r} does not match the file name "
-                f"{path.stem!r}; OpenCode derives the command name from the file name"
+                f"{rel}: frontmatter missing or empty field: description "
+                "(required by this repository)"
             )
         unknown = sorted(set(fields) - RECOGNISED_COMMAND_FIELDS)
         if unknown:

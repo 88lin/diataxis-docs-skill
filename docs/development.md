@@ -19,7 +19,7 @@ It validates:
 - `SKILL.md` frontmatter against the OpenCode skill spec: `name` matches `^[a-z0-9]+(-[a-z0-9]+)*$`, `description` is within 1024 characters, and unrecognised fields are reported
 - `SKILL.md` body stays under 500 lines, warning from 400
 - installation docs clone into a directory named after the skill
-- slash command frontmatter, and that any `name` matches its file name
+- slash command frontmatter against OpenCode's recognised fields, plus this repository's required `description`
 - `evals/evals.json` structure, unique ids, known categories, and referenced files
 - internal markdown links, heading anchors, and image paths
 - English and Chinese docs stay paired
@@ -35,6 +35,7 @@ python -m unittest discover -s tests -p 'test_*.py'
 
 - `tests/test_check_local.py` feeds deliberately wrong input to each check and asserts it is caught. A validator that stops validating is worse than no validator.
 - `tests/test_audit_docs.py` covers the signal counters, the CLI exit codes, and `--exclude`.
+- `tests/test_export_rules.py` writes compact and full exports to temporary projects, then checks link integrity and the Windsurf size limit.
 
 ## Scan docs for mixed-form smells
 
@@ -99,7 +100,7 @@ $ARGUMENTS
 ...
 ```
 
-Only `description` is required. OpenCode recognises `name`, `description`, `agent`, `model`, and `subtask`; the checker warns about anything else and fails if a `name` disagrees with the file name.
+OpenCode recognises `description`, `agent`, `model`, `variant`, and `subtask`; the command name comes from the file name. OpenCode itself makes `description` optional, but this repository requires it so every command has useful picker text. The checker warns about any other frontmatter field, including `name`.
 
 ## Edit SKILL.md
 

@@ -1,5 +1,4 @@
 ---
-name: docs-split
 description: Split a mixed-form documentation page into the right Diataxis documents. Use when the user pastes a messy page and asks for a refactor.
 ---
 

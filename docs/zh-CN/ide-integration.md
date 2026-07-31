@@ -4,7 +4,7 @@
 
 ## 开始之前
 
-先读 [上下文成本](#上下文成本)。13 个目标里有 10 个会注入到项目的每一次请求，完整指导每次约 5,200 tokens。
+先读 [上下文成本](#上下文成本)。12 个目标里有 9 个会注入到项目的每一次请求，完整指导每次约 5,200 tokens。
 
 ## 列出所有目标
 
@@ -12,7 +12,7 @@
 python scripts/export_rules.py --list
 ```
 
-覆盖 11 个助手的 13 个规则文件：
+覆盖 11 个助手的 12 个规则文件：
 
 | Key | 工具 | 路径 | 常驻 |
 | --- | --- | --- | --- |
@@ -21,7 +21,6 @@ python scripts/export_rules.py --list
 | `cline` | Cline | `.clinerules` | 是 |
 | `roo` | Roo Code | `.roo/rules/diataxis.md` | 是 |
 | `windsurf` | Windsurf | `.windsurf/rules/diataxis.md` | 否 |
-| `windsurf-legacy` | Windsurf（旧格式） | `.windsurfrules` | 是 |
 | `copilot` | GitHub Copilot | `.github/copilot-instructions.md` | 是 |
 | `claude` | Claude Code | `CLAUDE.md` | 是 |
 | `codex` | OpenAI Codex | `AGENTS.md` | 是 |
@@ -75,7 +74,7 @@ python /path/to/diataxis-docs-skill/scripts/export_rules.py --only claude --only
 
 **Cursor.** 项目规则必须使用 `.mdc` 扩展名；放在 `.cursor/rules` 里的普通 `.md` 文件会被规则系统忽略。脚本写入的是 `.cursor/rules/diataxis.mdc`，并带上 `description` 和 `alwaysApply: false`，让它成为一条 agent-requested 规则：Cursor 读取 description，在任务看起来与文档相关时把规则拉进来。不要同时启用旧的 `.cursorrules` 目标。
 
-**Windsurf.** workspace 规则单文件上限 12,000 字符。完整指导超过这个上限，所以 Windsurf 请用 `--compact`。目标超过其已知上限时脚本会打印 WARN。
+**Windsurf.** workspace 规则单文件上限 12,000 字符。完整指导超过这个上限，所以 Windsurf 请用 `--compact`。目标超过其已知上限时脚本会打印 WARN。脚本不再提供旧版 `.windsurfrules` 目标：它的 6,000 字符上限连精简版也容纳不下，因此不存在有效导出模式。请删除旧版本曾生成的 `.windsurfrules`。
 
 **Roo Code.** `.roo/rules/` 下的每个文件都会在每次请求时加载，所以这个目标虽然位于规则目录里，实际上仍是常驻上下文。
 
