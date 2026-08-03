@@ -5,14 +5,23 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  validate-evals:
-    name: Validate evals.json
+  validate:
+    name: Validate (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,288 +29,18 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
 
-      - name: Validate evals.json structure
+      # scripts/check_local.py is the single source of truth for repository
+      # validation and runs the unit tests itself, so `python
+      # scripts/check_local.py` locally reproduces this job exactly.
+      - name: Validate repository
+        run: python scripts/check_local.py
+
+      - name: Scan own docs for mixed-form smells
+        run: python scripts/audit_docs.py . --exclude 'CHANGELOG.md' --fail-on high
+
+      - name: Verify rule export is runnable
         run: |
-          python - <<'PY'
-          import json
-          import sys
-          from pathlib import Path
-
-          path = Path("evals/evals.json")
-          data = json.loads(path.read_text(encoding="utf-8"))
-
-          required_top = {"skill_name", "evals"}
-          missing = required_top - set(data.keys())
-          assert not missing, f"Missing top-level fields: {missing}"
-
-          evals = data["evals"]
-          assert isinstance(evals, list), "evals must be a list"
-          assert len(evals) > 0, "evals must not be empty"
-
-          required_per_eval = {"id", "category", "prompt", "expected_output", "files"}
-          known_categories = {
-              "classification",
-              "per-form-writing",
-              "decision-framework",
-              "single-page-classification",
-              "mixed-form-detection",
-              "review",
-              "large-system",
-              "migration",
-              "adjacent-types",
-              "anti-pattern-avoidance",
-              "non-trigger",
-          }
-
-          seen_ids = set()
-          problems = []
-          for i, ev in enumerate(evals):
-              for field in required_per_eval:
-                  if field not in ev:
-                      problems.append(f"eval[{i}] missing field: {field}")
-              if "id" in ev:
-                  if ev["id"] in seen_ids:
-                      problems.append(f"duplicate id: {ev['id']}")
-                  seen_ids.add(ev["id"])
-              if "category" in ev and ev["category"] not in known_categories:
-                  problems.append(
-                      f"eval[{ev.get('id', i)}] unknown category: {ev['category']!r}"
-                  )
-              if "prompt" in ev and len(ev["prompt"].strip()) < 10:
-                  problems.append(f"eval[{ev.get('id', i)}] prompt is too short")
-              if "expected_output" in ev and len(ev["expected_output"].strip()) < 10:
-                  problems.append(f"eval[{ev.get('id', i)}] expected_output is too short")
-
-          if problems:
-              print("evals.json validation FAILED:")
-              for p in problems:
-                  print(f"  - {p}")
-              sys.exit(1)
-
-          print(f"evals.json OK: {len(evals)} evals across {len({e['category'] for e in evals})} categories")
-          PY
-
-  check-internal-links:
-    name: Check internal markdown links
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Validate internal links
-        run: |
-          python - <<'PY'
-          import re
-          import sys
-          from pathlib import Path
-
-          root = Path(".")
-          md_files = sorted(root.rglob("*.md"))
-          # Skip .git, node_modules, etc.
-          md_files = [p for p in md_files if ".git" not in p.parts]
-
-          zero_width_chars = {
-              "\u200b": "U+200B ZERO WIDTH SPACE",
-              "\ufeff": "U+FEFF ZERO WIDTH NO-BREAK SPACE",
-          }
-          link_re = re.compile(r"\[[^\]]*\]\((?!https?://|mailto:)([^)]+?)\)")
-          problems = []
-          anchor_cache = {}
-
-          def markdown_anchor(text):
-              text = re.sub(r"<[^>]+>", "", text)
-              text = text.replace("`", "").replace("*", "").replace("_", "").replace("~", "")
-              text = text.strip().lower()
-              text = re.sub(r"[^\w\u4e00-\u9fff\- ]+", "", text)
-              text = re.sub(r"\s+", "-", text)
-              return re.sub(r"-+", "-", text).strip("-")
-
-          def anchors_for_markdown(path):
-              heading_re = re.compile(r"^(#{1,6})\s+(.+?)\s*#*\s*$", re.MULTILINE)
-              counts = {}
-              anchors = set()
-              text = path.read_text(encoding="utf-8")
-              for match in heading_re.finditer(text):
-                  base = markdown_anchor(match.group(2))
-                  if not base:
-                      continue
-                  count = counts.get(base, 0)
-                  counts[base] = count + 1
-                  anchors.add(base if count == 0 else f"{base}-{count}")
-              return anchors
-
-          for md in md_files:
-              text = md.read_text(encoding="utf-8")
-              for char, label in zero_width_chars.items():
-                  for line_no, line in enumerate(text.splitlines(), 1):
-                      if char in line:
-                          problems.append(f"{md}:{line_no}: contains {label}")
-
-              for match in link_re.finditer(text):
-                  raw_target = match.group(1).strip()
-                  if not raw_target:
-                      continue
-                  target_path, _, anchor = raw_target.partition("#")
-                  if not target_path and anchor:
-                      candidate = md.resolve()
-                  else:
-                      candidate = (md.parent / target_path).resolve()
-                  if not candidate.exists():
-                      problems.append(f"{md}: broken link to {raw_target}")
-                      continue
-                  if anchor:
-                      anchor_cache.setdefault(candidate, anchors_for_markdown(candidate))
-                      if anchor not in anchor_cache[candidate]:
-                          problems.append(f"{md}: broken anchor in link to {raw_target}")
-
-          if problems:
-              print("Internal link check FAILED:")
-              for p in problems:
-                  print(f"  - {p}")
-              sys.exit(1)
-
-          print(f"Internal links and markdown hygiene OK: scanned {len(md_files)} markdown files")
-          PY
-
-  verify-structure:
-    name: Verify repository structure
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Check required files
-        run: |
-          set -e
-          for f in SKILL.md README.md README.zh-CN.md LICENSE CHANGELOG.md CONTRIBUTING.md \
-                   evals/evals.json references/doc-blueprints.md references/reader-analysis.md \
-                   references/template-map.md references/zh-cn-anti-patterns.md assets/preview.svg \
-                   scripts/export_rules.py scripts/audit_docs.py \
-                   tests/test_audit_docs.py; do
-            if [ ! -f "$f" ]; then
-              echo "Missing required file: $f"
-              exit 1
-            fi
-          done
-          echo "Repository structure OK"
-
-      - name: Check example files
-        run: |
-          set -e
-          for f in examples/messy-to-diataxis/README.md \
-                   examples/messy-to-diataxis/before.md \
-                   examples/messy-to-diataxis/after/01-tutorial.md \
-                   examples/messy-to-diataxis/after/02-how-to.md \
-                   examples/messy-to-diataxis/after/03-reference.md \
-                   examples/messy-to-diataxis/after/04-explanation.md; do
-            if [ ! -f "$f" ]; then
-              echo "Missing example file: $f"
-              exit 1
-            fi
-          done
-          echo "Example files OK"
-
-      - name: Check command files
-        run: |
-          set -e
-          for f in .opencode/commands/docs-classify.md \
-                   .opencode/commands/docs-split.md \
-                   .opencode/commands/docs-review.md \
-                   .opencode/commands/docs-audit.md \
-                   .opencode/commands/docs-quickstart.md; do
-            if [ ! -f "$f" ]; then
-              echo "Missing command file: $f"
-              exit 1
-            fi
-            # Each command must have frontmatter with name and description
-            head -n 5 "$f" | grep -q "^name:" || { echo "$f: missing name in frontmatter"; exit 1; }
-            head -n 5 "$f" | grep -q "^description:" || { echo "$f: missing description in frontmatter"; exit 1; }
-          done
-          echo "Command files OK"
-
-      - name: Run audit_docs.py unit tests
-        run: python -m unittest discover -s tests -p 'test_*.py'
-
-      - name: Check SKILL.md frontmatter
-        run: |
-          set -e
-          python - <<'PY'
-          from pathlib import Path
-          import re
-          import sys
-
-          path = Path("SKILL.md")
-          if not path.is_file():
-              print("SKILL.md: file not found")
-              sys.exit(1)
-          text = path.read_text(encoding="utf-8")
-          if not text.startswith("---"):
-              print("SKILL.md: missing opening --- frontmatter delimiter")
-              sys.exit(1)
-          parts = text.split("---", 2)
-          if len(parts) < 3:
-              print("SKILL.md: frontmatter not properly closed")
-              sys.exit(1)
-          fm = parts[1].strip()
-          problems = []
-          for field in ("name", "version", "description"):
-              match = re.search(rf"^{re.escape(field)}:\s*(.+)$", fm, re.MULTILINE)
-              if not match or not match.group(1).strip().strip('"').strip("'"):
-                  problems.append(f"SKILL.md: frontmatter missing or empty field: {field}")
-          if problems:
-              for p in problems:
-                  print(p)
-              sys.exit(1)
-          print("SKILL.md frontmatter OK")
-          PY
-
-      - name: Check version consistency
-        run: |
-          set -e
-          python - <<'PY'
-          import json
-          import re
-          import sys
-          from pathlib import Path
-
-          skill_text = Path("SKILL.md").read_text(encoding="utf-8")
-          skill_match = re.search(r"^version:\s*([^\s]+)\s*$", skill_text, re.MULTILINE)
-          skill_version = skill_match.group(1).strip('"\'') if skill_match else ""
-
-          evals_data = json.loads(Path("evals/evals.json").read_text(encoding="utf-8"))
-          evals_version = str(evals_data.get("version", "")).strip()
-
-          changelog_text = Path("CHANGELOG.md").read_text(encoding="utf-8")
-          released_versions = set(re.findall(r"^## \[([^\]]+)\]", changelog_text, re.MULTILINE))
-
-          problems = []
-          if not skill_version:
-              problems.append("SKILL.md: version is missing")
-          if not evals_version:
-              problems.append("evals/evals.json: top-level version is missing")
-          if skill_version and evals_version and skill_version != evals_version:
-              problems.append(
-                  f"version mismatch: SKILL.md has {skill_version!r}, "
-                  f"evals/evals.json has {evals_version!r}"
-              )
-          if skill_version and skill_version not in released_versions:
-              problems.append(f"CHANGELOG.md: missing release heading for version {skill_version!r}")
-
-          if problems:
-              for problem in problems:
-                  print(problem)
-              sys.exit(1)
-          print(f"Version consistency OK: {skill_version}")
-          PY
+          python scripts/export_rules.py --list
+          python scripts/export_rules.py --target "$(mktemp -d)" --dry-run --compact

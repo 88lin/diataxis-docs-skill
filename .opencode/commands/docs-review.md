@@ -1,5 +1,4 @@
 ---
-name: docs-review
 description: Review a documentation page for Diataxis compliance. Use when the user pastes a draft and asks for feedback before publishing.
 ---
 

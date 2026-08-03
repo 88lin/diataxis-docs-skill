@@ -1,0 +1,24 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+.DS_Store
+Thumbs.db
+
+# Rule files that scripts/export_rules.py writes into a target project.
+# They are exports of SKILL.md, not sources; do not commit them here.
+/.cursorrules
+/.cursor/
+/.clinerules
+/.roo/
+/.windsurfrules
+/.windsurf/
+/.continue/
+/.amazonq/
+/CLAUDE.md
+/AGENTS.md
+/GEMINI.md
+/CONVENTIONS.md
+/.github/copilot-instructions.md
