@@ -5,8 +5,8 @@
 <br>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
-[![Hosts: any agent that reads SKILL.md](https://img.shields.io/badge/%E5%AE%BF%E4%B8%BB-%E4%BB%BB%E4%BD%95%E8%AF%BB%E5%8F%96%20SKILL.md%20%E7%9A%84%20Agent-111827?style=flat-square)](#安装)
-[![Assistants: 12](https://img.shields.io/badge/%E6%94%AF%E6%8C%81%E5%8A%A9%E6%89%8B-12%20%E4%B8%AA-0ea5e9?style=flat-square)](#哪些助手能用)
+[![Hosts: any agent that reads SKILL.md](https://img.shields.io/badge/%E5%AE%BF%E4%B8%BB-%E4%BB%BB%E4%BD%95%E8%AF%BB%E5%8F%96%20SKILL.md%20%E7%9A%84%20Agent-111827?style=flat-square)](docs/zh-CN/installation.md)
+[![Assistants: 12](https://img.shields.io/badge/%E6%94%AF%E6%8C%81%E5%8A%A9%E6%89%8B-12%20%E4%B8%AA-0ea5e9?style=flat-square)](docs/zh-CN/ide-integration.md)
 [![Framework: Diataxis](https://img.shields.io/badge/Framework-Diataxis-2563eb?style=flat-square)](https://diataxis.fr/)
 [![Evals: 35](https://img.shields.io/badge/Evals-35-blueviolet?style=flat-square)](evals/evals.json)
 
@@ -81,59 +81,107 @@
 
 ## 安装
 
-三种方式。从你手上已经有的东西出发，选第一个匹配的。
+挑符合你情况的那一列。三种方式最终效果相同。
+
+<table>
+<tr>
+<td width="33%" valign="top">
 
 ### 🗣️ &nbsp;交给 Agent 一句话
 
-最适合第一次装 Skill——除了 Agent 本身，零前置条件。把下面这段粘贴给 Claude Code、OpenCode 或 Codex：
+*最适合新手，零前置条件。*
+
+把下面这段粘贴给 Claude Code、OpenCode 或 Codex：
 
 ```text
-把 https://github.com/88lin/diataxis-docs-skill 这个 Skill 安装到我的全局
-skills 目录。存放 SKILL.md 的目录必须命名为 diataxis-docs，不要用仓库名。
+把这个 Skill 安装到我的全局
+skills 目录：
+github.com/88lin/diataxis-docs-skill
+存放 SKILL.md 的目录必须命名为
+diataxis-docs，不要用仓库名。
 装完告诉我你用的是哪个路径。
 ```
 
-Agent 会根据自己所处的宿主，选择正确的目录。
+</td>
+<td width="33%" valign="top">
 
 ### 📦 &nbsp;`skills` CLI
 
-最适合一次装进多个 Agent。需要 Node.js。
+*适合一次装进多个 Agent，需要 Node.js。*
 
 ```bash
-npx skills add 88lin/diataxis-docs-skill
+npx skills add \
+  88lin/diataxis-docs-skill
 ```
 
-它会检测你装了哪些 Agent，并写入各自正确的目录。想跳过交互、或一次指定多个 Agent：
+它会检测你装了哪些 Agent，并写入各自正确的目录。跳过交互：
 
 ```bash
-npx skills add 88lin/diataxis-docs-skill --skill diataxis-docs \
-  --agent claude-code --agent codex --agent opencode -y
+npx skills add \
+  88lin/diataxis-docs-skill \
+  --skill diataxis-docs \
+  --agent claude-code -g -y
 ```
 
-默认安装方式是指向同一份副本的符号链接，所以 `npx skills update diataxis-docs` 能一次更新所有 Agent。符号链接不方便的环境（例如未开启开发者模式的 Windows）请加 `--copy`。
+</td>
+<td width="33%" valign="top">
 
 ### 🧬 &nbsp;`git clone`
 
-最适合自己固定并管理一份 checkout。需要 `git`。
+*适合自己固定一份 checkout，需要 git。*
 
 ```bash
+U=88lin/diataxis-docs-skill
+
 # Claude Code
-git clone https://github.com/88lin/diataxis-docs-skill.git \
+git clone https://github.com/$U \
   ~/.claude/skills/diataxis-docs
 
 # OpenCode
-git clone https://github.com/88lin/diataxis-docs-skill.git \
+git clone https://github.com/$U \
   ~/.config/opencode/skills/diataxis-docs
 
 # Codex
-git clone https://github.com/88lin/diataxis-docs-skill.git \
+git clone https://github.com/$U \
   ~/.codex/skills/diataxis-docs
 ```
 
-> [!IMPORTANT]
-> 存放 `SKILL.md` 的目录**必须**命名为 `diataxis-docs`，与 frontmatter 里的 `name` 一致。前两种方式会自动处理好；clone 命令显式指定目标路径，原因也在这里。装好后重启宿主。
+</td>
+</tr>
+</table>
 
-项目级安装、各宿主路径、验证与排错见 **[安装 Skill](docs/zh-CN/installation.md)**。
+> [!IMPORTANT]
+> 存放 `SKILL.md` 的目录**必须**命名为 `diataxis-docs`，与 frontmatter 里的 `name` 一致。前两种方式会自动处理好；clone 命令显式指定目标路径，原因就在这里。装好后重启宿主。
+
+项目级安装、可选的斜杠命令复制步骤、验证与排错见 **[安装 Skill](docs/zh-CN/installation.md)**。
+
+## 哪些助手能用
+
+<table>
+<tr><th align="left" width="34%">原生加载 <code>SKILL.md</code></th><th align="left" width="66%">读取导出的规则文件</th></tr>
+<tr valign="top"><td>
+
+**Claude Code**<br>
+**OpenCode**<br>
+**Codex**
+
+按需加载：与文档无关的请求上成本为零。
+
+</td><td>
+
+Cursor &nbsp;·&nbsp; GitHub Copilot &nbsp;·&nbsp; Cline &nbsp;·&nbsp; Roo Code &nbsp;·&nbsp; Windsurf &nbsp;·&nbsp; Aider &nbsp;·&nbsp; Gemini CLI &nbsp;·&nbsp; Continue &nbsp;·&nbsp; Amazon Q
+
+```bash
+python scripts/export_rules.py --list
+python scripts/export_rules.py --target . --compact
+```
+
+导出脚本把 `SKILL.md` 写到各工具实际读取的路径，并补上它需要的 frontmatter。默认目标里有 6 个属于常驻上下文，这正是 `--compact` 的用途。
+
+</td></tr>
+</table>
+
+完整目标表和各工具注意事项见 **[AI IDE 集成](docs/zh-CN/ide-integration.md)**。
 
 ## 怎么用
 
@@ -158,7 +206,14 @@ git clone https://github.com/88lin/diataxis-docs-skill.git \
 | `/docs-audit` | 对整个文档目录逐页分类 |
 | `/docs-quickstart` | 一条通往首次成功的最短路径 |
 
-它们需要一次复制步骤，因为两个宿主都不会发现已安装 Skill *内部*嵌套的命令目录：
+完整输出结构见 **[斜杠命令](docs/zh-CN/commands.md)**。
+
+<details>
+<summary><b>这些命令是可选的，且需要一次复制步骤</b></summary>
+
+<br>
+
+不装它们，Skill 照样能通过自然语言工作。如果你想用，注意 Claude Code 和 OpenCode 都不会发现已安装 Skill *内部*嵌套的命令目录，所以要把它们复制到宿主自己的命令目录一次：
 
 ```bash
 # Claude Code
@@ -171,7 +226,9 @@ cp ~/.config/opencode/skills/diataxis-docs/.opencode/commands/*.md \
   ~/.config/opencode/commands/
 ```
 
-Codex 能加载这个 Skill，但没有内置命令——改用自然语言即可。完整输出结构见 **[斜杠命令](docs/zh-CN/commands.md)**。
+Codex 没有内置命令——改用自然语言描述模式即可。
+
+完整步骤、PowerShell 写法和项目级路径见 [安装 Skill](docs/zh-CN/installation.md)。
 
 ## 哪些助手能用
 
@@ -198,11 +255,23 @@ python scripts/export_rules.py --target . --compact
 
 | 页面 | 适用场景 |
 | :--- | :--- |
-| **[安装 Skill](docs/zh-CN/installation.md)** | 三种安装方式、各宿主路径、验证与排错 |
+| **[安装 Skill](docs/zh-CN/installation.md)** | 三种安装方式、各宿主路径、安装验证 |
 | **[斜杠命令](docs/zh-CN/commands.md)** | 每个命令接收什么、返回什么 |
 | **[AI IDE 集成](docs/zh-CN/ide-integration.md)** | 导出到 Cursor、Copilot、Aider 等其他助手 |
 | **[开发与贡献](docs/zh-CN/development.md)** | 跑本地检查、新增评测项和斜杠命令 |
 | **[范围与设计的常见问题](docs/zh-CN/faq.md)** | 它不做什么，以及为什么 |
+
+Skill **按需加载**的参考资料（不会进入每次请求）：
+
+各文档类型的[蓝图](references/doc-blueprints.md) &nbsp;·&nbsp; [读者分析清单](references/reader-analysis.md) &nbsp;·&nbsp; 到 Good Docs Project 模板的[映射表](references/template-map.md) &nbsp;·&nbsp; [中文写作反模式](references/zh-cn-anti-patterns.md)
+
+## 设计原则
+
+- **读者优先。** 围绕读者此刻想做的事来写。
+- **一页只服务一种需求。** 不要把学习、操作、查询、思考混在一起。
+- **用链接，不要堆砌。** 拆出配套文档，好过把一页写长。
+- **结构服从目的。** 先定文档类型，再定标题层级。
+- **它是指南，不是蓝图。** 从你现在所处的位置出发，一次走一步。
 
 ## 贡献
 

@@ -5,8 +5,8 @@
 <br>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
-[![Hosts: any agent that reads SKILL.md](https://img.shields.io/badge/Hosts-any%20agent%20that%20reads%20SKILL.md-111827?style=flat-square)](#install)
-[![Assistants: 12](https://img.shields.io/badge/Assistants-12-0ea5e9?style=flat-square)](#which-assistants-can-use-it)
+[![Hosts: any agent that reads SKILL.md](https://img.shields.io/badge/Hosts-any%20agent%20that%20reads%20SKILL.md-111827?style=flat-square)](docs/installation.md)
+[![Assistants: 12](https://img.shields.io/badge/Assistants-12-0ea5e9?style=flat-square)](docs/ide-integration.md)
 [![Framework: Diataxis](https://img.shields.io/badge/Framework-Diataxis-2563eb?style=flat-square)](https://diataxis.fr/)
 [![Evals: 35](https://img.shields.io/badge/Evals-35-blueviolet?style=flat-square)](evals/evals.json)
 
@@ -81,59 +81,108 @@ The full decision tree, the per-form anti-patterns, and the quality checks live 
 
 ## Install
 
-Three ways. Pick the first one that matches what you already have.
+Pick whichever row describes you. All three end at the same place.
+
+<table>
+<tr>
+<td width="33%" valign="top">
 
 ### 🗣️ &nbsp;Ask your agent
 
-Best for a first skill — no prerequisites beyond the agent itself. Paste this into Claude Code, OpenCode, or Codex:
+*Best for newcomers. No prerequisites.*
+
+Paste this into Claude Code, OpenCode, or Codex:
 
 ```text
-Install the skill at https://github.com/88lin/diataxis-docs-skill into my
-global skills directory. The directory holding SKILL.md must be named
-diataxis-docs, not the repository name. Then tell me the path you used.
+Install the skill at
+https://github.com/88lin/diataxis-docs-skill
+into my global skills directory.
+The directory holding SKILL.md must
+be named diataxis-docs, not the
+repository name. Then tell me the
+path you used.
 ```
 
-The agent picks the right directory for whichever host it is running in.
+</td>
+<td width="33%" valign="top">
 
 ### 📦 &nbsp;`skills` CLI
 
-Best for installing into several agents at once. Needs Node.js.
+*Best for several agents at once. Needs Node.js.*
 
 ```bash
-npx skills add 88lin/diataxis-docs-skill
+npx skills add \
+  88lin/diataxis-docs-skill
 ```
 
-It detects your installed agents and writes to the correct directory for each. To skip the prompts, or to target several agents in one go:
+It detects your installed agents and writes to the right directory for each. Non-interactive:
 
 ```bash
-npx skills add 88lin/diataxis-docs-skill --skill diataxis-docs \
-  --agent claude-code --agent codex --agent opencode -y
+npx skills add \
+  88lin/diataxis-docs-skill \
+  --skill diataxis-docs \
+  --agent claude-code -g -y
 ```
 
-Installs are symlinks to one canonical copy, so `npx skills update diataxis-docs` updates every agent at once. Add `--copy` where symlinks are awkward, such as Windows without Developer Mode.
+</td>
+<td width="33%" valign="top">
 
 ### 🧬 &nbsp;`git clone`
 
-Best for pinning a checkout you update yourself. Needs `git`.
+*Best for pinning a checkout. Needs git.*
 
 ```bash
+U=88lin/diataxis-docs-skill
+
 # Claude Code
-git clone https://github.com/88lin/diataxis-docs-skill.git \
+git clone https://github.com/$U \
   ~/.claude/skills/diataxis-docs
 
 # OpenCode
-git clone https://github.com/88lin/diataxis-docs-skill.git \
+git clone https://github.com/$U \
   ~/.config/opencode/skills/diataxis-docs
 
 # Codex
-git clone https://github.com/88lin/diataxis-docs-skill.git \
+git clone https://github.com/$U \
   ~/.codex/skills/diataxis-docs
 ```
 
-> [!IMPORTANT]
-> The directory containing `SKILL.md` **must** be named `diataxis-docs` to match the frontmatter `name`. The first two methods handle this; the clone commands pass the target path explicitly for the same reason. Restart the host afterwards.
+</td>
+</tr>
+</table>
 
-Project-local installs, per-host paths, verification, and troubleshooting: **[Install the skill](docs/installation.md)**.
+> [!IMPORTANT]
+> The directory containing `SKILL.md` **must** be named `diataxis-docs` to match the frontmatter `name`. The first two methods handle this; the clone commands pass the target path explicitly for this reason. Restart the host afterwards.
+
+Project-local installs, the optional slash-command copy step, verification, and troubleshooting: **[Install the skill](docs/installation.md)**.
+
+## Which assistants can use it
+
+<table>
+<tr><th align="left" width="34%">Loads <code>SKILL.md</code> natively</th><th align="left" width="66%">Reads an exported rule file</th></tr>
+<tr valign="top"><td>
+
+**Claude Code**<br>
+**OpenCode**<br>
+**Codex**
+
+On-demand: costs nothing on unrelated requests.
+
+</td><td>
+
+Cursor &nbsp;·&nbsp; GitHub Copilot &nbsp;·&nbsp; Cline &nbsp;·&nbsp; Roo Code &nbsp;·&nbsp; Windsurf &nbsp;·&nbsp; Aider &nbsp;·&nbsp; Gemini CLI &nbsp;·&nbsp; Continue &nbsp;·&nbsp; Amazon Q
+
+```bash
+python scripts/export_rules.py --list
+python scripts/export_rules.py --target . --compact
+```
+
+The exporter writes `SKILL.md` to the path each tool reads, with the frontmatter it needs. Six default targets are always-on context, which is what `--compact` is for.
+
+</td></tr>
+</table>
+
+Full target table and per-tool notes: **[AI IDE integration](docs/ide-integration.md)**.
 
 ## Use it
 
@@ -158,7 +207,14 @@ Optional shortcuts into one mode, for Claude Code and OpenCode:
 | `/docs-audit` | Page-by-page classification of a docs directory |
 | `/docs-quickstart` | A short path to first success |
 
-They need one copy step, because neither host discovers commands nested *inside* an installed skill:
+Full output shapes: **[Slash commands](docs/commands.md)**.
+
+<details>
+<summary><b>The commands are optional, and need one copy step</b></summary>
+
+<br>
+
+The skill works through natural language without them. If you want them, note that neither Claude Code nor OpenCode discovers a command directory nested *inside* an installed skill, so copy them into the host's own command directory once:
 
 ```bash
 # Claude Code
@@ -171,7 +227,9 @@ cp ~/.config/opencode/skills/diataxis-docs/.opencode/commands/*.md \
   ~/.config/opencode/commands/
 ```
 
-Codex loads the skill but ships no commands here — use natural language instead. Full output shapes: **[Slash commands](docs/commands.md)**.
+Codex has no bundled commands — describe the mode in natural language instead.
+
+Full steps, PowerShell variants, and project-local paths: [Install the skill](docs/installation.md).
 
 ## Which assistants can use it
 
@@ -198,11 +256,23 @@ Per-tool notes and the full target table: **[AI IDE integration](docs/ide-integr
 
 | Page | For |
 | :--- | :--- |
-| **[Install the skill](docs/installation.md)** | Three methods, per-host paths, verification, troubleshooting |
+| **[Install the skill](docs/installation.md)** | Three install methods, per-host paths, verification |
 | **[Slash commands](docs/commands.md)** | What each command takes and returns |
 | **[AI IDE integration](docs/ide-integration.md)** | Exporting to Cursor, Copilot, Aider, and others |
 | **[Develop and contribute](docs/development.md)** | Running the checks, adding evals and commands |
 | **[Scope and design FAQ](docs/faq.md)** | What it does not do, and why |
+
+Reference material the skill loads **on demand**, not on every request:
+
+[Blueprints](references/doc-blueprints.md) per document type &nbsp;·&nbsp; a [reader checklist](references/reader-analysis.md) &nbsp;·&nbsp; a [template map](references/template-map.md) to Good Docs Project templates &nbsp;·&nbsp; [Chinese-language anti-patterns](references/zh-cn-anti-patterns.md)
+
+## Design principles
+
+- **Reader first.** Write for what the reader is trying to do right now.
+- **One need per page.** Do not mix learning, working, lookup, and reflection.
+- **Link, do not overload.** Companion documents beat a longer page.
+- **Structure follows purpose.** Choose the document type before the headings.
+- **A guide, not a plan.** Apply the compass where you are, one step at a time.
 
 ## Contributing
 
