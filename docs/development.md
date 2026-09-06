@@ -16,15 +16,16 @@ This is the single source of truth for repository validation. CI runs this exact
 
 It validates:
 
-- `SKILL.md` frontmatter against the OpenCode skill spec: `name` matches `^[a-z0-9]+(-[a-z0-9]+)*$`, `description` is within 1024 characters, and unrecognised fields are reported
+- `SKILL.md` frontmatter against the skill spec: `name` matches `^[a-z0-9]+(-[a-z0-9]+)*$`, `description` is within 1024 characters, and unrecognised fields are reported
 - `SKILL.md` body stays under 500 lines, warning from 400
 - installation docs clone into a directory named after the skill
-- slash command frontmatter against OpenCode's recognised fields, plus this repository's required `description`
+- both hosts ship the same five slash commands, each with a `description`, a `$ARGUMENTS` placeholder, and frontmatter fields that host recognises
 - `evals/evals.json` structure, unique ids, known categories, and referenced files
 - internal markdown links, heading anchors, and image paths
 - English and Chinese docs stay paired
 - required files exist
 - `SKILL.md`, `evals/evals.json`, and `CHANGELOG.md` agree on the version
+- every section `export_rules.py --compact` selects still exists in `SKILL.md`
 - the unit tests pass
 
 ## Run the tests directly
@@ -52,11 +53,19 @@ Signals are counted on prose only: YAML frontmatter and fenced code blocks are r
 | --- | --- |
 | `code_blocks` | Fenced blocks, counted as blocks rather than fence lines |
 | `table_rows` | Header and body rows of real tables; separator rows excluded |
-| `step_lines` | Lines starting with an imperative verb, English or Chinese |
+| `step_lines` | Instruction lines. English: an imperative verb at the start. Chinese: a verb anywhere in a short list item or colon-terminated lead-in, since Chinese instructions usually open with an adverbial phrase |
 | `explanation_terms` | Words such as why, background, architecture, tradeoff |
-| `reference_terms` | Words such as parameter, field, schema, endpoint, limit |
+| `reference_terms` | Interface vocabulary such as parameter, field, schema, endpoint, limit |
 
 Scores accumulate across three rules; 4 or more is high risk, 2 or 3 is medium. `--fail-on {none,medium,high}` sets the exit code, which is how CI keeps this repository's own pages honest.
+
+Three deliberate limits keep the false-positive rate down:
+
+- **Code blocks are not reference evidence.** Every how-to is full of commands, so counting them made each installation guide look like a reference page carrying instructions.
+- **A table needs reference vocabulary to count against a how-to.** A how-to may legitimately end in a symptom/cause/fix table; only words like parameter or field mark a table as describing an interface.
+- **The weak `tutorial/how-to` rule cannot flag a page alone.** It adds 1 point to a page another rule already flagged, rather than promoting a clean page on its own.
+
+Chinese matching is keyword-based with no word segmentation, so a bullet opening with a verb used as a noun ("安装文档…", "installation docs…") can still be counted as a step. A one-signal miscount does not change the risk level on its own; treat the score as triage, not a verdict. `tests/test_audit_docs.py` asserts that each translated page scores the same risk as its English original, which is how per-language pattern drift gets caught.
 
 ## Add an eval
 
@@ -78,7 +87,7 @@ Evals are prompt-and-expectation pairs for human or model review. There is no au
 
 ## Add a slash command
 
-Create a Markdown file in [`.opencode/commands/`](../.opencode/commands/). The file name becomes the command name.
+Create the same file in **both** [`.claude/commands/`](../.claude/commands/) and [`.opencode/commands/`](../.opencode/commands/), then add its name to `COMMAND_NAMES` in `scripts/check_local.py`. The file name becomes the command name. `check_local.py` fails if a command exists for one host and not the other.
 
 ```markdown
 ---
@@ -100,7 +109,7 @@ $ARGUMENTS
 ...
 ```
 
-OpenCode recognises `description`, `agent`, `model`, `variant`, and `subtask`; the command name comes from the file name. OpenCode itself makes `description` optional, but this repository requires it so every command has useful picker text. The checker warns about any other frontmatter field, including `name`.
+Keep the body identical across hosts and vary only the frontmatter. Claude Code recognises `description`, `argument-hint`, `model`, `allowed-tools`, and `disable-model-invocation`; OpenCode recognises `description`, `agent`, `model`, `variant`, and `subtask`. Both hosts make `description` optional, but this repository requires it so every command has useful picker text, and requires `$ARGUMENTS` in the body so the command cannot silently ignore its input. The checker warns about a field the host does not recognise, including `name`.
 
 ## Edit SKILL.md
 
@@ -122,7 +131,8 @@ The same applies between `SKILL.md` and this documentation. The skill file is wr
 ├── references/                 # detail the skill links to on demand
 ├── examples/messy-to-diataxis/ # worked before-and-after split
 ├── evals/evals.json            # prompt-and-expectation pairs
-├── .opencode/commands/         # slash-command prompts
+├── .claude/commands/           # slash-command prompts, Claude Code
+├── .opencode/commands/         # slash-command prompts, OpenCode
 ├── scripts/                    # validation, audit, and export tooling
 ├── tests/                      # unit tests for the scripts
 └── .github/workflows/ci.yml    # runs check_local.py and the audit
@@ -145,7 +155,7 @@ The same applies between `SKILL.md` and this documentation. The skill file is wr
 
 1. `python scripts/check_local.py`
 2. `python scripts/audit_docs.py . --exclude 'CHANGELOG.md' --fail-on high`
-3. `python scripts/export_rules.py --list` and a `--dry-run --compact` export
+3. `python scripts/export_rules.py --list`, then a full and a compact `--dry-run` export, so a broken target is caught in either mode
 
 CI holds no validation logic of its own. Adding a check means editing `scripts/check_local.py`, which keeps the local and CI results identical.
 

@@ -40,7 +40,11 @@ jobs:
       - name: Scan own docs for mixed-form smells
         run: python scripts/audit_docs.py . --exclude 'CHANGELOG.md' --fail-on high
 
+      # Both modes are exercised: --compact and the full export take different
+      # paths through the size-limit fallback, so one passing does not imply the
+      # other does.
       - name: Verify rule export is runnable
         run: |
           python scripts/export_rules.py --list
+          python scripts/export_rules.py --target "$(mktemp -d)" --dry-run
           python scripts/export_rules.py --target "$(mktemp -d)" --dry-run --compact

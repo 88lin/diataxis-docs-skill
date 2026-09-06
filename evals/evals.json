@@ -1,6 +1,6 @@
 {
   "skill_name": "diataxis-docs",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Sample evaluation prompts for checking whether the diataxis-docs skill behaves as expected. Each eval targets a specific decision the skill must make well: classification, mixed-form detection, per-form writing, review, large-system planning, migration, adjacent doc types, anti-pattern avoidance, and explicit non-trigger cases. The `files` field lists the references inside this repo that back the expected output. The `non-trigger` category is intentionally negative: the skill must decline or stay silent on these prompts. For `non-trigger` evals, `files` is empty because the skill must not read any reference files.",
   "categories": [
     "adjacent-types",
@@ -8,12 +8,14 @@
     "classification",
     "decision-framework",
     "large-system",
+    "localization",
     "migration",
     "mixed-form-detection",
     "non-trigger",
     "per-form-writing",
     "review",
-    "single-page-classification"
+    "single-page-classification",
+    "tool-use"
   ],
   "evals": [
     {
@@ -355,6 +357,37 @@
       "files": [
         "SKILL.md",
         "references/reader-analysis.md",
+        "references/doc-blueprints.md"
+      ]
+    },
+    {
+      "id": 33,
+      "category": "tool-use",
+      "prompt": "Our docs/ directory has about 60 Markdown pages and I have no idea which ones are the worst offenders. Where should I start?",
+      "expected_output": "The skill runs or recommends `python scripts/audit_docs.py docs/` as a mechanical pre-pass, then applies the compass to the pages it flags. It must present the scanner output as a heuristic triage list, not as an authoritative classification, and it must not attempt to classify all 60 pages by reading them one by one.",
+      "files": [
+        "SKILL.md",
+        "scripts/audit_docs.py"
+      ]
+    },
+    {
+      "id": 34,
+      "category": "tool-use",
+      "prompt": "The audit script says docs/guides/webhooks.md is high risk with suspected mix how-to/reference. So it's a how-to that needs its reference tables pulled out, right?",
+      "expected_output": "The skill declines to treat the score as a verdict: it reads the page and applies the compass before agreeing or disagreeing. It should explain that the scanner counts signals (step lines beside tables and reference terms) and that a high score can also mean a legitimate reference page with an examples section, so the risk level narrows where to look rather than deciding the form.",
+      "files": [
+        "SKILL.md",
+        "scripts/audit_docs.py"
+      ]
+    },
+    {
+      "id": 35,
+      "category": "localization",
+      "prompt": "帮我 review 这篇中文教程。开头两段讲了团队三年来的产品愿景和技术选型心路历程，然后是「快速开始」的六个步骤，中间插了一张有 20 个字段的 API 参数表，最后是常见问题排查。",
+      "expected_output": "A review in Chinese that names the mixed-form signals from references/zh-cn-anti-patterns.md: the vision-and-history preface before the first action, the embedded API parameter table that belongs in reference, and the troubleshooting section. It should propose moving each to a companion page and keeping the tutorial as a single linear path, and it must apply the same compass reasoning it would in English rather than treating Chinese as a separate framework.",
+      "files": [
+        "SKILL.md",
+        "references/zh-cn-anti-patterns.md",
         "references/doc-blueprints.md"
       ]
     }

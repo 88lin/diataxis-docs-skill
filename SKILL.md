@@ -3,16 +3,16 @@ name: diataxis-docs
 description: "Apply the Diataxis compass to write, restructure, split, classify, review, audit, or migrate technical documentation. Trigger on requests like write docs, organize docs, fix docs, split this page, classify this docs page, audit our docs site, migrate to Diataxis, review this draft, or design a documentation system for an SDK or API."
 license: MIT
 metadata:
-  version: "0.2.0"
+  version: "0.3.0"
 ---
 
 # Diataxis Documentation Skill
 
-Use this skill to turn a documentation request into the right document type, with the right level of detail, for the right reader.
+Turn a documentation request into the right document type, at the right level of detail, for the right reader. Classify before writing.
 
 ## The Diataxis compass
 
-Diataxis separates documentation by two questions — action or cognition, and acquiring or applying skill — and yields four primary forms: tutorial, how-to, reference, explanation. The compass is its main classification tool: it reduces a two-dimensional problem to two questions and yields a single answer. See [Classification guide](#classification-guide) for the per-form writing details.
+Diataxis separates documentation by two questions — action or cognition, acquiring or applying skill — and yields four forms.
 
 | If the content… | …and serves the user's… | …then it must belong to… |
 | --- | --- | --- |
@@ -21,35 +21,22 @@ Diataxis separates documentation by two questions — action or cognition, and a
 | informs cognition | application of skill | reference |
 | informs cognition | acquisition of skill | explanation |
 
-To use the compass, ask just two questions:
+To use the compass, ask two questions:
 
-- Is the content about **action** (practical steps, doing) or **cognition** (theoretical or propositional knowledge, thinking)?
+- Is the content about **action** (practical steps, doing) or **cognition** (propositional knowledge, thinking)?
 - Is the user **acquiring** skill (study) or **applying** skill (work)?
 
 > "The compass can be applied equally to user situations that need documentation, or to documentation itself that perhaps needs to be moved or improved. Like many good tools, it's surprisingly banal." — [diataxis.fr/compass](https://diataxis.fr/compass/)
 
-The compass is a tool for finding your bearings, not a map of the territory. Diataxis is also published as a 2x2 quadrant diagram on [diataxis.fr](https://diataxis.fr/); this skill calls that the *map*. The map is good for orientation; the compass is good for decisions. The two are not interchangeable.
+The compass finds your bearings; it is not a map of the territory. The 2x2 quadrant diagram on [diataxis.fr](https://diataxis.fr/) is good for orientation, the compass for decisions. They are not interchangeable.
 
-### Use the compass flexibly
+Apply it at any scale — a sentence, a section, a page, a whole documentation set — and to existing pages as readily as to new ones. When an existing page's form does not match the answer, the page needs to be moved or rewritten, not relabelled.
 
-The compass is particularly effective when you think you are doing one thing — or the documentation in front of you seems to be — but feel doubt or difficulty in the work. It forces you to stop and reconsider. Sometimes intuition provides an immediate answer that is also wrong.
-
-Do not get fixated on the exact names. If a question feels ambiguous, both readings may be valid. Apply the compass at any scale: at the level of a single sentence, a section, an entire page, or a whole documentation set.
-
-The questions can be used in different ways:
-
-- "Do I think I am writing for *x* or *y*?"
-- "Is this writing in front of me engaged in *x* or *y*?"
-- "Does the user need *x* or *y*?"
-- "Do I want to *x* or *y*?"
-
-### Apply the compass to existing documentation
-
-The compass is just as useful for auditing existing pages as for greenfield work. For each page, ask the two questions. If the page's current form does not match the answer, the page needs to be moved or rewritten — not labelled differently.
+It is most useful exactly when you feel doubt, or when the page in front of you seems to be one thing but resists the work. Intuition sometimes answers immediately and is wrong. Do not fixate on the names; if a question feels ambiguous, both readings may be valid.
 
 ## Quick decision tree
 
-The compass above is the canonical tool. The tree below is a quick aid for the most common cases.
+The compass is canonical. This tree is a fast path for common cases.
 
 ```text
 What is the reader trying to do right now?
@@ -67,75 +54,59 @@ What is the reader trying to do right now?
 └── Trying to understand why or how it works?            → Explanation
 ```
 
-If the request hits more than one branch, split it into multiple documents rather than blending them.
+Request phrasing maps the same way: "a guide for my new users" → tutorial or quickstart; "how to do X" → how-to; "what does this field mean" → reference; "why is it designed this way" → explanation; "a documentation system" → use the compass to split it into the right forms.
 
-### Request phrasing shortcuts
+If a request hits more than one branch, split it into multiple documents rather than blending them.
 
-If the user asks for:
+## The four forms at a glance
 
-- "a guide for my new users" -> tutorial or quickstart
-- "how to do X" -> how-to
-- "what does this field/command mean" -> reference
-- "why is it designed this way" -> explanation
-- "a single document system for docs" -> use Diataxis to split the system into the right document types
+| Form | Reader is | Writing mode | Must have | Must not have |
+| --- | --- | --- | --- | --- |
+| Tutorial | learning | guided lesson | one linear path, visible expected results, stated prerequisites | branches, options, background essays |
+| How-to | working | practical directions | one goal, short logical sequence, verification step | teaching, concept introductions |
+| Reference | looking up | neutral description | structure mirroring the thing described, exact values, examples | instructions, recommendations, hedging |
+| Explanation | reflecting | discursive context | one bounded topic, a point of view, tradeoffs and alternatives | procedures, "how to" framing |
+
+Trigger words: tutorial — "try", "first time", "walkthrough". How-to — "configure", "deploy", "migrate". Reference — fields, flags, schemas, limits, error codes. Explanation — "why", "background", "design", "tradeoff".
+
+For section-by-section structures per form, load [`references/doc-blueprints.md`](references/doc-blueprints.md).
 
 ## When to use this skill
 
-Use this skill when the task is to:
-
 - write, rewrite, restructure, or review a documentation page
-- apply the Diataxis compass to classify a page or a request
-- split a single messy page into the right Diataxis forms
+- classify a page or a request with the compass
+- split a messy page into the right forms
 - audit or migrate an existing documentation set, one page at a time
-- design a full documentation system for an SDK, API, CLI, or product (using the compass as a guide, not as a plan)
+- design a documentation system for an SDK, API, CLI, or product
 - map user questions to the correct documentation form
 
 ## When NOT to use this skill
 
-Do not use this skill for:
-
 - marketing copy, blog posts, or non-technical writing
 - purely visual content such as UI mockups, slides, or design specs
-- code review, refactoring, or implementation work
-- writing a single paragraph or a short response that does not need a document structure
-- translations of finished documentation that already follows a clear structure
+- code review, refactoring, debugging, or implementation work
+- a single paragraph or short answer that needs no document structure
+- translating documentation that already follows a clear structure
 
-## Guiding principles
-
-- Clarity: write in simple, direct language.
-- Accuracy: keep facts, code snippets, and document details up to date.
-- User centricity: optimize for the reader's goal, not the author's internal structure.
-- Consistency: keep tone, terminology, and formatting aligned across the document set.
+A useful test: if the request is more about *what* to say than about *which kind of document* to write, it is out of scope.
 
 ## Workflow
 
-For a single page, work in this order:
+1. Identify the reader and their current state: learning, working, looking up, or reflecting.
+2. Identify the need behind the request: a task, a fact, a concept, or a learning path.
+3. Classify with the compass, and name what to exclude.
+4. Clarify document type, audience, goal, and scope only if still not obvious. One short question, not an approval loop.
+5. Outline using the blueprint for that form.
+6. Write for that form alone. Link out to the other forms instead of mixing them in.
+7. Run the [Quality checks](#quality-checks).
 
-1. Identify the reader.
-2. Identify the reader's current state: learning, working, looking up facts, or reflecting.
-3. Identify the user need: a task, a fact, a concept, or a learning path.
-4. Classify the content using the Diataxis compass.
-5. Write only for that form.
-6. Link out to the other forms instead of mixing them in.
-7. Check whether the document still feels complete, focused, and easy to use.
+If the request spans several needs, deliver companion documents rather than one blended page. Write in the language the user is writing in.
 
-If the request spans multiple needs, split it into multiple documents rather than blending them together. For a whole documentation system, work one page at a time, not as a top-down plan — see the [Workflow philosophy](#workflow-philosophy) and [Large documentation systems](#large-documentation-systems) sections.
-
-## Typical delivery pattern
-
-For most requests, follow this order:
-
-1. Run the diagnosis above: reader, reader state, user need, form, and what to exclude.
-2. Clarify the document type, audience, goal, and scope if they are still not obvious.
-3. Propose or infer the outline for that document type.
-4. Write the document in Markdown using the right blueprint, or produce a doc plan in the chosen form.
-5. If the request is actually a mixed documentation system, split it into companion docs instead of one large page.
-
-Do not force a long approval loop for every task. Use a short clarification loop only when the user has not given enough information.
+When the reader state is genuinely ambiguous — usually tutorial versus how-to — ask: *is the reader learning a new skill through a guided exercise, or completing a real task they already understand?* If the user cannot clarify, state your assumption and write a focused how-to, linking teaching material out. See [`references/reader-analysis.md`](references/reader-analysis.md) for the full checklist.
 
 ## Anti-patterns: what NOT to do
 
-The most common failure in technical documentation is **mixing forms**. The rules below are the inverse of the guidance above. If a draft shows any of these signals, stop and split, prune, or rewrite.
+The most common failure in technical documentation is **mixing forms**. If a draft shows any of these signals, stop and split, prune, or rewrite.
 
 ### The four cardinal sins
 
@@ -148,36 +119,13 @@ The most common failure in technical documentation is **mixing forms**. The rule
 
 ### Per-form anti-patterns
 
-**Tutorial anti-patterns**
+**Tutorial**: branching or "choose your adventure" steps; long background before the first action; hidden prerequisites; no expected result at each checkpoint; sentences that do not help the learner take the next step.
 
-- Branching paths or "choose your adventure" steps. Tutorials must be linear.
-- Long background sections before the first action. Move background to explanation.
-- Hidden prerequisites. State them at the top.
-- Skipping the expected result. Show what success looks like at every checkpoint.
-- Over-explaining. If a sentence is not helping the learner do the next step, cut it.
+**How-to**: opening with theory; "First, let's understand…" sections; re-teaching what the reader already knows; more than one goal per page; "when you are done, you will understand…" framing.
 
-**How-to anti-patterns**
+**Reference**: imperative voice ("Run this command") instead of description; comparisons, recommendations, or best-practice opinions; ordering by the author's sense of importance rather than the structure of the thing described; missing input and output examples; hedging such as "usually", "generally", "often".
 
-- Opening with theory. Start with the goal.
-- "First, let's understand…" sections. The reader is working, not learning.
-- Re-teaching concepts the user already knows. Link out instead.
-- More than one goal per page. Split the page.
-- "When you are done, you will understand…" framing. That belongs in a tutorial.
-
-**Reference anti-patterns**
-
-- Imperative voice ("Run this command", "Set this value"). Reference describes, it does not instruct.
-- Comparisons, recommendations, or "best practice" opinions. Move them to explanation.
-- Sections ordered by importance to the author. Order by the structure of the thing described.
-- Missing examples of input and output. Every entry should show concrete usage.
-- Soft language such as "usually", "generally", "often". Be exact or omit.
-
-**Explanation anti-patterns**
-
-- Step-by-step instructions. Explanations do not give procedures.
-- "How to" titles. Use "About …" or "Why …" framing.
-- Unbounded scope. Cover one concept, one design decision, or one tradeoff at a time.
-- No point of view or insight. An explanation that neither offers a perspective nor helps the reader form a new understanding is just a summary.
+**Explanation**: step-by-step instructions; "How to" titles instead of "About…" or "Why…"; unbounded scope; no point of view, which makes it a summary rather than an explanation.
 
 ### Mixed-doc smell test
 
@@ -187,227 +135,75 @@ A page is probably mixing forms if it has two or more of:
 - Both narrative paragraphs **and** parameter tables in roughly equal weight
 - Both "Why we built it this way" framing **and** "Run this command" instructions
 - A "Tutorial" heading that includes optional branches or troubleshooting
-- A "How-to" that begins with "In this tutorial you will learn…" or similar tutorial-style framing
-- A README longer than about 500 lines that tries to teach, instruct, list, and explain at once
+- A "How-to" that begins with "In this tutorial you will learn…"
+- A README over roughly 500 lines trying to teach, instruct, list, and explain at once
 
-When a page trips the smell test, the right response is to **split it**, not to add headings.
+When a page trips the smell test, **split it** — do not add headings.
 
-### README-specific anti-patterns
+### README and adjacent types
 
-- README doing the work of an entire docs site. README is an entry point.
-- "Quickstart" inside the README that is actually a full tutorial. Link to the tutorial instead.
-- Listing every command, option, or flag in the README. Move them to reference.
-- Mixing install, configure, deploy, troubleshoot, and contribute all in one file.
+- **README**: an entry point, not a docs site. Do not inline a full tutorial, list every flag, or mix install, configure, deploy, troubleshoot, and contribute.
+- **Troubleshooting**: symptom → cause → solution. Move "why this happens" to explanation.
+- **Glossary**: a list of terms. Move usage examples to how-to or reference.
+- **Release notes**: change and impact. Move rationale to explanation.
+- **Quickstart**: optimizes for first success, not completeness.
+- **Style guide**: describes voice and rules; it does not re-derive Diataxis.
 
-### Adjacent-type anti-patterns
+## Working at scale
 
-- **Troubleshooting that explains**: keep it symptom → cause → solution. Move "why this happens" to explanation.
-- **Glossary that teaches**: a glossary is a list of terms. Move usage examples to how-to or reference.
-- **Release notes that justify**: release notes state change and impact. Move rationale to explanation.
-- **Style guide that classifies**: the style guide should describe voice and rules, not re-derive Diataxis.
-- **Quickstart that explores**: a quickstart optimizes for first success, not for completeness.
+Diataxis is a guide, not a plan. For a full documentation system, SDK docs, API docs, or a developer portal:
 
-## Workflow philosophy
+1. Apply the compass to existing material first. Tag every page with a compass cell and move the misplaced ones before adding anything new.
+2. Write one page at a time, applying the compass to that page alone.
+3. Let top-level structure emerge once enough pages exist to demand it.
+4. If asked to propose a structure up front, treat it as a sketch, not a contract.
 
-Diataxis is meant to be used as a guide, not as a plan. The official workflow says:
+Do not create empty sections in advance, allocate content quotas per quadrant, force information architecture before the content is good, or treat "documentation system" as a deliverable — it is a practice. A messy page that is honest about its content beats a clean four-section site with nothing in three sections.
 
-- **Use Diataxis as a guide, not a plan.** Apply the compass where you are, not where you wish you were. Do not create empty structures in advance.
-- **Do not worry about structure.** Focus on content quality. The structure will emerge from the work.
-- **Work one step at a time.** Make small, responsive improvements; finish and ship each one before starting the next. Do not plan a complete rewrite before starting.
-- **Diataxis changes the structure of your documentation from the inside, the way cells form a tissue.** It is not a template to impose on top of existing content. Allow the work to develop organically; the structure will differentiate once enough content is in place.
+When the user asks for "a complete documentation system", ask what already exists and start there. When they ask to fix "one mega-page", walk the compass with them; the split is a consequence, not the goal.
 
-In practice, this means:
+Gather only the inputs you need now: source material, audience, platform, style constraints, code examples, and lifecycle needs such as versioning or release notes. The compass does the rest.
 
-- When the user asks for "a complete documentation system", do not deliver an empty scaffold. Ask what already exists and start there.
-- When the user asks for "a single mega-page that does everything", do not just split it. Walk through the compass with the user; the split is a consequence, not a goal.
-- When a single improvement would move a page from one form to another, make that improvement before planning the next.
+**Per-platform notes.** Plain Markdown or repo docs: one form per file, clear filenames such as `how-to-deploy.md`. Docusaurus, Mintlify, or GitBook: one form per top-level section so navigation reinforces the separation. ReadTheDocs and static sites: use section labels and admonitions sparingly; do not bury form boundaries in prose. Multi-product portals: one quadrant per page, with cross-product indexes on their own overview page.
 
-A messy page that is honest about its content is better than a clean four-section site with nothing in three of the four sections.
+## Bundled tools
 
-## Large documentation systems
+`scripts/audit_docs.py` is a heuristic mixed-form scanner bundled with this skill. Use it as a mechanical pre-pass when auditing more than a handful of pages, then apply the compass to the pages it flags.
 
-When the user asks for a full documentation system, SDK docs, API docs, developer portal, or documentation site, **use the compass as a guide, not a plan**. Diataxis explicitly warns against top-down planning: the structure should emerge from content, not be imposed on it.
+```bash
+python scripts/audit_docs.py docs/                       # Markdown report
+python scripts/audit_docs.py docs/ --format json         # machine-readable
+python scripts/audit_docs.py . --exclude 'CHANGELOG.md'  # skip known-mixed files
+```
 
-### How to work iteratively
-
-1. Apply the compass to any existing material first. Tag every existing page with a compass cell. Move pages that are misplaced before adding new ones.
-2. For new content, write one page at a time. Apply the compass to that page alone. Do not create empty top-level sections in advance.
-3. After enough pages exist, the top-level structure will start to demand certain headings. Let those emerge from the work, not from a plan.
-4. If you are asked to propose a structure up front, treat it as a sketch, not a contract. The structure is allowed to change as the content improves.
-
-### Anti-patterns for large systems
-
-- **Creating empty sections up front.** An empty "Tutorials" section is worse than no Tutorials section.
-- **Allocating fixed content quotas per quadrant.** Compass cells are not buckets to fill.
-- **Forcing IA before content is good.** A navigation that pre-commits to four forms is brittle.
-- **Treating "documentation system" as a deliverable.** It is a practice, not a product.
-
-### Inputs to gather, but only what is needed
-
-Before starting, confirm what you actually need: source material (API spec, source code, existing docs, product notes), audience (beginners, experienced developers, admins, support, partners, non-technical users), platform preference (plain Markdown, Docusaurus, ReadTheDocs, Mintlify, GitBook, static site, repo docs), style constraints (brand voice, terminology, localization, accessibility, formatting rules), code examples (languages, runnable snippets, SDK samples, CLI examples, sample repositories), and lifecycle needs (versioning, search, navigation, release notes, changelog, deprecation policy). Ask only what is needed right now; the compass does the rest.
-
-### Common artifact patterns (for reference only)
-
-Do not treat artifact lists as a backlog. Only produce artifacts the compass calls for. For the artifact-to-form mapping, including the compass cell for each artifact, see [`references/template-map.md`](references/template-map.md).
-
-### Per-platform notes
-
-- **Plain Markdown or repo docs**: keep one form per file; use clear filenames such as `how-to-deploy.md`.
-- **Docusaurus / Mintlify / GitBook**: place each form under a distinct top-level section so navigation reinforces the separation.
-- **ReadTheDocs / static sites**: use section labels and admonitions sparingly; do not hide form boundaries inside prose.
-- **Multi-product portals**: keep one Diataxis quadrant per page; let the cross-product index live in a separate overview page.
-
-Keep the Diataxis separation intact when navigation does emerge, but do not force the separation before there is content to separate.
+It reports a risk level and the signals behind it. It is not an authoritative classifier — it narrows where to look. Never present its output as a final classification; read the flagged pages and decide with the compass.
 
 ## Reference files
 
-Use the bundled references when you need more structure than the main guidance provides:
+Load these on demand; do not read them for every request.
 
-- `references/reader-analysis.md`: ask these questions before drafting.
-- `references/doc-blueprints.md`: use these section patterns when outlining a document.
-- `references/template-map.md`: use this to map Diataxis forms to common TGDP templates.
-- `references/zh-cn-anti-patterns.md`: use this only when reviewing Chinese technical documentation or Chinese localization drafts.
-
-## Classification guide
-
-### Tutorial
-
-Use when the reader needs a guided learning experience.
-
-Write it as a safe, structured lesson:
-
-- start with what the reader will do or build
-- use a single, stable, predictable path
-- keep steps concrete and sequential
-- write in second person and show expected results early and often
-- minimize explanation; no comprehensive background sections
-- avoid options and digressions
-
-Good signs:
-
-- "try", "first time", "hands-on", "intro", "walkthrough"
-- the user is not yet competent
-
-### How-to
-
-Use when the reader already knows the basics and wants to achieve a task.
-
-Write it as practical directions:
-
-- begin with the goal
-- assume basic competence
-- cover one task or problem
-- keep the sequence logical and short
-- use conditional imperatives ("If you want X, do Y") where helpful
-- include warnings and alternate paths only when needed
-- do not teach concepts; put supporting material in links, not inline essays
-
-Good signs:
-
-- "how do I...", "configure", "deploy", "set up", "migrate", "troubleshoot"
-- the reader is in work mode
-
-### Reference
-
-Use when the reader needs exact facts.
-
-Write it as neutral technical description:
-
-- mirror the structure of the thing described
-- keep language factual, concise, and consistent across entries
-- prefer tables, lists, and schemas over prose
-- include parameters, values, limits, fields, commands, return values, examples
-- avoid instructions, teaching, and discussion
-
-Good signs:
-
-- APIs, fields, commands, flags, schemas, tables, options, limits, error codes
-
-### Explanation
-
-Use when the reader needs understanding.
-
-Write it as context-rich discussion:
-
-- explain why something exists and provide the context around it
-- connect related ideas
-- discuss tradeoffs, history, alternatives, and implications
-- allow perspective and judgment
-- keep the scope bounded to one concept or topic
-- keep it separate from procedural guidance
-
-Good signs:
-
-- "why", "background", "concept", "design", "tradeoff", "overview", "discussion"
-
-## Useful adjacent document types
-
-Use these as concrete specializations of the four forms:
-
-- Quickstart: a short tutorial that gets a user to a first success fast
-- README: the project's first impression and entry point
-- Troubleshooting: symptom -> cause -> solution
-- Glossary: terms and definitions for project-specific language
-- Release notes: what changed, why it matters, and known issues
-- Style guide: team rules for writing consistently
-
-For API and SDK documentation, treat these as common combinations:
-
-- Getting started or quickstart -> tutorial
-- Authentication setup -> how-to or reference, depending on whether it is task steps or field definitions
-- Endpoint, method, class, option, or error-code pages -> reference
-- Architecture, design model, rate limits, pagination model, or SDK philosophy -> explanation
-- Migration and upgrade guides -> how-to with reference links
-
-When a request sounds like one of these, map it back to the four Diataxis needs before writing.
-
-
-### Tutorial or how-to ambiguity
-
-Tutorial and how-to are the most common gray area. When the request could be either, ask one short question before drafting if the answer is not already clear:
-
-> Is the reader trying to learn a new skill through a guided exercise, or trying to complete a real task they already understand?
-
-Use these fallbacks:
-
-- Choose tutorial or quickstart when the reader is new, needs a safe single path, and benefits from visible expected results.
-- Choose how-to when the reader has a production goal, already understands the basics, and mainly needs practical steps.
-- If the user cannot clarify, state your assumption and prefer a focused how-to; link teaching material out instead of embedding a lesson.
-
+| File | Load when |
+| --- | --- |
+| [`references/doc-blueprints.md`](references/doc-blueprints.md) | outlining or drafting a document and you want the section structure for its form |
+| [`references/reader-analysis.md`](references/reader-analysis.md) | the reader or their state is unclear before drafting |
+| [`references/template-map.md`](references/template-map.md) | mapping an artifact or a Good Docs Project template to a form or compass cell |
+| [`references/zh-cn-anti-patterns.md`](references/zh-cn-anti-patterns.md) | reviewing Chinese technical documentation or a Chinese localization draft |
 
 ## Quality checks
 
-Before finishing, run both the **intent check** and the **smell test** (see [Mixed-doc smell test](#mixed-doc-smell-test) above for the full list of signals).
+Before finishing, run the intent check, the per-form check, and the [Mixed-doc smell test](#mixed-doc-smell-test).
 
-### Intent check
+**Intent check.** Did I identify the reader and their state before drafting? Classify with the compass first? Write for the reader's actual state rather than my own mental model? Keep the document on one need? Avoid inventing structure that the content does not yet demand? Leave room for linked companion documents?
 
-- Did I identify the reader and their state before drafting?
-- Did I classify the content using the Diataxis compass first?
-- Did I write for the reader's actual state, not the author's mental model?
-- Did I keep the document focused on one need?
-- Did I avoid unnecessary structure at the top level?
-- Did I leave room for linked companion documents?
-
-### Per-form final check
+**Per-form check.**
 
 - **Tutorial**: a complete beginner can finish it without reading anything else; every step has a visible result.
-- **How-to**: an experienced user can find the answer in under a minute; the page covers exactly one goal.
+- **How-to**: an experienced user finds the answer in under a minute; the page covers exactly one goal.
 - **Reference**: every entry is structured identically; nothing is missing or redundant.
-- **Explanation**: a single concept is covered; the author offers a point of view or insight; no procedures are included.
+- **Explanation**: one concept, a clear point of view, no procedures.
 
-## References
+Never claim a document is verified when it has not been. If a code example or command has not been run, say so.
 
-Use these as the primary source material behind this skill:
+## Sources
 
-- https://diataxis.fr/
-- https://diataxis.fr/start-here/
-- https://diataxis.fr/compass/
-- https://diataxis.fr/how-to-use-diataxis/
-- https://diataxis.fr/tutorials/
-- https://diataxis.fr/how-to-guides/
-- https://diataxis.fr/reference/
-- https://diataxis.fr/explanation/
-- https://www.thegooddocsproject.dev/
-- https://www.thegooddocsproject.dev/template/
-
-This skill distills those sources into a practical documentation workflow.
+This skill distills [diataxis.fr](https://diataxis.fr/) — in particular [start here](https://diataxis.fr/start-here/), [the compass](https://diataxis.fr/compass/), [how to use Diataxis](https://diataxis.fr/how-to-use-diataxis/), and the pages for [tutorials](https://diataxis.fr/tutorials/), [how-to guides](https://diataxis.fr/how-to-guides/), [reference](https://diataxis.fr/reference/), and [explanation](https://diataxis.fr/explanation/) — together with [The Good Docs Project](https://www.thegooddocsproject.dev/) [templates](https://www.thegooddocsproject.dev/template/).

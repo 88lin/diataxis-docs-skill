@@ -1,10 +1,10 @@
 # Export the guidance to other AI assistants
 
-This repository is packaged as an OpenCode skill, but the guidance in `SKILL.md` is portable. [`scripts/export_rules.py`](../scripts/export_rules.py) writes it to the rule-file path each assistant reads, with the frontmatter that tool needs.
+Claude Code and OpenCode load this repository as a skill directly — see [Install the skill](installation.md). For every other assistant, [`scripts/export_rules.py`](../scripts/export_rules.py) writes `SKILL.md` to the rule-file path that tool reads, with the frontmatter it needs.
 
 ## Before you start
 
-Read [Context cost](#context-cost) first. Eight of the eleven default targets load into every request in the project. The optional legacy Cursor target brings the total to nine always-on targets.
+Read [Context cost](#context-cost) first. Seven of the eleven default targets load into every request in the project.
 
 ## List the targets
 
@@ -12,7 +12,7 @@ Read [Context cost](#context-cost) first. Eight of the eleven default targets lo
 python scripts/export_rules.py --list
 ```
 
-12 rule-file targets across 11 assistants (11 selected by default):
+13 rule-file targets across 11 assistants (11 selected by default):
 
 | Key | Tool | Path | Default | Always-on |
 | --- | --- | --- | --- | --- |
@@ -22,12 +22,15 @@ python scripts/export_rules.py --list
 | `roo` | Roo Code | `.roo/rules/diataxis.md` | yes | yes |
 | `windsurf` | Windsurf | `.windsurf/rules/diataxis.md` | yes | no |
 | `copilot` | GitHub Copilot | `.github/copilot-instructions.md` | yes | yes |
-| `claude` | Claude Code | `CLAUDE.md` | yes | yes |
+| `claude` | Claude Code (skill) | `.claude/skills/diataxis-docs/SKILL.md` | yes | no |
+| `claude-md` | Claude Code (CLAUDE.md) | `CLAUDE.md` | no | yes |
 | `codex` | OpenAI Codex | `AGENTS.md` | yes | yes |
 | `aider` | Aider | `CONVENTIONS.md` | yes | yes |
 | `gemini` | Gemini CLI | `GEMINI.md` | yes | yes |
 | `continue` | Continue | `.continue/rules/diataxis.md` | yes | no |
 | `amazonq` | Amazon Q Developer | `.amazonq/rules/diataxis.md` | yes | yes |
+
+Two pairs target the same tool and cannot be selected together: `cursor` with `cursor-legacy`, and `claude` with `claude-md`.
 
 ## Preview before writing
 
@@ -61,19 +64,21 @@ Existing files are never overwritten unless you pass `--force`.
 | `--list` | Print the target table and exit. |
 | `--dry-run` | Report planned writes without touching the filesystem. |
 | `--force` | Overwrite existing rule files. |
-| `--compact` | Export five sections instead of the whole guide. |
+| `--compact` | Export six decision-critical sections instead of the whole guide. |
 
 ## Context cost
 
-An always-on rule file is prepended to every request in that project. The full guidance is about 20,900 characters, roughly 5,200 tokens per request.
+An always-on rule file is prepended to every request in that project. The full guidance is about 13,900 characters, roughly 3,500 tokens per request. Across the seven always-on default targets that is around 24,000 tokens per request if you export the full guide to all of them.
 
-`--compact` exports only the compass, the quick decision tree, the non-trigger list, the anti-patterns, and the quality checks — about 9,400 characters, roughly 2,300 tokens. That is enough for the assistant to classify a request correctly and to avoid the common failure modes.
+`--compact` exports the compass, the quick decision tree, the four-forms table, the non-trigger list, the anti-patterns, and the quality checks — about 8,400 characters, roughly 2,100 tokens. That is enough for the assistant to classify a request correctly and avoid the common failure modes.
 
-Eight of the eleven default targets are always-on; the legacy Cursor target is optional and makes nine always-on targets when selected. Use the full export for the targets that load conditionally (`cursor`, `windsurf`, `continue`), keeping in mind that Windsurf automatically receives compact output when full output is over its limit. Use `--compact` for the rest.
+Use the full export for the targets that load conditionally (`cursor`, `windsurf`, `continue`, `claude`), and `--compact` for the always-on ones. The exporter prints both numbers after each run.
 
 ## Tool-specific notes
 
-**Cursor.** Project rules must use the `.mdc` extension; a plain `.md` file in `.cursor/rules` is ignored by the rules system. The script writes `.cursor/rules/diataxis.mdc` with `description` and `alwaysApply: false`, which makes it an agent-requested rule: Cursor reads the description and pulls the rule in when the task looks documentation-related. The modern target is selected by default. Use `--only cursor-legacy` only for an older Cursor setup, and never select both targets together.
+**Claude Code.** The default `claude` target writes a native skill to `.claude/skills/diataxis-docs/SKILL.md`, which the host loads only when a request matches the skill description. It costs nothing on unrelated requests, so it is the target to prefer. `claude-md` writes `CLAUDE.md` instead, which is always-on; use it only for a host that reads `CLAUDE.md` but does not support skills, and pair it with `--compact`. If you installed this repository as a skill by cloning it, you do not need either target.
+
+**Cursor.** Project rules must use the `.mdc` extension; a plain `.md` file in `.cursor/rules` is ignored by the rules system. The script writes `.cursor/rules/diataxis.mdc` with `description` and `alwaysApply: false`, which makes it an agent-requested rule: Cursor reads the description and pulls the rule in when the task looks documentation-related. Use `--only cursor-legacy` only for an older Cursor setup, and never select both targets together.
 
 **Cline.** Workspace rules live in the `.clinerules/` directory. The exporter writes `.clinerules/diataxis.md`; a single `.clinerules` file is not the current directory-based format.
 
@@ -92,7 +97,7 @@ read:
 
 ## Keep exports out of version control
 
-The exported files are derived from `SKILL.md`. This repository's `.gitignore` excludes them so a local export never lands in a commit. In your own project, decide whether to commit them: committing shares the rules with your team, and ignoring them keeps a single source of truth.
+The exported files are derived from `SKILL.md`. This repository's `.gitignore` excludes every path the exporter can write, so a local export never lands in a commit. In your own project, decide whether to commit them: committing shares the rules with your team, and ignoring them keeps a single source of truth.
 
 ## Re-export after an update
 

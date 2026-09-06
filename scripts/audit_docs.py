@@ -32,14 +32,44 @@ STEP_RE = re.compile(
     r"^\s*(?:\d+\.\s*|[-*]\s+)?(?:run|install|configure|create|set|copy|open|click|deploy|start|stop|verify|add|update|enable|disable)\b",
     re.IGNORECASE,
 )
-CN_STEP_RE = re.compile(r"^\s*(?:\d+\.\s*|[-*]\s+)?(?:运行|安装|配置|创建|设置|复制|打开|点击|部署|启动|停止|验证|添加|更新|启用|禁用)")
+CN_VERBS = (
+    "运行|执行|安装|配置|创建|新建|设置|复制|打开|点击|部署|启动|停止"
+    "|验证|检查|添加|更新|启用|禁用|重启"
+)
+# Chinese instructions rarely start with the verb; an adverbial phrase usually
+# comes first ("在项目根目录运行："). Anchoring to the line start as the English
+# pattern does would miss most of them, so the verb may appear anywhere in a
+# short line. But a verb alone is not an instruction — Chinese prose reuses
+# these words as nouns ("安装文档", "配置项"), so two structural markers gate
+# the match, and headings, table rows and block quotes are excluded outright:
+#
+#   1. a numbered or bulleted list item, or
+#   2. a short line ending in a colon, which is how a command is introduced.
+#
+# A sentence merely mentioning the verb is not counted, which keeps the Chinese
+# step count comparable to the English one on the same page.
+# Both branches cap the whole line at 40 characters. Without the cap, a long
+# descriptive bullet that happens to contain one of these verbs counted as a
+# step, which inflated the Chinese count far above the English one for the same
+# translated page. An actual instruction line is short.
+CN_STEP_RE = re.compile(
+    r"^(?!\s*(?:#|\||>))\s*(?=.{0,40}$)"
+    r"(?:(?:\d+[.、]\s*|[-*]\s+).*?(?:" + CN_VERBS + r")"
+    r"|.*?(?:" + CN_VERBS + r").{0,20}[：:]\s*$)"
+)
 EXPLANATION_RE = re.compile(
     r"\b(?:why|background|concept|architecture|design|tradeoff|trade-off|rationale|overview|history)\b",
     re.IGNORECASE,
 )
 CN_EXPLANATION_RE = re.compile(r"(?:为什么|背景|概念|架构|设计|取舍|权衡|原理|历史)")
 REFERENCE_RE = re.compile(r"\b(?:parameter|field|schema|endpoint|status code|return value|limit|type)\b", re.IGNORECASE)
-CN_REFERENCE_RE = re.compile(r"(?:参数|字段|模式|接口|端点|状态码|返回值|限制|类型)")
+# `模式` and `类型` are deliberately absent: they match inside `反模式`
+# (anti-pattern), `模式匹配` (pattern matching) and `文档类型` (document form),
+# all of which are Diataxis vocabulary rather than interface vocabulary. Keeping
+# them would make any page discussing Diataxis itself look like a reference page.
+CN_REFERENCE_RE = re.compile(
+    r"(?:参数|字段|接口|端点|状态码|返回值|数据类型|字段类型|取值范围|默认值)"
+)
 
 FRONTMATTER_RE = re.compile(r"\A---[ \t]*\r?\n.*?\r?\n---[ \t]*(?:\r?\n|\Z)", re.DOTALL)
 FENCE_RE = re.compile(r"^(?P<indent>\s{0,3})(?P<fence>`{3,}|~{3,})(?P<info>.*)$")
@@ -193,19 +223,29 @@ def analyze_text(text: str) -> tuple[dict[str, int], list[str], list[str], int]:
     evidence: list[str] = []
     score = 0
 
-    reference_weight = signals["table_rows"] + signals["reference_terms"] + signals["code_blocks"]
+    # Code blocks are excluded from the reference weight. Every how-to worth the
+    # name is full of commands, so counting them as reference evidence made any
+    # installation guide look like a reference page carrying instructions.
+    # Tables and reference vocabulary are what actually distinguish the two.
+    reference_weight = signals["table_rows"] + signals["reference_terms"]
     howto_weight = signals["step_lines"]
     explanation_weight = signals["explanation_terms"]
 
-    if reference_weight >= 4 and howto_weight >= 3:
+    # Tables alone are not reference evidence: a how-to legitimately ends in a
+    # symptom/cause/fix table. Reference vocabulary (parameter, field, schema,
+    # endpoint, limit) is what marks a table as describing an interface, so at
+    # least one such term is required before a table counts against a how-to.
+    if reference_weight >= 4 and howto_weight >= 3 and signals["reference_terms"]:
         suspected_mix.append("how-to/reference")
-        evidence.append("step-like instructions appear beside tables, reference terms, or code blocks")
+        evidence.append("step-like instructions appear beside tables and reference vocabulary")
         score += 3
     if explanation_weight >= 2 and (howto_weight >= 2 or reference_weight >= 3):
         suspected_mix.append("explanation")
         evidence.append("background, architecture, or tradeoff language appears beside practical/reference material")
         score += 2
-    if signals["code_blocks"] >= 4 and howto_weight >= 3:
+    # A weak +1 signal must not decide the risk level on its own: it only
+    # promotes a page that another rule has already flagged.
+    if signals["code_blocks"] >= 4 and howto_weight >= 3 and score:
         suspected_mix.append("tutorial/how-to")
         evidence.append("many code blocks appear beside task steps; check whether this is a lesson or a task guide")
         score += 1

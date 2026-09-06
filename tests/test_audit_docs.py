@@ -183,6 +183,140 @@ tool auth login
             self.write_file(root / "guide.md", "# Guide\n\nA short explanation page.\n")
             self.run_script(str(root), "--fail-on", "high", expect_code=0)
 
+    def test_install_how_to_is_not_flagged(self) -> None:
+        """Commands and a troubleshooting table do not make a page mixed-form.
+
+        A how-to is expected to be full of code blocks and may legitimately end
+        in a symptom/cause/fix table. Counting either as reference evidence made
+        every installation guide look like a reference page with instructions.
+        """
+        page = """# Install the thing
+
+## Install
+
+Run this from the project root:
+
+```bash
+git clone https://example.com/thing.git
+```
+
+```bash
+cd thing && make install
+```
+
+```bash
+thing --version
+```
+
+```bash
+thing init
+```
+
+## Verify
+
+Set `THING_HOME`, then confirm the version:
+
+```bash
+echo "$THING_HOME"
+```
+
+## Troubleshoot
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| Command not found | Not on PATH | Add the bin directory to PATH |
+| Version mismatch | Stale build | Re-run make install |
+| Nothing happens | Config missing | Copy the sample config |
+"""
+        signals, mix, _, score = audit_docs.analyze_text(page)
+        self.assertEqual(mix, [], signals)
+        self.assertEqual(score, 0, signals)
+
+    def test_how_to_with_reference_table_is_still_flagged(self) -> None:
+        """Reference vocabulary beside steps is the signal that must survive."""
+        page = """# Configure webhooks
+
+1. Run the create command.
+2. Set the endpoint URL.
+3. Verify the signature.
+
+| Parameter | Type | Limit |
+| --- | --- | --- |
+| url | string | 2048 |
+| secret | string | 64 |
+| retries | integer | 5 |
+"""
+        signals, mix, _, score = audit_docs.analyze_text(page)
+        self.assertIn("how-to/reference", mix)
+        self.assertGreaterEqual(score, 3, signals)
+
+    def test_weak_signal_alone_does_not_reach_medium_risk(self) -> None:
+        """The +1 code-blocks rule must not promote an otherwise clean page."""
+        signals, mix, _, score = audit_docs.analyze_text(
+            "# Guide\n\n"
+            + "Run the command:\n\n```bash\nrun\n```\n\n" * 4
+            + "Install the package:\n\nSet the value:\n"
+        )
+        self.assertNotIn("tutorial/how-to", mix)
+        self.assertLess(score, 2, signals)
+
+    def test_chinese_instructions_are_counted(self) -> None:
+        for line in (
+            "在项目根目录运行：",
+            "1. 安装依赖",
+            "- 复制配置文件",
+            "采用项目级安装时：",
+        ):
+            with self.subTest(line=line):
+                self.assertEqual(audit_docs.count_steps([line]), 1)
+
+    def test_chinese_headings_and_tables_are_not_steps(self) -> None:
+        """These lines contain instruction verbs used as nouns, not as steps."""
+        for line in (
+            "## 安装到 Claude Code",
+            "### 全局安装",
+            "| Skill 从不触发 | 目录名不对 | 重命名目录 |",
+            "> 存放 SKILL.md 的目录必须命名为 diataxis-docs",
+            "- `tests/test_check_local.py` 给每个检查喂进故意写错的输入，断言它确实被抓住了",
+        ):
+            with self.subTest(line=line):
+                self.assertEqual(audit_docs.count_steps([line]), 0)
+
+    def test_diataxis_vocabulary_is_not_reference_vocabulary(self) -> None:
+        """`反模式` and `文档类型` are Diataxis terms, not interface terms.
+
+        Matching them made any page that discusses Diataxis itself look like a
+        reference page.
+        """
+        text = "反模式清单说明了文档类型的选择，以及模式匹配的边界。"
+        self.assertEqual(audit_docs.count_matches(audit_docs.CN_REFERENCE_RE, text), 0)
+        self.assertEqual(
+            audit_docs.count_matches(audit_docs.CN_REFERENCE_RE, "参数与字段的取值范围"), 3
+        )
+
+    def test_translated_pages_score_the_same(self) -> None:
+        """A translation must not score differently from its English original.
+
+        The signal patterns are per-language, so drift between them shows up as
+        one language flagging a page the other considers clean.
+        """
+        pairs = [
+            ("docs/installation.md", "docs/zh-CN/installation.md"),
+            ("docs/development.md", "docs/zh-CN/development.md"),
+            ("docs/commands.md", "docs/zh-CN/commands.md"),
+            ("docs/faq.md", "docs/zh-CN/faq.md"),
+            ("docs/ide-integration.md", "docs/zh-CN/ide-integration.md"),
+        ]
+        for english, chinese in pairs:
+            with self.subTest(page=english):
+                left = audit_docs.analyze_file(ROOT / english, ROOT)
+                right = audit_docs.analyze_file(ROOT / chinese, ROOT)
+                self.assertEqual(
+                    left.risk,
+                    right.risk,
+                    f"{english} is {left.risk} but {chinese} is {right.risk}",
+                )
+
     def test_exclude_skips_matching_pages(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

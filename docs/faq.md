@@ -55,7 +55,7 @@ Only as part of a tutorial or a reference page, and only where an example is wha
 
 ## How is the skill evaluated?
 
-[`evals/evals.json`](../evals/evals.json) holds 32 prompts across 11 categories: classification, single-page classification, mixed-form detection, per-form writing, decision framework, review, migration, large-system planning, adjacent types, anti-pattern avoidance, and non-trigger cases.
+[`evals/evals.json`](../evals/evals.json) holds 35 prompts across 13 categories: classification, single-page classification, mixed-form detection, per-form writing, decision framework, review, migration, large-system planning, adjacent types, anti-pattern avoidance, bundled-tool use, Chinese localization, and non-trigger cases.
 
 Each eval pairs a realistic prompt with the shape a correct answer should have. Scoring is manual — a human or a model reads the response and judges it. There is no automated grader, so treat the evals as a regression checklist rather than a benchmark score. Adding one is described in [Development](development.md#add-an-eval).
 
@@ -68,3 +68,9 @@ The same reasoning shapes the rule export for other assistants. See [Context cos
 ## Can I install from an arbitrary checkout with `skills.paths`?
 
 No. OpenCode does not define a `skills.paths` configuration key. Put the checkout in a documented project or global skill directory, or expose an external checkout there with a copy or link. Keep the containing directory named `diataxis-docs` so it matches the frontmatter `name`. Supported installation locations are shown in [Install the skill](installation.md#install-into-opencode).
+
+## Why doesn't the Claude Code export write `CLAUDE.md`?
+
+Because `CLAUDE.md` is always-on context: it is prepended to every request in that project, including requests that have nothing to do with documentation. The full guide is roughly 3,500 tokens, charged per request.
+
+Claude Code supports skills natively, and a skill is loaded only when a request matches its description, so the default `claude` export target writes `.claude/skills/diataxis-docs/SKILL.md`. The always-on behaviour remains available as the opt-in `claude-md` target, for a host that reads `CLAUDE.md` but does not support skills. See [Context cost](ide-integration.md#context-cost).

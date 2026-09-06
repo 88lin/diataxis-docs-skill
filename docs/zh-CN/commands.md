@@ -1,8 +1,13 @@
 # 斜杠命令
 
-[`.opencode/commands/`](../../.opencode/commands/) 里五个 OpenCode 斜杠命令的参考。当你想直接指定某种 Diataxis 工作模式、而不依赖自然语言触发时使用它们。
+五个斜杠命令的参考。当你想直接指定某种 Diataxis 工作模式、而不依赖自然语言触发时使用它们。
 
-命令名来自文件名，而不是 frontmatter。`docs-classify.md` 定义的是 `/docs-classify`。
+每个命令都提供两份，正文相同，frontmatter 按宿主区分：
+
+- Claude Code：[`.claude/commands/`](../../.claude/commands/)
+- OpenCode：[`.opencode/commands/`](../../.opencode/commands/)
+
+两个宿主的命令名都来自文件名，而不是 frontmatter。`docs-classify.md` 定义的是 `/docs-classify`。
 
 ## 速查
 
@@ -72,13 +77,24 @@ Drafts 章节会给出拆分方案中每个页面的完整草稿，所以这是�
 
 每个命令正文里的 `$ARGUMENTS` 会被替换成你在命令名之后输入的全部内容。可以传路径、路径列表，或直接粘贴页面内容。
 
-## 让 OpenCode 发现这些命令
+## 让宿主发现这些命令
 
-本仓库 `.opencode/commands/` 里的文件是命令源文件。把仓库安装成 Skill 后，它们位于 Skill checkout 内部；但 OpenCode 只从当前项目的 `.opencode/commands/` 或全局 `~/.config/opencode/commands/` 发现命令。请按[安装斜杠命令](installation.md#安装斜杠命令)中的步骤，把文件复制到其中一个位置。
+仓库里的两个命令目录都是源文件。把仓库安装成 Skill 后它们位于 Skill checkout 内部，而两个宿主都不会发现 Skill 内嵌的命令目录：Claude Code 读 `~/.claude/commands/` 或项目里的 `.claude/commands/`，OpenCode 读 `~/.config/opencode/commands/` 或项目里的 `.opencode/commands/`。请按[安装 Skill](installation.md) 中的步骤，把文件复制到其中一个位置。
 
-## 在 OpenCode 之外的宿主里
+## 各宿主的 frontmatter
 
-斜杠命令的发现机制由宿主决定。Claude Code 会加载 `SKILL.md`，但不读 `.opencode/commands/`。在其他宿主里，要么用自然语言描述模式（"判断这个页面的类型，并指出混合形态"），要么把命令正文改写成该宿主自己的命令格式。
+正文完全相同，只有 frontmatter 不同——每个宿主只认识自己的字段，其余会被静默忽略。
+
+| 宿主 | 这里用到的字段 | 该宿主还支持 |
+| --- | --- | --- |
+| Claude Code | `description`、`argument-hint` | `model`、`allowed-tools`、`disable-model-invocation` |
+| OpenCode | `description` | `agent`、`model`、`variant`、`subtask` |
+
+`check_local.py` 会强制两个目录包含同样的五个命令，并在某个字段属于另一个宿主时给出警告。
+
+## 其他宿主
+
+斜杠命令的发现机制由宿主决定。在第三个宿主里，要么用自然语言描述模式（"判断这个页面的类型，并指出混合形态"），要么把命令正文改写成该宿主自己的命令格式。
 
 ## 新增命令
 
