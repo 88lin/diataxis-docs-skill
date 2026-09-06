@@ -27,4 +27,4 @@ If you have a guess, share it. If not, leave this blank.
 
 ## Context
 
-Anything else that helps — model, OpenCode version, links, screenshots.
+Anything else that helps — the host and its version (Claude Code, OpenCode, Codex, or another), the model, how you installed the skill, links, screenshots.

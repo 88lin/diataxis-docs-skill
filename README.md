@@ -5,7 +5,8 @@
 <br>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
-[![Hosts: Claude Code and OpenCode](https://img.shields.io/badge/Hosts-Claude%20Code%20%7C%20OpenCode-111827?style=flat-square)](docs/installation.md)
+[![Hosts: any agent that reads SKILL.md](https://img.shields.io/badge/Hosts-any%20agent%20that%20reads%20SKILL.md-111827?style=flat-square)](docs/installation.md)
+[![Assistants: 12](https://img.shields.io/badge/Assistants-12-0ea5e9?style=flat-square)](docs/ide-integration.md)
 [![Framework: Diataxis](https://img.shields.io/badge/Framework-Diataxis-2563eb?style=flat-square)](https://diataxis.fr/)
 [![Templates: Good Docs Project](https://img.shields.io/badge/Templates-Good%20Docs%20Project-16a34a?style=flat-square)](https://www.thegooddocsproject.dev/)
 [![Evals: 35](https://img.shields.io/badge/Evals-35-blueviolet?style=flat-square)](evals/evals.json)
@@ -36,34 +37,108 @@ The skill then writes in that form — and says what to leave out. [`SKILL.md`](
 
 ## Install
 
+Pick whichever row describes you. All three end at the same place.
+
 <table>
-<tr><td width="50%" valign="top">
+<tr>
+<td width="33%" valign="top">
 
-**Claude Code**
+### 🗣️ &nbsp;Ask your agent
+
+*Best for newcomers. No prerequisites.*
+
+Paste this into Claude Code, OpenCode, or Codex:
+
+```text
+Install the skill at
+https://github.com/88lin/diataxis-docs-skill
+into my global skills directory.
+The directory holding SKILL.md must
+be named diataxis-docs, not the
+repository name. Then tell me the
+path you used.
+```
+
+</td>
+<td width="33%" valign="top">
+
+### 📦 &nbsp;`skills` CLI
+
+*Best for several agents at once. Needs Node.js.*
 
 ```bash
-git clone \
-  https://github.com/88lin/diataxis-docs-skill.git \
+npx skills add \
+  88lin/diataxis-docs-skill
+```
+
+It detects your installed agents and writes to the right directory for each. Non-interactive:
+
+```bash
+npx skills add \
+  88lin/diataxis-docs-skill \
+  --skill diataxis-docs \
+  --agent claude-code -g -y
+```
+
+</td>
+<td width="33%" valign="top">
+
+### 🧬 &nbsp;`git clone`
+
+*Best for pinning a checkout. Needs git.*
+
+```bash
+U=88lin/diataxis-docs-skill
+
+# Claude Code
+git clone https://github.com/$U \
   ~/.claude/skills/diataxis-docs
+
+# OpenCode
+git clone https://github.com/$U \
+  ~/.config/opencode/skills/diataxis-docs
+
+# Codex
+git clone https://github.com/$U \
+  ~/.codex/skills/diataxis-docs
 ```
 
-</td><td width="50%" valign="top">
+</td>
+</tr>
+</table>
 
-**OpenCode**
+> [!IMPORTANT]
+> The directory containing `SKILL.md` **must** be named `diataxis-docs` to match the frontmatter `name`. The first two methods handle this; the clone commands pass the target path explicitly for this reason. Restart the host afterwards.
+
+Project-local installs, the optional slash-command copy step, verification, and troubleshooting: **[Install the skill](docs/installation.md)**.
+
+## Which assistants can use it
+
+<table>
+<tr><th align="left" width="34%">Loads <code>SKILL.md</code> natively</th><th align="left" width="66%">Reads an exported rule file</th></tr>
+<tr valign="top"><td>
+
+**Claude Code**<br>
+**OpenCode**<br>
+**Codex**
+
+On-demand: costs nothing on unrelated requests.
+
+</td><td>
+
+Cursor &nbsp;·&nbsp; GitHub Copilot &nbsp;·&nbsp; Cline &nbsp;·&nbsp; Roo Code &nbsp;·&nbsp; Windsurf &nbsp;·&nbsp; Aider &nbsp;·&nbsp; Gemini CLI &nbsp;·&nbsp; Continue &nbsp;·&nbsp; Amazon Q
 
 ```bash
-git clone \
-  https://github.com/88lin/diataxis-docs-skill.git \
-  ~/.config/opencode/skills/diataxis-docs
+python scripts/export_rules.py --list
+python scripts/export_rules.py --target . --compact
 ```
+
+The exporter writes `SKILL.md` to the path each tool reads, with the frontmatter it needs. Six default targets are always-on context, which is what `--compact` is for.
 
 </td></tr>
 </table>
 
-> [!IMPORTANT]
-> The directory containing `SKILL.md` **must** be named `diataxis-docs` to match the frontmatter `name` — which is why both commands pass the target path explicitly. Restart the host afterwards.
-
-Project-local installs, the slash-command copy step, verification, and troubleshooting: **[Install the skill](docs/installation.md)**.
+Full target table and per-tool notes: **[AI IDE integration](docs/ide-integration.md)**.
 
 ## Use it
 
@@ -89,11 +164,11 @@ Or run a slash command for a specific mode:
 Full output shapes: **[Slash commands](docs/commands.md)**.
 
 <details>
-<summary><b>Both hosts ship all five commands — but they need one copy step</b></summary>
+<summary><b>The commands are optional, and need one copy step</b></summary>
 
 <br>
 
-The commands live in `.claude/commands/` and `.opencode/commands/`. Neither host discovers a command directory nested *inside* an installed skill, so copy them into the host's own command directory once:
+The skill works through natural language without them. If you want them, note that neither Claude Code nor OpenCode discovers a command directory nested *inside* an installed skill, so copy them into the host's own command directory once:
 
 ```bash
 # Claude Code
@@ -104,6 +179,8 @@ cp ~/.claude/skills/diataxis-docs/.claude/commands/*.md ~/.claude/commands/
 mkdir -p ~/.config/opencode/commands
 cp ~/.config/opencode/skills/diataxis-docs/.opencode/commands/*.md ~/.config/opencode/commands/
 ```
+
+Codex has no bundled commands — describe the mode in natural language instead.
 
 Full steps, PowerShell variants, and project-local paths: [Install the skill](docs/installation.md).
 
@@ -126,7 +203,7 @@ AFTER      ├──▶  after/02-how-to.md        🔧  complete a task
 
 | Page | For |
 | :--- | :--- |
-| **[Install the skill](docs/installation.md)** | Getting it loaded in Claude Code or OpenCode |
+| **[Install the skill](docs/installation.md)** | Three install methods, per-host paths, verification |
 | **[Slash commands](docs/commands.md)** | What each command takes and returns |
 | **[AI IDE integration](docs/ide-integration.md)** | Exporting to Cursor, Copilot, Aider, and other assistants |
 | **[Develop and contribute](docs/development.md)** | Running the checks, adding evals and commands |
@@ -135,17 +212,6 @@ AFTER      ├──▶  after/02-how-to.md        🔧  complete a task
 Reference material the skill loads **on demand**, not on every request:
 
 [Blueprints](references/doc-blueprints.md) per document type &nbsp;·&nbsp; a [reader checklist](references/reader-analysis.md) &nbsp;·&nbsp; a [template map](references/template-map.md) to Good Docs Project templates &nbsp;·&nbsp; [Chinese-language anti-patterns](references/zh-cn-anti-patterns.md)
-
-## Use it in other assistants
-
-`SKILL.md` is portable. The exporter writes it to the rule file each assistant reads, with the frontmatter that tool needs:
-
-```bash
-python scripts/export_rules.py --list           # see all targets
-python scripts/export_rules.py --target . --compact
-```
-
-Seven of the eleven default targets load into **every** request in the project, so `--compact` matters there — it exports the six decision-critical sections instead of the whole guide. See **[AI IDE integration](docs/ide-integration.md)**.
 
 ## Design principles
 

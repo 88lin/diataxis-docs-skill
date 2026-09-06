@@ -40,10 +40,12 @@ class ExportRulesTests(unittest.TestCase):
         keys = {target.key for target in selected}
         self.assertIn("cursor", keys)
         self.assertNotIn("cursor-legacy", keys)
-        # The native skill is the default for Claude Code; CLAUDE.md is opt-in
-        # because it is always-on context.
+        # The native skill is the default for both skill-capable hosts; the
+        # always-on rule files are opt-in.
         self.assertIn("claude", keys)
         self.assertNotIn("claude-md", keys)
+        self.assertIn("codex", keys)
+        self.assertNotIn("codex-md", keys)
         self.assertEqual(len(selected), 11)
 
     def test_exclusive_groups_are_rejected(self) -> None:
@@ -105,9 +107,26 @@ class ExportRulesTests(unittest.TestCase):
 
     def test_compact_export_has_no_dead_local_anchors(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            content = self.export(Path(tmp), "codex", compact=True)
+            content = self.export(Path(tmp), "copilot", compact=True)
         self.assertNotIn("(#classification-guide)", content)
         self.assert_local_anchor_links_resolve(content)
+
+    def test_codex_target_writes_a_native_skill(self) -> None:
+        """Codex discovers .agents/skills/, so the default must not be always-on."""
+        target = next(item for item in export_rules.TARGETS if item.key == "codex")
+        self.assertFalse(target.always_on)
+        self.assertEqual(
+            target.path.as_posix(), ".agents/skills/diataxis-docs/SKILL.md"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            content = self.export(Path(tmp), "codex")
+        self.assertIn("name: diataxis-docs", content)
+
+    def test_codex_md_target_is_opt_in_and_always_on(self) -> None:
+        target = next(item for item in export_rules.TARGETS if item.key == "codex-md")
+        self.assertFalse(target.default)
+        self.assertTrue(target.always_on)
+        self.assertEqual(target.path.as_posix(), "AGENTS.md")
 
     def test_full_export_uses_absolute_links_for_repository_references(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -137,7 +156,7 @@ class ExportRulesTests(unittest.TestCase):
         selected, unknown = export_rules.select_targets(["windsurf-legacy"])
         self.assertEqual(selected, [])
         self.assertEqual(unknown, ["windsurf-legacy"])
-        self.assertEqual(len(export_rules.TARGETS), 13)
+        self.assertEqual(len(export_rules.TARGETS), 14)
 
     def test_compact_sections_all_exist_in_skill(self) -> None:
         """--compact selects by exact heading text, so a rename must be caught."""

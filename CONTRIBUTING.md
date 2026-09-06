@@ -94,7 +94,7 @@ Aim for at least two evals per category. Single-eval categories are easy to regr
 
 ## Adding or editing a slash command
 
-Every command ships once per host: `.claude/commands/` for Claude Code and `.opencode/commands/` for OpenCode. Each file is a small prompt template with a YAML frontmatter block.
+Every command ships once per command-capable host: `.claude/commands/` for Claude Code and `.opencode/commands/` for OpenCode. Each file is a small prompt template with a YAML frontmatter block. Codex loads `SKILL.md` but is not covered here, since its prompt format is not one this repository targets.
 
 Conventions:
 

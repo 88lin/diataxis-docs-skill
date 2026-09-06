@@ -2,12 +2,16 @@
 
 Reference for the five slash commands. Use them when you want a specific Diataxis mode without relying on natural-language triggering.
 
-Each command ships twice, once per host, with the same body and host-specific frontmatter:
+The commands are optional. The skill works through natural language in any host that loads it; these are a shortcut into one mode.
+
+Each command ships twice, once per host that supports command discovery, with the same body and host-specific frontmatter:
 
 - Claude Code: [`.claude/commands/`](../.claude/commands/)
 - OpenCode: [`.opencode/commands/`](../.opencode/commands/)
 
 The command name comes from the file name in both hosts, not from the frontmatter. `docs-classify.md` defines `/docs-classify`.
+
+Codex loads the skill but has no bundled commands here — see [Other hosts](#other-hosts).
 
 ## Summary
 
@@ -79,7 +83,7 @@ Every command body substitutes `$ARGUMENTS` with everything you typed after the 
 
 ## Make the commands discoverable
 
-The bundled command directories are sources. Installing the repository as a skill places them inside the skill checkout, and neither host discovers commands nested in a skill: Claude Code reads `~/.claude/commands/` or a project's `.claude/commands/`, and OpenCode reads `~/.config/opencode/commands/` or a project's `.opencode/commands/`. Follow [Install the skill](installation.md) to copy them into one of those locations.
+The bundled command directories are sources. Installing the repository as a skill places them inside the skill checkout, and neither host discovers commands nested in a skill: Claude Code reads `~/.claude/commands/` or a project's `.claude/commands/`, and OpenCode reads `~/.config/opencode/commands/` or a project's `.opencode/commands/`. Follow [Install the skill](installation.md#install-the-slash-commands) to copy them into one of those locations.
 
 ## Frontmatter per host
 
@@ -94,7 +98,9 @@ The bodies are identical; only the frontmatter differs, because each host recogn
 
 ## Other hosts
 
-Slash-command discovery is host-specific. In a third host, either describe the mode in natural language ("classify this page and flag mixed forms") or copy a command body into that host's own command format.
+Slash-command discovery is host-specific, and this repository ships commands only for the two hosts above. Codex loads `SKILL.md` the same way they do, but its prompt format is not covered here.
+
+In Codex or any other host, either describe the mode in natural language — "classify this page and flag mixed forms", "audit docs/ and tell me which pages mix forms" — or copy a command body into that host's own command format. The bodies are plain Markdown prompts with a `$ARGUMENTS` placeholder, so adapting one is mostly a matter of matching the frontmatter and the substitution syntax.
 
 ## Add a command
 
