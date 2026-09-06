@@ -8,22 +8,57 @@
 [![Hosts: any agent that reads SKILL.md](https://img.shields.io/badge/%E5%AE%BF%E4%B8%BB-%E4%BB%BB%E4%BD%95%E8%AF%BB%E5%8F%96%20SKILL.md%20%E7%9A%84%20Agent-111827?style=flat-square)](docs/zh-CN/installation.md)
 [![Assistants: 12](https://img.shields.io/badge/%E6%94%AF%E6%8C%81%E5%8A%A9%E6%89%8B-12%20%E4%B8%AA-0ea5e9?style=flat-square)](docs/zh-CN/ide-integration.md)
 [![Framework: Diataxis](https://img.shields.io/badge/Framework-Diataxis-2563eb?style=flat-square)](https://diataxis.fr/)
-[![Templates: Good Docs Project](https://img.shields.io/badge/Templates-Good%20Docs%20Project-16a34a?style=flat-square)](https://www.thegooddocsproject.dev/)
 [![Evals: 35](https://img.shields.io/badge/Evals-35-blueviolet?style=flat-square)](evals/evals.json)
 
-**[English](README.md)** &nbsp;·&nbsp; [安装](docs/zh-CN/installation.md) &nbsp;·&nbsp; [斜杠命令](docs/zh-CN/commands.md) &nbsp;·&nbsp; [IDE 集成](docs/zh-CN/ide-integration.md) &nbsp;·&nbsp; [常见问题](docs/zh-CN/faq.md)
+**[English](README.md)** &nbsp;·&nbsp; [安装](#安装) &nbsp;·&nbsp; [它能做什么](#它到底做什么) &nbsp;·&nbsp; [命令](#斜杠命令) &nbsp;·&nbsp; [文档](docs/zh-CN/installation.md)
 
 </div>
 
 ---
 
-## 它解决什么问题
+## 大多数文档问题，其实是分类问题
 
-绝大多数文档问题其实是分类问题，而不是写作问题。
+一个页面同时要教会新手、指导熟练用户、罗列 API 字段、解释设计取舍，结果是**四类读者都没被服务好**。新手找不到那节课；熟练用户找不到操作步骤；专家找不到他要查的那个字段；维护者不知道新内容该放哪里。
 
-一个页面同时要教会新手、指导熟练用户、罗列 API 字段、解释设计取舍，结果是**四类读者都没被服务好**。文笔可以很好，页面依然是失败的。
+文笔可以很好，页面依然是失败的。
 
 这个 Skill 让 AI 助手在动笔之前，先判断*需要写的是哪一类文档*。
+
+## 它到底做什么
+
+给它一个身兼四职的页面。它会告诉你这一页本该是哪四份文档，并把每一份都写出来。
+
+```text
+输入    《QuokkaDB 快速开始》 ── 一个页面，四种任务
+
+        ├─ 简介 ...................... 💡 解释说明
+        ├─ 我们为什么做 QuokkaDB ..... 💡 解释说明
+        ├─ 快速安装与首次连接 ........ 🎓 教程
+        │    └─ 刚才发生了什么 ....... 💡 解释说明  ← 放错了页面
+        ├─ 常见任务 .................. 🔧 操作指南
+        ├─ 参考 ...................... 📖 参考
+        ├─ 排查问题 .................. 🔧 操作指南
+        └─ 下一步 .................... ·  链接堆，不属于任何文体
+
+输出    4 个单一目的的页面
+        🎓  教程：你的第一个 QuokkaDB 程序
+              你将做出什么 · 前置条件 · 步骤
+              刚才发生了什么 · 下一步去哪
+        🔧  操作指南：配置 QuokkaDB 连接
+              目标 · 步骤 · 执行事务 · 结果 · 延伸阅读
+        📖  参考：QuokkaDB Python 客户端
+              连接参数 · 函数 · 错误码 · 限制
+        💡  解释说明：QuokkaDB 为什么选 LSM-tree 引擎
+              起因 · 为什么要 ACID · 为什么选 LSM-tree · 对用户的影响
+```
+
+这是一个真实跑出来的示例，不是示意图——拆分前后的页面都在 [`examples/messy-to-diataxis/`](examples/messy-to-diataxis/)。
+
+更关键的是，它还会说明**每一页不该写什么**。一份教程一旦长出「背景介绍」章节，它就不再是教程了。
+
+## 它怎么判断
+
+两个问题，四种答案。这就是 Diataxis 罗盘：
 
 <table>
 <tr><th align="left">如果内容…</th><th align="left">…服务于用户的…</th><th align="left">…那么它属于…</th></tr>
@@ -33,7 +68,16 @@
 <tr><td>传递<b>认知</b></td><td>技能<b>获取</b></td><td>💡 &nbsp;<b>解释说明</b> Explanation</td></tr>
 </table>
 
-判断完成后，Skill 会按该文体写作，并明确说明**哪些内容不该写进这一页**。决策树、各文体的反模式清单和质量检查项都在 [`SKILL.md`](SKILL.md)。
+写的时候，每种文体还各有一套规则：
+
+| 文体 | 读者在 | 必须有 | **不能**有 |
+| :--- | :--- | :--- | :--- |
+| 🎓 教程 | 学习 | 一条线性路径、看得见的结果、明确的前置条件 | 分支、可选项、大段背景 |
+| 🔧 操作指南 | 干活 | 单一目标、简短序列、一个验证步骤 | 教学、概念铺垫 |
+| 📖 参考 | 查阅 | 结构与被描述对象一致、精确取值 | 操作指令、推荐做法、模糊表述 |
+| 💡 解释说明 | 思考 | 一个有边界的话题、明确观点、取舍分析 | 操作流程、「怎么做」的写法 |
+
+完整决策树、各文体的反模式清单和质量检查项都在 [`SKILL.md`](SKILL.md)。
 
 ## 安装
 
@@ -141,7 +185,7 @@ python scripts/export_rules.py --target . --compact
 
 ## 怎么用
 
-直接用自然语言提问：
+直接用自然语言提问，不需要命令：
 
 ```text
 把这份混乱的指南改写成 Diataxis 风格的文档。
@@ -150,7 +194,9 @@ python scripts/export_rules.py --target . --compact
 审计我们的文档站，标出混合形态的页面。
 ```
 
-也可以用斜杠命令进入特定模式：
+### 斜杠命令
+
+可选的快捷入口，用于直接进入某种模式，目前提供给 Claude Code 和 OpenCode：
 
 | 命令 | 产出 |
 | :--- | :--- |
@@ -176,27 +222,34 @@ cp ~/.claude/skills/diataxis-docs/.claude/commands/*.md ~/.claude/commands/
 
 # OpenCode
 mkdir -p ~/.config/opencode/commands
-cp ~/.config/opencode/skills/diataxis-docs/.opencode/commands/*.md ~/.config/opencode/commands/
+cp ~/.config/opencode/skills/diataxis-docs/.opencode/commands/*.md \
+  ~/.config/opencode/commands/
 ```
 
 Codex 没有内置命令——改用自然语言描述模式即可。
 
 完整步骤、PowerShell 写法和项目级路径见 [安装 Skill](docs/zh-CN/installation.md)。
 
-</details>
+## 哪些助手能用
 
-## 看它实际怎么工作
+**原生加载 `SKILL.md`**——按需触发，与文档无关的请求上成本为零：**Claude Code**、**OpenCode**、**Codex**。
 
-[`examples/messy-to-diataxis/`](examples/messy-to-diataxis/) 里有一个真实感的「快速开始」页面，它一页干了四件事；旁边是它应该被拆成的四个单一目的页面。
+**读取导出的规则文件**——Cursor、GitHub Copilot、Cline、Roo Code、Windsurf、Aider、Gemini CLI、Continue、Amazon Q：
 
-```text
-拆分前   before.md                  1 个页面，4 种任务
-           │
-           ├──▶  after/01-tutorial.md      🎓  动手学会
-拆分后     ├──▶  after/02-how-to.md        🔧  完成任务
-           ├──▶  after/03-reference.md     📖  查询事实
-           └──▶  after/04-explanation.md   💡  理解原因
+```bash
+python scripts/export_rules.py --list             # 查看全部 14 个目标
+python scripts/export_rules.py --target . --compact
 ```
+
+导出脚本把 `SKILL.md` 写到各工具实际读取的路径，并补上它需要的 frontmatter。默认目标里有 6 个属于常驻上下文——会被拼接到项目的**每一次**请求前面，每个约 3,500 tokens——这正是 `--compact` 的用途：它只导出六个决策关键章节，约 2,100 tokens。
+
+各工具注意事项和完整目标表见 **[AI IDE 集成](docs/zh-CN/ide-integration.md)**。
+
+## 还附带了什么
+
+- **一个混合形态扫描器。** `python scripts/audit_docs.py docs/` 会按代码块、表格行、步骤行和解释性词汇给每个页面打分，标出值得人工过一眼的那些。大型站点在花模型 token 之前，可以先用它做筛查。
+- **按需加载的参考资料**，不会进入每次请求：各文档类型的[蓝图](references/doc-blueprints.md)、[读者分析清单](references/reader-analysis.md)、到 Good Docs Project 模板的[映射表](references/template-map.md)，以及[中文写作反模式](references/zh-cn-anti-patterns.md)。
+- **35 条评测**，覆盖 13 个类别，见 [`evals/evals.json`](evals/evals.json)，其中包含故意设置的「不应触发」用例——遇到与文档结构无关的请求，这个 Skill 应该保持安静。
 
 ## 文档
 

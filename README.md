@@ -8,22 +8,57 @@
 [![Hosts: any agent that reads SKILL.md](https://img.shields.io/badge/Hosts-any%20agent%20that%20reads%20SKILL.md-111827?style=flat-square)](docs/installation.md)
 [![Assistants: 12](https://img.shields.io/badge/Assistants-12-0ea5e9?style=flat-square)](docs/ide-integration.md)
 [![Framework: Diataxis](https://img.shields.io/badge/Framework-Diataxis-2563eb?style=flat-square)](https://diataxis.fr/)
-[![Templates: Good Docs Project](https://img.shields.io/badge/Templates-Good%20Docs%20Project-16a34a?style=flat-square)](https://www.thegooddocsproject.dev/)
 [![Evals: 35](https://img.shields.io/badge/Evals-35-blueviolet?style=flat-square)](evals/evals.json)
 
-**[中文](README.zh-CN.md)** &nbsp;·&nbsp; [Install](docs/installation.md) &nbsp;·&nbsp; [Commands](docs/commands.md) &nbsp;·&nbsp; [IDE integration](docs/ide-integration.md) &nbsp;·&nbsp; [FAQ](docs/faq.md)
+**[中文](README.zh-CN.md)** &nbsp;·&nbsp; [Install](#install) &nbsp;·&nbsp; [What it does](#what-it-actually-does) &nbsp;·&nbsp; [Commands](#commands) &nbsp;·&nbsp; [Docs](docs/installation.md)
 
 </div>
 
 ---
 
-## Why this exists
+## Most docs problems are classification problems
 
-Most documentation problems are classification problems, not writing problems.
+A page that teaches a beginner, guides a working user, lists API fields, and explains design tradeoffs **fails all four readers at once**. The beginner cannot find the lesson. The working user cannot find the steps. The expert cannot find the field they came for. The maintainer does not know where new content belongs.
 
-A page that teaches a beginner, guides a working user, lists API fields, and explains design tradeoffs **fails all four readers at once**. The prose can be excellent and the page still fails.
+The prose can be excellent and the page still fails.
 
 This skill makes an AI assistant decide *what kind of document is needed* before it writes anything.
+
+## What it actually does
+
+Give it a page that does four jobs. It tells you which four documents that page should have been, and drafts each one.
+
+```text
+INPUT   "Getting Started with QuokkaDB"  ── one page, four jobs
+
+        ├─ Introduction ........................ 💡 explanation
+        ├─ Why we built QuokkaDB ............... 💡 explanation
+        ├─ Quick install, first connection ..... 🎓 tutorial
+        │    └─ What just happened ............. 💡 explanation  ← wrong page
+        ├─ Common tasks ........................ 🔧 how-to
+        ├─ Reference ........................... 📖 reference
+        ├─ Troubleshooting ..................... 🔧 how-to
+        └─ Next steps .......................... ·  link farm, no form
+
+OUTPUT  4 single-purpose pages
+        🎓  Tutorial: Your first QuokkaDB program
+              What you will build · Prerequisites · Steps
+              What just happened · Where to go next
+        🔧  How-to: Configure a QuokkaDB connection
+              Goal · Steps · Run a transaction · Results · See also
+        📖  Reference: QuokkaDB Python client
+              Connection options · Functions · Error codes · Limits
+        💡  Explanation: Why QuokkaDB chose an LSM-tree engine
+              Origin · Why ACID · Why an LSM-tree · Implications
+```
+
+That is a real worked example, not an illustration — the before-and-after pages are in [`examples/messy-to-diataxis/`](examples/messy-to-diataxis/).
+
+Critically, it also says **what to leave out of each page**. A tutorial that grows a "Background" section has stopped being a tutorial.
+
+## How it decides
+
+Two questions, four answers. This is the Diataxis compass:
 
 <table>
 <tr><th align="left">If the content…</th><th align="left">…and serves the user's…</th><th align="left">…then it belongs to…</th></tr>
@@ -33,7 +68,16 @@ This skill makes an AI assistant decide *what kind of document is needed* before
 <tr><td>informs <b>cognition</b></td><td><b>acquisition</b> of skill</td><td>💡 &nbsp;<b>explanation</b></td></tr>
 </table>
 
-The skill then writes in that form — and says what to leave out. [`SKILL.md`](SKILL.md) holds the decision tree, the per-form anti-patterns, and the quality checks.
+And each form has rules the assistant applies while writing:
+
+| Form | Reader is | Must have | Must **not** have |
+| :--- | :--- | :--- | :--- |
+| 🎓 Tutorial | learning | one linear path, visible results, stated prerequisites | branches, options, background essays |
+| 🔧 How-to | working | one goal, short sequence, a verification step | teaching, concept introductions |
+| 📖 Reference | looking up | structure mirroring the thing described, exact values | instructions, recommendations, hedging |
+| 💡 Explanation | reflecting | one bounded topic, a point of view, tradeoffs | procedures, "how to" framing |
+
+The full decision tree, the per-form anti-patterns, and the quality checks live in [`SKILL.md`](SKILL.md).
 
 ## Install
 
@@ -142,7 +186,7 @@ Full target table and per-tool notes: **[AI IDE integration](docs/ide-integratio
 
 ## Use it
 
-Ask in natural language:
+Ask in natural language. No command needed:
 
 ```text
 Turn this messy guide into Diataxis-style docs.
@@ -151,7 +195,9 @@ Design a Diataxis documentation system for my SDK.
 Audit our docs site and flag pages that mix forms.
 ```
 
-Or run a slash command for a specific mode:
+### Commands
+
+Optional shortcuts into one mode, for Claude Code and OpenCode:
 
 | Command | Returns |
 | :--- | :--- |
@@ -177,27 +223,34 @@ cp ~/.claude/skills/diataxis-docs/.claude/commands/*.md ~/.claude/commands/
 
 # OpenCode
 mkdir -p ~/.config/opencode/commands
-cp ~/.config/opencode/skills/diataxis-docs/.opencode/commands/*.md ~/.config/opencode/commands/
+cp ~/.config/opencode/skills/diataxis-docs/.opencode/commands/*.md \
+  ~/.config/opencode/commands/
 ```
 
 Codex has no bundled commands — describe the mode in natural language instead.
 
 Full steps, PowerShell variants, and project-local paths: [Install the skill](docs/installation.md).
 
-</details>
+## Which assistants can use it
 
-## See it work
+**Load `SKILL.md` natively** — on demand, costing nothing on unrelated requests: **Claude Code**, **OpenCode**, **Codex**.
 
-[`examples/messy-to-diataxis/`](examples/messy-to-diataxis/) holds a realistic "Getting Started" page doing four jobs at once, beside the four single-purpose pages it should become.
+**Read an exported rule file** — Cursor, GitHub Copilot, Cline, Roo Code, Windsurf, Aider, Gemini CLI, Continue, Amazon Q:
 
-```text
-BEFORE   before.md                  1 page, 4 jobs
-           │
-           ├──▶  after/01-tutorial.md      🎓  learn by doing
-AFTER      ├──▶  after/02-how-to.md        🔧  complete a task
-           ├──▶  after/03-reference.md     📖  look up facts
-           └──▶  after/04-explanation.md   💡  understand why
+```bash
+python scripts/export_rules.py --list             # see all 14 targets
+python scripts/export_rules.py --target . --compact
 ```
+
+The exporter writes `SKILL.md` to the path each tool reads, with the frontmatter it needs. Six default targets are always-on context — prepended to *every* request in the project, roughly 3,500 tokens each — which is what `--compact` is for: it exports the six decision-critical sections at about 2,100 tokens instead.
+
+Per-tool notes and the full target table: **[AI IDE integration](docs/ide-integration.md)**.
+
+## Also bundled
+
+- **A mixed-form scanner.** `python scripts/audit_docs.py docs/` scores each page on code blocks, table rows, step lines, and explanation vocabulary, then flags the ones worth a human look. Triage for a large site before you spend model tokens on it.
+- **Reference material loaded on demand**, never on every request: [blueprints](references/doc-blueprints.md) per document type, a [reader checklist](references/reader-analysis.md), a [template map](references/template-map.md) to Good Docs Project templates, and [Chinese-language anti-patterns](references/zh-cn-anti-patterns.md).
+- **35 evals** across 13 categories in [`evals/evals.json`](evals/evals.json), including deliberate non-trigger cases — the skill is meant to stay quiet on requests that are not about document structure.
 
 ## Documentation
 
@@ -205,7 +258,7 @@ AFTER      ├──▶  after/02-how-to.md        🔧  complete a task
 | :--- | :--- |
 | **[Install the skill](docs/installation.md)** | Three install methods, per-host paths, verification |
 | **[Slash commands](docs/commands.md)** | What each command takes and returns |
-| **[AI IDE integration](docs/ide-integration.md)** | Exporting to Cursor, Copilot, Aider, and other assistants |
+| **[AI IDE integration](docs/ide-integration.md)** | Exporting to Cursor, Copilot, Aider, and others |
 | **[Develop and contribute](docs/development.md)** | Running the checks, adding evals and commands |
 | **[Scope and design FAQ](docs/faq.md)** | What it does not do, and why |
 
