@@ -10,7 +10,7 @@
 [![Framework: Diataxis](https://img.shields.io/badge/Framework-Diataxis-2563eb?style=flat-square)](https://diataxis.fr/)
 [![Evals: 35](https://img.shields.io/badge/Evals-35-blueviolet?style=flat-square)](evals/evals.json)
 
-**[中文](README.zh-CN.md)** &nbsp;·&nbsp; [Install](#install) &nbsp;·&nbsp; [What it does](#what-it-actually-does) &nbsp;·&nbsp; [Commands](#commands) &nbsp;·&nbsp; [Docs](docs/installation.md)
+**[中文](README.zh-CN.md)** &nbsp;·&nbsp; [What it does](#what-it-does) &nbsp;·&nbsp; [Install](#install) &nbsp;·&nbsp; [Compatibility](#compatibility) &nbsp;·&nbsp; [Use it](#use-it) &nbsp;·&nbsp; [Docs](#documentation)
 
 </div>
 
@@ -24,32 +24,38 @@ The prose can be excellent and the page still fails.
 
 This skill makes an AI assistant decide *what kind of document is needed* before it writes anything.
 
-## What it actually does
+## What it does
 
-Give it a page that does four jobs. It tells you which four documents that page should have been, and drafts each one.
+**One page in, four documents out.** Give it a page that is trying to do four jobs, and it tells you which four documents that page should have been — then drafts each one.
+
+**Before** — one page, four jobs:
 
 ```text
-INPUT   "Getting Started with QuokkaDB"  ── one page, four jobs
+"Getting Started with QuokkaDB"
+├── Introduction  ...................... 💡 explanation
+├── Why we built QuokkaDB  ............. 💡 explanation
+├── Quick install, first connection  ... 🎓 tutorial
+│    └─ What just happened  ........... 💡 explanation   ← wrong page
+├── Common tasks  ...................... 🔧 how-to
+├── Reference  ......................... 📖 reference
+├── Troubleshooting  ................... 🔧 how-to
+└── Next steps  ........................ ·  a link farm, no form
+```
 
-        ├─ Introduction ........................ 💡 explanation
-        ├─ Why we built QuokkaDB ............... 💡 explanation
-        ├─ Quick install, first connection ..... 🎓 tutorial
-        │    └─ What just happened ............. 💡 explanation  ← wrong page
-        ├─ Common tasks ........................ 🔧 how-to
-        ├─ Reference ........................... 📖 reference
-        ├─ Troubleshooting ..................... 🔧 how-to
-        └─ Next steps .......................... ·  link farm, no form
+**After** — four single-purpose pages:
 
-OUTPUT  4 single-purpose pages
-        🎓  Tutorial: Your first QuokkaDB program
-              What you will build · Prerequisites · Steps
-              What just happened · Where to go next
-        🔧  How-to: Configure a QuokkaDB connection
-              Goal · Steps · Run a transaction · Results · See also
-        📖  Reference: QuokkaDB Python client
-              Connection options · Functions · Error codes · Limits
-        💡  Explanation: Why QuokkaDB chose an LSM-tree engine
-              Origin · Why ACID · Why an LSM-tree · Implications
+```text
+🎓  Tutorial     Your first QuokkaDB program
+                 What you will build · Prerequisites · Steps · Where to go next
+
+🔧  How-to       Configure a QuokkaDB connection
+                 Goal · Steps · Run a transaction · Results
+
+📖  Reference    QuokkaDB Python client
+                 Connection options · Functions · Error codes · Limits
+
+💡  Explanation  Why QuokkaDB chose an LSM-tree engine
+                 Origin · Why ACID · Why an LSM-tree · Implications
 ```
 
 That is a real worked example, not an illustration — the before-and-after pages are in [`examples/messy-to-diataxis/`](examples/messy-to-diataxis/).
@@ -60,13 +66,12 @@ Critically, it also says **what to leave out of each page**. A tutorial that gro
 
 Two questions, four answers. This is the Diataxis compass:
 
-<table>
-<tr><th align="left">If the content…</th><th align="left">…and serves the user's…</th><th align="left">…then it belongs to…</th></tr>
-<tr><td>informs <b>action</b></td><td><b>acquisition</b> of skill</td><td>🎓 &nbsp;a <b>tutorial</b></td></tr>
-<tr><td>informs <b>action</b></td><td><b>application</b> of skill</td><td>🔧 &nbsp;a <b>how-to guide</b></td></tr>
-<tr><td>informs <b>cognition</b></td><td><b>application</b> of skill</td><td>📖 &nbsp;<b>reference</b></td></tr>
-<tr><td>informs <b>cognition</b></td><td><b>acquisition</b> of skill</td><td>💡 &nbsp;<b>explanation</b></td></tr>
-</table>
+| If the content… | …and serves the user's… | …then it belongs to… |
+| :--- | :--- | :--- |
+| informs **action** | **acquisition** of skill | 🎓 &nbsp;a **tutorial** |
+| informs **action** | **application** of skill | 🔧 &nbsp;a **how-to guide** |
+| informs **cognition** | **application** of skill | 📖 &nbsp;**reference** |
+| informs **cognition** | **acquisition** of skill | 💡 &nbsp;**explanation** |
 
 And each form has rules the assistant applies while writing:
 
@@ -81,11 +86,7 @@ The full decision tree, the per-form anti-patterns, and the quality checks live 
 
 ## Install
 
-Pick whichever row describes you. All three end at the same place.
-
-<table>
-<tr>
-<td width="33%" valign="top">
+Three ways in, all ending at the same place. Pick whichever fits.
 
 ### 🗣️ &nbsp;Ask your agent
 
@@ -94,95 +95,69 @@ Pick whichever row describes you. All three end at the same place.
 Paste this into Claude Code, OpenCode, or Codex:
 
 ```text
-Install the skill at
-https://github.com/88lin/diataxis-docs-skill
-into my global skills directory.
-The directory holding SKILL.md must
-be named diataxis-docs, not the
-repository name. Then tell me the
-path you used.
+Install the skill at https://github.com/88lin/diataxis-docs-skill into my global skills directory.
+The directory holding SKILL.md must be named diataxis-docs, not the repository name.
+Then tell me the path you used.
 ```
-
-</td>
-<td width="33%" valign="top">
 
 ### 📦 &nbsp;`skills` CLI
 
 *Best for several agents at once. Needs Node.js.*
 
 ```bash
-npx skills add \
-  88lin/diataxis-docs-skill
+npx skills add 88lin/diataxis-docs-skill
 ```
 
 It detects your installed agents and writes to the right directory for each. Non-interactive:
 
 ```bash
-npx skills add \
-  88lin/diataxis-docs-skill \
-  --skill diataxis-docs \
-  --agent claude-code -g -y
+npx skills add 88lin/diataxis-docs-skill --skill diataxis-docs --agent claude-code -g -y
 ```
-
-</td>
-<td width="33%" valign="top">
 
 ### 🧬 &nbsp;`git clone`
 
 *Best for pinning a checkout. Needs git.*
 
 ```bash
-U=88lin/diataxis-docs-skill
-
 # Claude Code
-git clone https://github.com/$U \
-  ~/.claude/skills/diataxis-docs
+git clone https://github.com/88lin/diataxis-docs-skill ~/.claude/skills/diataxis-docs
 
 # OpenCode
-git clone https://github.com/$U \
-  ~/.config/opencode/skills/diataxis-docs
+git clone https://github.com/88lin/diataxis-docs-skill ~/.config/opencode/skills/diataxis-docs
 
 # Codex
-git clone https://github.com/$U \
-  ~/.codex/skills/diataxis-docs
+git clone https://github.com/88lin/diataxis-docs-skill ~/.codex/skills/diataxis-docs
 ```
-
-</td>
-</tr>
-</table>
 
 > [!IMPORTANT]
 > The directory containing `SKILL.md` **must** be named `diataxis-docs` to match the frontmatter `name`. The first two methods handle this; the clone commands pass the target path explicitly for this reason. Restart the host afterwards.
 
-Project-local installs, the optional slash-command copy step, verification, and troubleshooting: **[Install the skill](docs/installation.md)**.
+Project-local installs, the optional [slash-command copy step](#commands), verification, and troubleshooting: **[Install the skill](docs/installation.md)**.
 
-## Which assistants can use it
+## Compatibility
 
-<table>
-<tr><th align="left" width="34%">Loads <code>SKILL.md</code> natively</th><th align="left" width="66%">Reads an exported rule file</th></tr>
-<tr valign="top"><td>
+Twelve hosts, two loading mechanisms.
 
-**Claude Code**<br>
-**OpenCode**<br>
-**Codex**
+### ⚡ &nbsp;Loads `SKILL.md` natively
 
-On-demand: costs nothing on unrelated requests.
+**Claude Code** &nbsp;·&nbsp; **OpenCode** &nbsp;·&nbsp; **Codex**
 
-</td><td>
+The host reads the frontmatter, loads the body only when a request matches, and stays out of the way otherwise — **zero token cost on unrelated requests**. Nothing to configure: install, restart, done.
+
+### 📄 &nbsp;Reads an exported rule file
 
 Cursor &nbsp;·&nbsp; GitHub Copilot &nbsp;·&nbsp; Cline &nbsp;·&nbsp; Roo Code &nbsp;·&nbsp; Windsurf &nbsp;·&nbsp; Aider &nbsp;·&nbsp; Gemini CLI &nbsp;·&nbsp; Continue &nbsp;·&nbsp; Amazon Q
+
+These read a plain rule file rather than a skill, so export one:
 
 ```bash
 python scripts/export_rules.py --list
 python scripts/export_rules.py --target . --compact
 ```
 
-The exporter writes `SKILL.md` to the path each tool reads, with the frontmatter it needs. Six default targets are always-on context, which is what `--compact` is for.
+`--list` prints all 14 targets. The exporter then writes `SKILL.md` to the path each tool reads, with the frontmatter it needs. Six default targets are always-on context — prepended to *every* request in the project, roughly 3,500 tokens each — which is what `--compact` is for: it exports the six decision-critical sections at about 2,100 tokens instead.
 
-</td></tr>
-</table>
-
-Full target table and per-tool notes: **[AI IDE integration](docs/ide-integration.md)**.
+Full target list and per-tool notes: **[AI IDE integration](docs/ide-integration.md)**.
 
 ## Use it
 
@@ -197,24 +172,21 @@ Audit our docs site and flag pages that mix forms.
 
 ### Commands
 
-Optional shortcuts into one mode, for Claude Code and OpenCode:
+Five optional shortcuts, for Claude Code and OpenCode. Each drops you into one mode directly instead of relying on natural-language triggering.
 
-| Command | Returns |
-| :--- | :--- |
-| `/docs-classify` | Which form a page belongs to, plus mixed-form signals |
-| `/docs-split` | A split plan and a draft of each resulting page |
-| `/docs-review` | Severity-tagged pre-publication findings |
-| `/docs-audit` | Page-by-page classification of a docs directory |
-| `/docs-quickstart` | A short path to first success |
+| Command | Input | Returns |
+| :--- | :--- | :--- |
+| `/docs-classify` | a page or paste | which form it belongs to, plus mixed-form signals |
+| `/docs-split` | a mixed-form page | a split plan and a draft of each resulting page |
+| `/docs-review` | a draft | severity-tagged pre-publication findings |
+| `/docs-audit` | a docs directory or page list | page-by-page classification and a triage list |
+| `/docs-quickstart` | a product or tool description | a short path to first success |
 
-Full output shapes: **[Slash commands](docs/commands.md)**.
+Every command substitutes `$ARGUMENTS` with whatever you typed after the name. Full output shapes: **[Slash commands](docs/commands.md)**.
 
-<details>
-<summary><b>The commands are optional, and need one copy step</b></summary>
-
-<br>
-
-The skill works through natural language without them. If you want them, note that neither Claude Code nor OpenCode discovers a command directory nested *inside* an installed skill, so copy them into the host's own command directory once:
+> [!NOTE]
+> **Commands are optional — and if you want them, they need one copy step.**
+> The skill works through natural language without them. Neither Claude Code nor OpenCode discovers a command directory nested *inside* an installed skill, so copy them into the host's own command directory once:
 
 ```bash
 # Claude Code
@@ -223,28 +195,12 @@ cp ~/.claude/skills/diataxis-docs/.claude/commands/*.md ~/.claude/commands/
 
 # OpenCode
 mkdir -p ~/.config/opencode/commands
-cp ~/.config/opencode/skills/diataxis-docs/.opencode/commands/*.md \
-  ~/.config/opencode/commands/
+cp ~/.config/opencode/skills/diataxis-docs/.opencode/commands/*.md ~/.config/opencode/commands/
 ```
 
-Codex has no bundled commands — describe the mode in natural language instead.
+Codex has no bundled commands — describe the mode in natural language instead, e.g. *"classify this page and flag mixed forms"*.
 
-Full steps, PowerShell variants, and project-local paths: [Install the skill](docs/installation.md).
-
-## Which assistants can use it
-
-**Load `SKILL.md` natively** — on demand, costing nothing on unrelated requests: **Claude Code**, **OpenCode**, **Codex**.
-
-**Read an exported rule file** — Cursor, GitHub Copilot, Cline, Roo Code, Windsurf, Aider, Gemini CLI, Continue, Amazon Q:
-
-```bash
-python scripts/export_rules.py --list             # see all 14 targets
-python scripts/export_rules.py --target . --compact
-```
-
-The exporter writes `SKILL.md` to the path each tool reads, with the frontmatter it needs. Six default targets are always-on context — prepended to *every* request in the project, roughly 3,500 tokens each — which is what `--compact` is for: it exports the six decision-critical sections at about 2,100 tokens instead.
-
-Per-tool notes and the full target table: **[AI IDE integration](docs/ide-integration.md)**.
+PowerShell variants, project-local paths, and what to do after an update: **[Install the slash commands](docs/installation.md#install-the-slash-commands)**.
 
 ## Also bundled
 
@@ -262,10 +218,6 @@ Per-tool notes and the full target table: **[AI IDE integration](docs/ide-integr
 | **[Develop and contribute](docs/development.md)** | Running the checks, adding evals and commands |
 | **[Scope and design FAQ](docs/faq.md)** | What it does not do, and why |
 
-Reference material the skill loads **on demand**, not on every request:
-
-[Blueprints](references/doc-blueprints.md) per document type &nbsp;·&nbsp; a [reader checklist](references/reader-analysis.md) &nbsp;·&nbsp; a [template map](references/template-map.md) to Good Docs Project templates &nbsp;·&nbsp; [Chinese-language anti-patterns](references/zh-cn-anti-patterns.md)
-
 ## Design principles
 
 - **Reader first.** Write for what the reader is trying to do right now.
@@ -279,10 +231,10 @@ Reference material the skill loads **on demand**, not on every request:
 Issues and pull requests are welcome. Open an issue first for anything larger than a fix.
 
 ```bash
-python scripts/check_local.py    # CI runs this exact command
+python scripts/check_local.py
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) and [Develop and contribute](docs/development.md).
+CI runs this exact command. See [CONTRIBUTING.md](CONTRIBUTING.md) and [Develop and contribute](docs/development.md).
 
 ## Sources
 
