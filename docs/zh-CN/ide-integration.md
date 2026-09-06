@@ -1,10 +1,10 @@
 # 把指导导出到其他 AI 助手
 
-Claude Code 和 OpenCode 可以直接把本仓库作为 Skill 加载，见 [安装 Skill](installation.md)。对于其他助手，[`scripts/export_rules.py`](../../scripts/export_rules.py) 会把 `SKILL.md` 写到该工具实际读取的规则文件路径，并补上它需要的 frontmatter。
+Claude Code、OpenCode 和 Codex 可以直接把本仓库作为 Skill 加载，见 [安装 Skill](installation.md)。对于其他助手，[`scripts/export_rules.py`](../../scripts/export_rules.py) 会把 `SKILL.md` 写到该工具实际读取的规则文件路径，并补上它需要的 frontmatter。
 
 ## 开始之前
 
-先读 [上下文成本](#上下文成本)。默认选中的 11 个目标里有 7 个会注入到项目的每一次请求。
+先读 [上下文成本](#上下文成本)。默认选中的 11 个目标里有 6 个会注入到项目的每一次请求。
 
 ## 列出所有目标
 
@@ -12,7 +12,7 @@ Claude Code 和 OpenCode 可以直接把本仓库作为 Skill 加载，见 [安�
 python scripts/export_rules.py --list
 ```
 
-覆盖 11 个助手的 13 个规则文件目标（默认选择其中 11 个）：
+覆盖 11 个助手的 14 个规则文件目标（默认选择其中 11 个）：
 
 | Key | 工具 | 路径 | 默认 | 常驻 |
 | --- | --- | --- | --- | --- |
@@ -24,13 +24,14 @@ python scripts/export_rules.py --list
 | `copilot` | GitHub Copilot | `.github/copilot-instructions.md` | 是 | 是 |
 | `claude` | Claude Code（Skill） | `.claude/skills/diataxis-docs/SKILL.md` | 是 | 否 |
 | `claude-md` | Claude Code（CLAUDE.md） | `CLAUDE.md` | 否 | 是 |
-| `codex` | OpenAI Codex | `AGENTS.md` | 是 | 是 |
+| `codex` | OpenAI Codex（Skill） | `.agents/skills/diataxis-docs/SKILL.md` | 是 | 否 |
+| `codex-md` | OpenAI Codex（AGENTS.md） | `AGENTS.md` | 否 | 是 |
 | `aider` | Aider | `CONVENTIONS.md` | 是 | 是 |
 | `gemini` | Gemini CLI | `GEMINI.md` | 是 | 是 |
 | `continue` | Continue | `.continue/rules/diataxis.md` | 是 | 否 |
 | `amazonq` | Amazon Q Developer | `.amazonq/rules/diataxis.md` | 是 | 是 |
 
-有两组目标指向同一个工具，不能同时选择：`cursor` 与 `cursor-legacy`，`claude` 与 `claude-md`。
+有三组目标指向同一个工具，不能同时选择：`cursor` 与 `cursor-legacy`、`claude` 与 `claude-md`、`codex` 与 `codex-md`。
 
 ## 先预览再写入
 
@@ -50,7 +51,7 @@ python /path/to/diataxis-docs-skill/scripts/export_rules.py --target . --dry-run
 python /path/to/diataxis-docs-skill/scripts/export_rules.py
 
 # 只导出团队在用的工具，并使用精简版
-python /path/to/diataxis-docs-skill/scripts/export_rules.py --only claude --only cursor --compact
+python /path/to/diataxis-docs-skill/scripts/export_rules.py --only cursor --only copilot --compact
 ```
 
 除非加 `--force`，否则已存在的文件不会被覆盖。
@@ -68,15 +69,17 @@ python /path/to/diataxis-docs-skill/scripts/export_rules.py --only claude --only
 
 ## 上下文成本
 
-常驻规则文件会被拼接到该项目的每一次请求前面。完整指导约 13,900 字符，每次请求约 3,500 tokens。如果把完整版导出到全部 7 个常驻目标，每次请求合计约 24,000 tokens。
+常驻规则文件会被拼接到该项目的每一次请求前面。完整指导约 13,900 字符，每次请求约 3,500 tokens。如果把完整版导出到全部 6 个常驻目标，每次请求合计约 21,000 tokens。
 
 `--compact` 只导出罗盘、快速决策树、四类文体速查表、不适用场景清单、反模式和质量检查——约 8,400 字符，约 2,100 tokens。这些内容足以让助手正确判定请求类型并避开常见的失败模式。
 
-按需加载的目标（`cursor`、`windsurf`、`continue`、`claude`）可以用完整版，常驻目标建议用 `--compact`。脚本每次运行后都会打印这两个数字。
+按需加载的目标（`cursor`、`windsurf`、`continue`、`claude`、`codex`）可以用完整版，常驻目标建议用 `--compact`。脚本每次运行后都会打印这两个数字。
 
 ## 各工具注意事项
 
-**Claude Code.** 默认的 `claude` 目标会把原生 Skill 写到 `.claude/skills/diataxis-docs/SKILL.md`，宿主只在请求与 Skill 描述匹配时才加载它，与文档无关的请求上成本为零，所以优先用这个目标。`claude-md` 写的是 `CLAUDE.md`，属于常驻上下文；只有当宿主读取 `CLAUDE.md` 但不支持 Skill 时才用它，并且要配合 `--compact`。如果你已经通过 clone 把本仓库装成 Skill，这两个目标都不需要。
+**Claude Code.** 默认的 `claude` 目标会把原生 Skill 写到 `.claude/skills/diataxis-docs/SKILL.md`，宿主只在请求与 Skill 描述匹配时才加载它，与文档无关的请求上成本为零，所以优先用这个目标。`claude-md` 写的是 `CLAUDE.md`，属于常驻上下文；只有当宿主读取 `CLAUDE.md` 但不支持 Skill 时才用它，并且要配合 `--compact`。如果你已经把本仓库装成 Skill，这两个目标都不需要。
+
+**Codex.** 结构与 Claude Code 相同。默认的 `codex` 目标把原生 Skill 写到 `.agents/skills/diataxis-docs/SKILL.md`——这是 Codex 会扫描的项目级 Skill 目录，因此按需加载。`codex-md` 写的是 `AGENTS.md`，属于常驻上下文；当项目里有多个 Agent 都读 `AGENTS.md`、你希望它们共用一份文件时，选它是合理的。这种情况请配合 `--compact`，并删除 0.3.0 及更早版本默认写入的旧 `AGENTS.md`。
 
 **Cursor.** 项目规则必须使用 `.mdc` 扩展名；放在 `.cursor/rules` 里的普通 `.md` 文件会被规则系统忽略。脚本写入的是 `.cursor/rules/diataxis.mdc`，并带上 `description` 和 `alwaysApply: false`，让它成为一条 agent-requested 规则：Cursor 读取 description，在任务看起来与文档相关时把规则拉进来。只有旧版 Cursor 环境才显式使用 `--only cursor-legacy`，两个目标不能同时选择。
 

@@ -19,7 +19,7 @@ It validates:
 - `SKILL.md` frontmatter against the skill spec: `name` matches `^[a-z0-9]+(-[a-z0-9]+)*$`, `description` is within 1024 characters, and unrecognised fields are reported
 - `SKILL.md` body stays under 500 lines, warning from 400
 - installation docs clone into a directory named after the skill
-- both hosts ship the same five slash commands, each with a `description`, a `$ARGUMENTS` placeholder, and frontmatter fields that host recognises
+- both command-capable hosts ship the same five slash commands, each with a `description`, a `$ARGUMENTS` placeholder, and frontmatter fields that host recognises
 - `evals/evals.json` structure, unique ids, known categories, and referenced files
 - internal markdown links, heading anchors, and image paths
 - English and Chinese docs stay paired
@@ -133,6 +133,7 @@ The same applies between `SKILL.md` and this documentation. The skill file is wr
 ├── evals/evals.json            # prompt-and-expectation pairs
 ├── .claude/commands/           # slash-command prompts, Claude Code
 ├── .opencode/commands/         # slash-command prompts, OpenCode
+│                               # (Codex loads SKILL.md but ships no commands)
 ├── scripts/                    # validation, audit, and export tooling
 ├── tests/                      # unit tests for the scripts
 └── .github/workflows/ci.yml    # runs check_local.py and the audit

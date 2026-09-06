@@ -1,6 +1,6 @@
 {
   "skill_name": "diataxis-docs",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Sample evaluation prompts for checking whether the diataxis-docs skill behaves as expected. Each eval targets a specific decision the skill must make well: classification, mixed-form detection, per-form writing, review, large-system planning, migration, adjacent doc types, anti-pattern avoidance, and explicit non-trigger cases. The `files` field lists the references inside this repo that back the expected output. The `non-trigger` category is intentionally negative: the skill must decline or stay silent on these prompts. For `non-trigger` evals, `files` is empty because the skill must not read any reference files.",
   "categories": [
     "adjacent-types",

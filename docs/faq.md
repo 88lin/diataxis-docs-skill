@@ -67,7 +67,23 @@ The same reasoning shapes the rule export for other assistants. See [Context cos
 
 ## Can I install from an arbitrary checkout with `skills.paths`?
 
-No. OpenCode does not define a `skills.paths` configuration key. Put the checkout in a documented project or global skill directory, or expose an external checkout there with a copy or link. Keep the containing directory named `diataxis-docs` so it matches the frontmatter `name`. Supported installation locations are shown in [Install the skill](installation.md#install-into-opencode).
+No. OpenCode does not define a `skills.paths` configuration key. Put the checkout in a documented project or global skill directory, or expose an external checkout there with a copy or link. Keep the containing directory named `diataxis-docs` so it matches the frontmatter `name`. Supported installation locations are shown in [Install the skill](installation.md#supported-hosts).
+
+## Which assistants can use this?
+
+Any of them, in one of two ways.
+
+Hosts that discover skills load `SKILL.md` directly: Claude Code, OpenCode, and Codex all read a `SKILL.md` from a skills directory and pull it in only when a request matches the description. Installing is a clone or one `npx skills add` command — see [Install the skill](installation.md).
+
+Every other assistant reads a rule file instead of a skill. `scripts/export_rules.py` writes `SKILL.md` to the path each one reads, with the frontmatter that tool needs: Cursor, Cline, Roo Code, Windsurf, GitHub Copilot, Aider, Gemini CLI, Continue, and Amazon Q are covered by default. See [AI IDE integration](ide-integration.md).
+
+The framework itself is not host-specific. If your assistant reads a project instruction file at all, it can use this guidance.
+
+## Why doesn't the Codex export write `AGENTS.md` any more?
+
+For the same reason the Claude Code export stopped writing `CLAUDE.md`: `AGENTS.md` is always-on context, charged on every request in the project.
+
+Codex supports skills natively — it reads `~/.codex/skills/` globally and `.agents/skills/` in a project — so the default `codex` target writes a native skill there. The always-on file remains available as the opt-in `codex-md` target, which is worth using when several agents in your project read `AGENTS.md` and you want one shared file. Pair it with `--compact`.
 
 ## Why doesn't the Claude Code export write `CLAUDE.md`?
 
