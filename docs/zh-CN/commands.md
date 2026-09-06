@@ -2,12 +2,16 @@
 
 五个斜杠命令的参考。当你想直接指定某种 Diataxis 工作模式、而不依赖自然语言触发时使用它们。
 
-每个命令都提供两份，正文相同，frontmatter 按宿主区分：
+这些命令是可选的。在任何能加载 Skill 的宿主里，自然语言都能正常触发；命令只是直接进入某种模式的快捷方式。
+
+每个命令都提供两份——对应两个支持命令发现的宿主——正文相同，frontmatter 按宿主区分：
 
 - Claude Code：[`.claude/commands/`](../../.claude/commands/)
 - OpenCode：[`.opencode/commands/`](../../.opencode/commands/)
 
 两个宿主的命令名都来自文件名，而不是 frontmatter。`docs-classify.md` 定义的是 `/docs-classify`。
+
+Codex 能加载这个 Skill，但本仓库没有为它内置命令——见[其他宿主](#其他宿主)。
 
 ## 速查
 
@@ -79,7 +83,7 @@ Drafts 章节会给出拆分方案中每个页面的完整草稿，所以这是�
 
 ## 让宿主发现这些命令
 
-仓库里的两个命令目录都是源文件。把仓库安装成 Skill 后它们位于 Skill checkout 内部，而两个宿主都不会发现 Skill 内嵌的命令目录：Claude Code 读 `~/.claude/commands/` 或项目里的 `.claude/commands/`，OpenCode 读 `~/.config/opencode/commands/` 或项目里的 `.opencode/commands/`。请按[安装 Skill](installation.md) 中的步骤，把文件复制到其中一个位置。
+仓库里的两个命令目录都是源文件。把仓库安装成 Skill 后它们位于 Skill checkout 内部，而两个宿主都不会发现 Skill 内嵌的命令目录：Claude Code 读 `~/.claude/commands/` 或项目里的 `.claude/commands/`，OpenCode 读 `~/.config/opencode/commands/` 或项目里的 `.opencode/commands/`。请按[安装斜杠命令](installation.md#安装斜杠命令)中的步骤，把文件复制到其中一个位置。
 
 ## 各宿主的 frontmatter
 
@@ -94,7 +98,9 @@ Drafts 章节会给出拆分方案中每个页面的完整草稿，所以这是�
 
 ## 其他宿主
 
-斜杠命令的发现机制由宿主决定。在第三个宿主里，要么用自然语言描述模式（"判断这个页面的类型，并指出混合形态"），要么把命令正文改写成该宿主自己的命令格式。
+斜杠命令的发现机制由宿主决定，本仓库只为上面两个宿主提供命令文件。Codex 加载 `SKILL.md` 的方式与它们相同，但它的 prompt 格式不在本文覆盖范围内。
+
+在 Codex 或其他宿主里，要么用自然语言描述模式——「判断这个页面的类型，并指出混合形态」、「审计 docs/，告诉我哪些页面混合了文体」——要么把命令正文改写成该宿主自己的命令格式。这些正文就是带 `$ARGUMENTS` 占位符的普通 Markdown 提示词，改写主要就是对齐 frontmatter 和参数替换语法。
 
 ## 新增命令
 

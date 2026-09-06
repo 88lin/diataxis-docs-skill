@@ -1,10 +1,10 @@
 # Export the guidance to other AI assistants
 
-Claude Code and OpenCode load this repository as a skill directly — see [Install the skill](installation.md). For every other assistant, [`scripts/export_rules.py`](../scripts/export_rules.py) writes `SKILL.md` to the rule-file path that tool reads, with the frontmatter it needs.
+Claude Code, OpenCode, and Codex load this repository as a skill directly — see [Install the skill](installation.md). For every other assistant, [`scripts/export_rules.py`](../scripts/export_rules.py) writes `SKILL.md` to the rule-file path that tool reads, with the frontmatter it needs.
 
 ## Before you start
 
-Read [Context cost](#context-cost) first. Seven of the eleven default targets load into every request in the project.
+Read [Context cost](#context-cost) first. Six of the eleven default targets load into every request in the project.
 
 ## List the targets
 
@@ -12,7 +12,7 @@ Read [Context cost](#context-cost) first. Seven of the eleven default targets lo
 python scripts/export_rules.py --list
 ```
 
-13 rule-file targets across 11 assistants (11 selected by default):
+14 rule-file targets across 11 assistants (11 selected by default):
 
 | Key | Tool | Path | Default | Always-on |
 | --- | --- | --- | --- | --- |
@@ -24,13 +24,14 @@ python scripts/export_rules.py --list
 | `copilot` | GitHub Copilot | `.github/copilot-instructions.md` | yes | yes |
 | `claude` | Claude Code (skill) | `.claude/skills/diataxis-docs/SKILL.md` | yes | no |
 | `claude-md` | Claude Code (CLAUDE.md) | `CLAUDE.md` | no | yes |
-| `codex` | OpenAI Codex | `AGENTS.md` | yes | yes |
+| `codex` | OpenAI Codex (skill) | `.agents/skills/diataxis-docs/SKILL.md` | yes | no |
+| `codex-md` | OpenAI Codex (AGENTS.md) | `AGENTS.md` | no | yes |
 | `aider` | Aider | `CONVENTIONS.md` | yes | yes |
 | `gemini` | Gemini CLI | `GEMINI.md` | yes | yes |
 | `continue` | Continue | `.continue/rules/diataxis.md` | yes | no |
 | `amazonq` | Amazon Q Developer | `.amazonq/rules/diataxis.md` | yes | yes |
 
-Two pairs target the same tool and cannot be selected together: `cursor` with `cursor-legacy`, and `claude` with `claude-md`.
+Three pairs target the same tool and cannot be selected together: `cursor` with `cursor-legacy`, `claude` with `claude-md`, and `codex` with `codex-md`.
 
 ## Preview before writing
 
@@ -50,7 +51,7 @@ Run from the project that should receive the rule files, or point `--target` at 
 python /path/to/diataxis-docs-skill/scripts/export_rules.py
 
 # Only the tools your team uses, compact form
-python /path/to/diataxis-docs-skill/scripts/export_rules.py --only claude --only cursor --compact
+python /path/to/diataxis-docs-skill/scripts/export_rules.py --only cursor --only copilot --compact
 ```
 
 Existing files are never overwritten unless you pass `--force`.
@@ -68,15 +69,17 @@ Existing files are never overwritten unless you pass `--force`.
 
 ## Context cost
 
-An always-on rule file is prepended to every request in that project. The full guidance is about 13,900 characters, roughly 3,500 tokens per request. Across the seven always-on default targets that is around 24,000 tokens per request if you export the full guide to all of them.
+An always-on rule file is prepended to every request in that project. The full guidance is about 13,900 characters, roughly 3,500 tokens per request. Across the six always-on default targets that is around 21,000 tokens per request if you export the full guide to all of them.
 
 `--compact` exports the compass, the quick decision tree, the four-forms table, the non-trigger list, the anti-patterns, and the quality checks — about 8,400 characters, roughly 2,100 tokens. That is enough for the assistant to classify a request correctly and avoid the common failure modes.
 
-Use the full export for the targets that load conditionally (`cursor`, `windsurf`, `continue`, `claude`), and `--compact` for the always-on ones. The exporter prints both numbers after each run.
+Use the full export for the targets that load conditionally (`cursor`, `windsurf`, `continue`, `claude`, `codex`), and `--compact` for the always-on ones. The exporter prints both numbers after each run.
 
 ## Tool-specific notes
 
-**Claude Code.** The default `claude` target writes a native skill to `.claude/skills/diataxis-docs/SKILL.md`, which the host loads only when a request matches the skill description. It costs nothing on unrelated requests, so it is the target to prefer. `claude-md` writes `CLAUDE.md` instead, which is always-on; use it only for a host that reads `CLAUDE.md` but does not support skills, and pair it with `--compact`. If you installed this repository as a skill by cloning it, you do not need either target.
+**Claude Code.** The default `claude` target writes a native skill to `.claude/skills/diataxis-docs/SKILL.md`, which the host loads only when a request matches the skill description. It costs nothing on unrelated requests, so it is the target to prefer. `claude-md` writes `CLAUDE.md` instead, which is always-on; use it only for a host that reads `CLAUDE.md` but does not support skills, and pair it with `--compact`. If you installed this repository as a skill, you do not need either target.
+
+**Codex.** Same shape as Claude Code. The default `codex` target writes a native skill to `.agents/skills/diataxis-docs/SKILL.md`, the project skill directory Codex discovers, so it loads on demand. `codex-md` writes `AGENTS.md`, which is always-on; it is worth choosing when several agents in the project read `AGENTS.md` and you want one shared file rather than a per-tool rule. Pair it with `--compact`, and delete a stale `AGENTS.md` written by version 0.3.0 or earlier, which exported there by default.
 
 **Cursor.** Project rules must use the `.mdc` extension; a plain `.md` file in `.cursor/rules` is ignored by the rules system. The script writes `.cursor/rules/diataxis.mdc` with `description` and `alwaysApply: false`, which makes it an agent-requested rule: Cursor reads the description and pulls the rule in when the task looks documentation-related. Use `--only cursor-legacy` only for an older Cursor setup, and never select both targets together.
 

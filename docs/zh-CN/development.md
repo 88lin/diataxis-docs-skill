@@ -19,7 +19,7 @@ python scripts/check_local.py
 - `SKILL.md` frontmatter 是否符合 Skill 规范：`name` 匹配 `^[a-z0-9]+(-[a-z0-9]+)*$`、`description` 不超过 1024 字符，并报告未被识别的字段
 - `SKILL.md` 正文不超过 500 行，超过 400 行时告警
 - 安装文档 clone 的目标目录名与 Skill 名一致
-- 两个宿主提供同样的五个斜杠命令，每个都有 `description`、`$ARGUMENTS` 占位符，且 frontmatter 字段为该宿主所识别
+- 两个支持命令发现的宿主提供同样的五个斜杠命令，每个都有 `description`、`$ARGUMENTS` 占位符，且 frontmatter 字段为该宿主所识别
 - `evals/evals.json` 的结构、id 唯一性、分类合法性，以及引用的文件确实存在
 - Markdown 内部链接、标题锚点和图片路径
 - 中英文档保持配对
@@ -133,6 +133,7 @@ $ARGUMENTS
 ├── evals/evals.json            # 提示词与预期的配对
 ├── .claude/commands/           # 斜杠命令提示词，Claude Code
 ├── .opencode/commands/         # 斜杠命令提示词，OpenCode
+│                               # （Codex 加载 SKILL.md，但没有内置命令）
 ├── scripts/                    # 校验、审计与导出工具
 ├── tests/                      # 脚本的单元测试
 └── .github/workflows/ci.yml    # 运行 check_local.py 与审计

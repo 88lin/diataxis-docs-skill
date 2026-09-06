@@ -6,11 +6,11 @@ the frontmatter that tool requires so the exported file is actually loaded.
 
 Two things are worth knowing before you run this:
 
-1.  Several targets are *always-on* context. Cline, Roo Code, Copilot, Codex,
-    Aider, Gemini CLI, and Amazon Q load their rule file into every request in
-    the project, as do the opt-in legacy Cursor and CLAUDE.md targets. Use
-    --compact for those. Claude Code's default target is a native skill, which
-    the host loads only when a request matches its description.
+1.  Several targets are *always-on* context. Cline, Roo Code, Copilot, Aider,
+    Gemini CLI, and Amazon Q load their rule file into every request in the
+    project, as do the opt-in legacy Cursor, CLAUDE.md, and AGENTS.md targets.
+    Use --compact for those. Claude Code and Codex default to a native skill,
+    which the host loads only when a request matches its description.
 2.  Tool-specific formats are not interchangeable. Cursor ignores plain .md
     files in .cursor/rules (they must be .mdc), and Windsurf workspace rules
     are capped at 12,000 characters. This script writes the correct extension,
@@ -60,6 +60,7 @@ SKILL_DESCRIPTION = (
 EXCLUSIVE_GROUPS = [
     ("cursor", "cursor-legacy"),
     ("claude", "claude-md"),
+    ("codex", "codex-md"),
 ]
 
 # Sections kept by --compact, matched on the H2 heading text. These are the
@@ -161,7 +162,27 @@ TARGETS: list[Target] = [
             "use --compact if you must write CLAUDE.md."
         ),
     ),
-    Target(key="codex", name="OpenAI Codex", path=Path("AGENTS.md")),
+    Target(
+        key="codex",
+        name="OpenAI Codex (skill)",
+        path=Path(".agents/skills/diataxis-docs/SKILL.md"),
+        frontmatter={"name": "diataxis-docs", "description": SKILL_DESCRIPTION},
+        always_on=False,
+        note=(
+            "Native skill install: Codex reads .agents/skills/ in a project and "
+            "loads the skill only when a request matches the description."
+        ),
+    ),
+    Target(
+        key="codex-md",
+        name="OpenAI Codex (AGENTS.md)",
+        path=Path("AGENTS.md"),
+        default=False,
+        note=(
+            "Always-on fallback. AGENTS.md is read by Codex and several other "
+            "agents; prefer --only codex, and pair this with --compact."
+        ),
+    ),
     Target(key="aider", name="Aider", path=Path("CONVENTIONS.md")),
     Target(key="gemini", name="Gemini CLI", path=Path("GEMINI.md")),
     Target(

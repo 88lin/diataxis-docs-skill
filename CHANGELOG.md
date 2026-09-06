@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-09-06
+
+Codex becomes a first-class host, the install story stops assuming you know
+what a skills directory is, and the READMEs say which assistants can actually
+use this.
+
+### Added
+
+- `docs/installation.md` and `docs/zh-CN/installation.md`: three install methods, ordered by how little the reader needs to know. Method 1 is a prompt to paste into the agent, which needs no prerequisites at all; method 2 is `npx skills add`, which detects installed agents and writes to the correct directory for each; method 3 is the existing `git clone`. Previously the only documented method was a clone into a path the reader had to already understand.
+- `docs/installation.md`: a `Supported hosts` table listing the global and project skill directory per host, and which hosts ship slash commands. Codex reads `~/.codex/skills/` globally and `.agents/skills/` in a project.
+- `scripts/export_rules.py`: a `codex` target that writes a native skill to `.agents/skills/diataxis-docs/SKILL.md`, matching the shape of the `claude` target. Codex loads it only when a request matches the description.
+- `docs/faq.md`: a `Which assistants can use this?` entry, splitting the answer into hosts that load `SKILL.md` natively and hosts that read an exported rule file.
+- `README.md` and `README.zh-CN.md`: a `Which assistants can use it` table making the same split visible on the front page, and a three-column install section, one column per method.
+
+### Changed
+
+- **Breaking.** `scripts/export_rules.py`: the `codex` target no longer writes `AGENTS.md`. That file is always-on context, charged on every request in the project including requests unrelated to documentation — the same problem the `claude` target had in 0.3.0. The always-on behaviour is still available as the opt-in `codex-md` target, which is the right choice when several agents in a project share one `AGENTS.md`. Delete a stale `AGENTS.md` written by an earlier version.
+- `docs/commands.md`, `docs/zh-CN/commands.md`, and both READMEs: the slash commands are now described as optional. They are a shortcut into one mode, not a requirement — the skill triggers from natural language in any host that loads it. Codex loads the skill but ships no commands here, and that is now stated rather than implied.
+- `README.md` and `README.zh-CN.md`: the host badge reads "any agent that reads SKILL.md" instead of naming two hosts, with a new badge for the eleven rule-export targets. Naming hosts in a badge made the project look narrower than it is.
+- `docs/ide-integration.md` and its translation: six of the eleven default targets are always-on rather than seven, since `codex` moved to a skill. The combined always-on cost estimate drops from about 24,000 to about 21,000 tokens per request.
+- `.gitignore`: ignore `/.agents/`, where the `codex` target now exports.
+
+### Fixed
+
+- `docs/faq.md`: the `skills.paths` answer linked to `installation.md#install-into-opencode`, a heading that no longer exists after the installation rewrite. It now points at the supported-hosts table.
+
 ## [0.3.0] - 2026-09-06
 
 Dual-host release. Claude Code and OpenCode are now equal citizens, `SKILL.md`

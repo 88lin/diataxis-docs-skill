@@ -67,7 +67,23 @@ Diataxis 的做法是在动笔之前先问两个问题：这段内容是指导�
 
 ## 可以通过 `skills.paths` 从任意 checkout 安装吗？
 
-不可以。OpenCode 没有定义 `skills.paths` 配置项。请把 checkout 放进文档列出的项目级或全局 Skill 目录；也可以把其他位置的 checkout 复制或链接到这些目录。存放它的目录仍须命名为 `diataxis-docs`，与 frontmatter 里的 `name` 一致。支持的安装位置见[安装 Skill](installation.md#安装到-opencode)。
+不可以。OpenCode 没有定义 `skills.paths` 配置项。请把 checkout 放进文档列出的项目级或全局 Skill 目录；也可以把其他位置的 checkout 复制或链接到这些目录。存放它的目录仍须命名为 `diataxis-docs`，与 frontmatter 里的 `name` 一致。支持的安装位置见[安装 Skill](installation.md#支持哪些宿主)。
+
+## 哪些助手能用？
+
+都能用，方式分两种。
+
+支持 Skill 发现机制的宿主直接加载 `SKILL.md`：Claude Code、OpenCode 和 Codex 都会从 Skill 目录读取 `SKILL.md`，并且只在请求与描述匹配时才把它拉进上下文。安装只需要一次 clone 或一条 `npx skills add`，见[安装 Skill](installation.md)。
+
+其他助手读的是规则文件而不是 Skill。`scripts/export_rules.py` 会把 `SKILL.md` 写到各自读取的路径，并补上该工具需要的 frontmatter：默认覆盖 Cursor、Cline、Roo Code、Windsurf、GitHub Copilot、Aider、Gemini CLI、Continue 和 Amazon Q。详见 [AI IDE 集成](ide-integration.md)。
+
+框架本身与宿主无关。只要你的助手会读取项目级指令文件，就能用上这份指导。
+
+## 为什么导出到 Codex 时不再写 AGENTS.md？
+
+原因和 Claude Code 不再写 `CLAUDE.md` 一样：`AGENTS.md` 是常驻上下文，项目里的每一次请求都要为它付费。
+
+Codex 原生支持 Skill——全局读 `~/.codex/skills/`，项目级读 `.agents/skills/`——所以默认的 `codex` 目标把原生 Skill 写到那里。常驻写法仍然保留为需要显式选择的 `codex-md` 目标；当项目里有多个 Agent 都读 `AGENTS.md`、你希望它们共用一份文件时，用它是合理的，并请配合 `--compact`。
 
 ## 为什么导出到 Claude Code 时不写 CLAUDE.md？
 
