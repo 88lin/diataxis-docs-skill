@@ -6,10 +6,11 @@ the frontmatter that tool requires so the exported file is actually loaded.
 
 Two things are worth knowing before you run this:
 
-1.  Several targets are *always-on* context. Legacy Cursor, Cline, Roo Code,
-    Copilot, Claude Code, Codex, Aider, Gemini CLI, and Amazon Q load their
-    rule file into every request in the project. Exporting the full SKILL.md
-    there costs roughly 5k tokens per request. Use --compact for those.
+1.  Several targets are *always-on* context. Cline, Roo Code, Copilot, Codex,
+    Aider, Gemini CLI, and Amazon Q load their rule file into every request in
+    the project, as do the opt-in legacy Cursor and CLAUDE.md targets. Use
+    --compact for those. Claude Code's default target is a native skill, which
+    the host loads only when a request matches its description.
 2.  Tool-specific formats are not interchangeable. Cursor ignores plain .md
     files in .cursor/rules (they must be .mdc), and Windsurf workspace rules
     are capped at 12,000 characters. This script writes the correct extension,
@@ -44,10 +45,30 @@ RULE_DESCRIPTION = (
     "reference, or explanation, and write it in the right form."
 )
 
-# Sections kept by --compact, matched on the H2 heading text.
+# The native-skill target needs a trigger description, not a rule description:
+# the host reads it to decide whether to load the skill at all. Reusing
+# SKILL.md's own description keeps the trigger wording in one place.
+SKILL_DESCRIPTION = (
+    "Apply the Diataxis compass to write, restructure, split, classify, review, "
+    "audit, or migrate technical documentation. Trigger on requests like write "
+    "docs, organize docs, fix docs, split this page, classify this docs page, "
+    "audit our docs site, migrate to Diataxis, review this draft, or design a "
+    "documentation system for an SDK or API."
+)
+
+# Targets that write to the same tool and must not be selected together.
+EXCLUSIVE_GROUPS = [
+    ("cursor", "cursor-legacy"),
+    ("claude", "claude-md"),
+]
+
+# Sections kept by --compact, matched on the H2 heading text. These are the
+# decision-critical ones: classify, know when not to, avoid the failure modes,
+# and check the result. `check_local.py` verifies every entry still exists.
 COMPACT_SECTIONS = [
     "The Diataxis compass",
     "Quick decision tree",
+    "The four forms at a glance",
     "When NOT to use this skill",
     "Anti-patterns: what NOT to do",
     "Quality checks",
@@ -119,7 +140,27 @@ TARGETS: list[Target] = [
         note="Workspace rules are capped at 12,000 characters.",
     ),
     Target(key="copilot", name="GitHub Copilot", path=Path(".github/copilot-instructions.md")),
-    Target(key="claude", name="Claude Code", path=Path("CLAUDE.md")),
+    Target(
+        key="claude",
+        name="Claude Code (skill)",
+        path=Path(".claude/skills/diataxis-docs/SKILL.md"),
+        frontmatter={"name": "diataxis-docs", "description": SKILL_DESCRIPTION},
+        always_on=False,
+        note=(
+            "Native skill install: Claude Code loads it only when a request matches "
+            "the description, so it costs nothing on unrelated requests."
+        ),
+    ),
+    Target(
+        key="claude-md",
+        name="Claude Code (CLAUDE.md)",
+        path=Path("CLAUDE.md"),
+        default=False,
+        note=(
+            "Always-on fallback for hosts without skill support. Prefer --only claude; "
+            "use --compact if you must write CLAUDE.md."
+        ),
+    ),
     Target(key="codex", name="OpenAI Codex", path=Path("AGENTS.md")),
     Target(key="aider", name="Aider", path=Path("CONVENTIONS.md")),
     Target(key="gemini", name="Gemini CLI", path=Path("GEMINI.md")),
@@ -263,25 +304,36 @@ def select_targets(keys: Sequence[str]) -> tuple[list[Target], list[str]]:
     return selected, unknown
 
 
+def assistant_count() -> int:
+    """Number of distinct assistants, counting a tool's variants only once."""
+    aliased = {key for group in EXCLUSIVE_GROUPS for key in group[1:]}
+    return sum(1 for target in TARGETS if target.key not in aliased)
+
+
 def print_target_table() -> None:
-    width = max(len(target.key) for target in TARGETS)
+    key_width = max(len(target.key) for target in TARGETS)
+    name_width = max(len(target.name) for target in TARGETS)
     default_count = sum(target.default for target in TARGETS)
+    always_on_default = sum(target.always_on and target.default for target in TARGETS)
     print(
-        f"{len(TARGETS)} rule-file targets across 11 assistants "
+        f"{len(TARGETS)} rule-file targets across {assistant_count()} assistants "
         f"({default_count} selected by default):\n"
     )
     print(
-        f"{'KEY'.ljust(width)}  {'TOOL'.ljust(20)}  "
+        f"{'KEY'.ljust(key_width)}  {'TOOL'.ljust(name_width)}  "
         f"{'DEFAULT'.ljust(7)}  {'ALWAYS-ON'.ljust(9)}  PATH"
     )
     for target in TARGETS:
         default = "yes" if target.default else "no"
         always = "yes" if target.always_on else "no"
         print(
-            f"{target.key.ljust(width)}  {target.name.ljust(20)}  "
+            f"{target.key.ljust(key_width)}  {target.name.ljust(name_width)}  "
             f"{default.ljust(7)}  {always.ljust(9)}  {target.path.as_posix()}"
         )
-    print("\nAlways-on targets enter every request in the project. Use --compact for those.")
+    print(
+        f"\n{always_on_default} of the {default_count} default targets enter every "
+        "request in the project. Use --compact for those."
+    )
 
 
 def parse_args(argv: Sequence[str]) -> argparse.Namespace:
@@ -316,31 +368,35 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 1
 
     selected_keys = {target.key for target in targets}
-    if {"cursor", "cursor-legacy"}.issubset(selected_keys):
-        print(
-            "Error: cursor and cursor-legacy are mutually exclusive; "
-            "choose one target.",
-            file=sys.stderr,
-        )
-        return 1
+    for group in EXCLUSIVE_GROUPS:
+        if set(group).issubset(selected_keys):
+            print(
+                f"Error: {' and '.join(group)} target the same tool and are "
+                "mutually exclusive; choose one.",
+                file=sys.stderr,
+            )
+            return 1
 
     if not SKILL_PATH.is_file():
         print(f"Error: {SKILL_PATH} not found.", file=sys.stderr)
         return 1
 
     full_body = strip_frontmatter(SKILL_PATH.read_text(encoding="utf-8"))
-    compact_body: str | None = None
-    if args.compact or any(target.char_limit for target in targets):
-        compact_body, missing = extract_sections(full_body, COMPACT_SECTIONS)
-        if missing:
-            print(f"Error: --compact could not find section(s): {', '.join(missing)}", file=sys.stderr)
-            return 1
-        if not compact_body:
-            print("Error: --compact produced an empty document.", file=sys.stderr)
-            return 1
+    # Always built: a size-limited target may need it as a fallback, and the
+    # context-cost note quotes the saving even on a full export.
+    compact_body, missing = extract_sections(full_body, COMPACT_SECTIONS)
+    if missing:
+        print(
+            f"Error: compact export could not find section(s): {', '.join(missing)}. "
+            "A heading in SKILL.md was renamed; update COMPACT_SECTIONS.",
+            file=sys.stderr,
+        )
+        return 1
+    if not compact_body:
+        print("Error: compact export produced an empty document.", file=sys.stderr)
+        return 1
     body = rewrite_export_links(full_body)
-    if compact_body is not None:
-        compact_body = rewrite_export_links(compact_body)
+    compact_body = rewrite_export_links(compact_body)
 
     target_root = args.target.resolve()
     if not target_root.is_dir():
@@ -354,15 +410,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     skipped = 0
     failed = 0
 
+    label_width = max(len(target.name) for target in targets)
+
     for target in targets:
-        source_body = compact_body if args.compact and compact_body is not None else body
+        source_body = compact_body if args.compact else body
         content = build_content(target, source_body)
         path = target_root / target.path
         display = target.path.as_posix()
-        label = f"{target.name:<19} {display}"
+        label = f"{target.name:<{label_width}} {display}"
 
         if target.char_limit and len(content) > target.char_limit:
-            if not args.compact and compact_body is not None:
+            if not args.compact:
                 compact_content = build_content(target, compact_body)
                 if len(compact_content) <= target.char_limit:
                     print(
@@ -394,8 +452,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             skipped += 1
             continue
 
+        existed = path.exists()
+
         if args.dry_run:
-            action = "would overwrite" if path.exists() else "would write"
+            action = "would overwrite" if existed else "would write"
             print(f"  PLAN  {label} - {action}, {len(content)} chars")
             written += 1
             continue
@@ -408,7 +468,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             failed += 1
             continue
 
-        action = "overwrote" if args.force else "wrote"
+        action = "overwrote" if existed else "wrote"
         print(f"  OK    {label} - {action}, {len(content)} chars")
         written += 1
 
@@ -416,12 +476,25 @@ def main(argv: Sequence[str] | None = None) -> int:
     print(f"\n{verb} {written}, skipped {skipped}, failed {failed}.")
 
     always_on = [t for t in targets if t.always_on]
-    if always_on and not args.compact:
-        cost = approx_tokens(build_content(always_on[0], body))
-        print(
-            f"Note: {len(always_on)} of these targets load into every request. "
-            f"That is roughly {cost} tokens per request each. Re-run with --compact to shrink them."
+    if always_on:
+        source = compact_body if args.compact and compact_body is not None else body
+        per_file = approx_tokens(build_content(always_on[0], source))
+        total = per_file * len(always_on)
+        detail = (
+            f"Note: {len(always_on)} of these targets load into every request in the "
+            f"project, roughly {per_file} tokens each"
         )
+        if len(always_on) > 1:
+            detail += f" and about {total} tokens combined"
+        print(detail + ".")
+        if not args.compact:
+            saving = per_file - approx_tokens(
+                build_content(always_on[0], compact_body)
+            ) if compact_body is not None else None
+            hint = "Re-run with --compact to shrink them"
+            if saving:
+                hint += f" (saves roughly {saving} tokens per always-on file)"
+            print(hint + ".")
 
     return 1 if failed else 0
 

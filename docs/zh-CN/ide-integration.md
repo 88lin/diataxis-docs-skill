@@ -1,10 +1,10 @@
 # 把指导导出到其他 AI 助手
 
-本仓库以 OpenCode Skill 的形式打包，但 `SKILL.md` 里的指导是可移植的。[`scripts/export_rules.py`](../../scripts/export_rules.py) 会把它写到各个助手实际读取的规则文件路径，并补上该工具需要的 frontmatter。
+Claude Code 和 OpenCode 可以直接把本仓库作为 Skill 加载，见 [安装 Skill](installation.md)。对于其他助手，[`scripts/export_rules.py`](../../scripts/export_rules.py) 会把 `SKILL.md` 写到该工具实际读取的规则文件路径，并补上它需要的 frontmatter。
 
 ## 开始之前
 
-先读 [上下文成本](#上下文成本)。默认选中的 11 个目标里有 8 个会注入到项目的每一次请求；可选的旧版 Cursor 目标会把常驻目标总数增加到 9 个。
+先读 [上下文成本](#上下文成本)。默认选中的 11 个目标里有 7 个会注入到项目的每一次请求。
 
 ## 列出所有目标
 
@@ -12,7 +12,7 @@
 python scripts/export_rules.py --list
 ```
 
-覆盖 11 个助手的 12 个规则文件目标（默认选择其中 11 个）：
+覆盖 11 个助手的 13 个规则文件目标（默认选择其中 11 个）：
 
 | Key | 工具 | 路径 | 默认 | 常驻 |
 | --- | --- | --- | --- | --- |
@@ -22,12 +22,15 @@ python scripts/export_rules.py --list
 | `roo` | Roo Code | `.roo/rules/diataxis.md` | 是 | 是 |
 | `windsurf` | Windsurf | `.windsurf/rules/diataxis.md` | 是 | 否 |
 | `copilot` | GitHub Copilot | `.github/copilot-instructions.md` | 是 | 是 |
-| `claude` | Claude Code | `CLAUDE.md` | 是 | 是 |
+| `claude` | Claude Code（Skill） | `.claude/skills/diataxis-docs/SKILL.md` | 是 | 否 |
+| `claude-md` | Claude Code（CLAUDE.md） | `CLAUDE.md` | 否 | 是 |
 | `codex` | OpenAI Codex | `AGENTS.md` | 是 | 是 |
 | `aider` | Aider | `CONVENTIONS.md` | 是 | 是 |
 | `gemini` | Gemini CLI | `GEMINI.md` | 是 | 是 |
 | `continue` | Continue | `.continue/rules/diataxis.md` | 是 | 否 |
 | `amazonq` | Amazon Q Developer | `.amazonq/rules/diataxis.md` | 是 | 是 |
+
+有两组目标指向同一个工具，不能同时选择：`cursor` 与 `cursor-legacy`，`claude` 与 `claude-md`。
 
 ## 先预览再写入
 
@@ -61,19 +64,21 @@ python /path/to/diataxis-docs-skill/scripts/export_rules.py --only claude --only
 | `--list` | 打印目标表格后退出 |
 | `--dry-run` | 只报告将要写入的内容，不触碰文件系统 |
 | `--force` | 覆盖已存在的规则文件 |
-| `--compact` | 只导出五个章节，而不是完整指导 |
+| `--compact` | 只导出六个决策关键章节，而不是完整指导 |
 
 ## 上下文成本
 
-常驻规则文件会被拼接到该项目的每一次请求前面。完整指导约 20,900 字符，每次请求约 5,200 tokens。
+常驻规则文件会被拼接到该项目的每一次请求前面。完整指导约 13,900 字符，每次请求约 3,500 tokens。如果把完整版导出到全部 7 个常驻目标，每次请求合计约 24,000 tokens。
 
-`--compact` 只导出罗盘、快速决策树、不适用场景清单、反模式和质量检查——约 9,400 字符，约 2,300 tokens。这些内容足以让助手正确判定请求类型并避开常见的失败模式。
+`--compact` 只导出罗盘、快速决策树、四类文体速查表、不适用场景清单、反模式和质量检查——约 8,400 字符，约 2,100 tokens。这些内容足以让助手正确判定请求类型并避开常见的失败模式。
 
-默认选中的 11 个目标里有 8 个是常驻上下文；选择可选的旧版 Cursor 目标后，常驻目标会增加到 9 个。三个按需加载的目标是 `cursor`、`windsurf` 和 `continue`，但 Windsurf 的完整输出超过上限时会自动收到精简版。其余目标建议使用 `--compact`。
+按需加载的目标（`cursor`、`windsurf`、`continue`、`claude`）可以用完整版，常驻目标建议用 `--compact`。脚本每次运行后都会打印这两个数字。
 
 ## 各工具注意事项
 
-**Cursor.** 项目规则必须使用 `.mdc` 扩展名；放在 `.cursor/rules` 里的普通 `.md` 文件会被规则系统忽略。脚本写入的是 `.cursor/rules/diataxis.mdc`，并带上 `description` 和 `alwaysApply: false`，让它成为一条 agent-requested 规则：Cursor 读取 description，在任务看起来与文档相关时把规则拉进来。默认只选择现代目标；只有旧版 Cursor 环境才显式使用 `--only cursor-legacy`，两个目标不能同时选择。
+**Claude Code.** 默认的 `claude` 目标会把原生 Skill 写到 `.claude/skills/diataxis-docs/SKILL.md`，宿主只在请求与 Skill 描述匹配时才加载它，与文档无关的请求上成本为零，所以优先用这个目标。`claude-md` 写的是 `CLAUDE.md`，属于常驻上下文；只有当宿主读取 `CLAUDE.md` 但不支持 Skill 时才用它，并且要配合 `--compact`。如果你已经通过 clone 把本仓库装成 Skill，这两个目标都不需要。
+
+**Cursor.** 项目规则必须使用 `.mdc` 扩展名；放在 `.cursor/rules` 里的普通 `.md` 文件会被规则系统忽略。脚本写入的是 `.cursor/rules/diataxis.mdc`，并带上 `description` 和 `alwaysApply: false`，让它成为一条 agent-requested 规则：Cursor 读取 description，在任务看起来与文档相关时把规则拉进来。只有旧版 Cursor 环境才显式使用 `--only cursor-legacy`，两个目标不能同时选择。
 
 **Cline.** workspace 规则位于 `.clinerules/` 目录。导出器会写入 `.clinerules/diataxis.md`；单个 `.clinerules` 文件不是当前的目录格式。
 
@@ -92,7 +97,7 @@ read:
 
 ## 不要把导出结果纳入版本控制
 
-导出的文件派生自 `SKILL.md`。本仓库的 `.gitignore` 已经排除了它们，本地导出不会误进 commit。在你自己的项目里，是否提交由你决定：提交能让团队共享规则，忽略则保持单一事实来源。
+导出的文件派生自 `SKILL.md`。本仓库的 `.gitignore` 已经排除了导出器可能写入的每个路径，本地导出不会误进 commit。在你自己的项目里，是否提交由你决定：提交能让团队共享规则，忽略则保持单一事实来源。
 
 ## 更新后重新导出
 

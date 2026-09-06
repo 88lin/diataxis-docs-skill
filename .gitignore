@@ -22,3 +22,7 @@ Thumbs.db
 /GEMINI.md
 /CONVENTIONS.md
 /.github/copilot-instructions.md
+
+# The `claude` target exports a copy of SKILL.md here. Ignore the export, but
+# keep .claude/commands/ tracked: those are sources, not generated files.
+/.claude/skills/

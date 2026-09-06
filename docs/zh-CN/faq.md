@@ -55,7 +55,7 @@ Diataxis 的做法是在动笔之前先问两个问题：这段内容是指导�
 
 ## Skill 是怎么评测的？
 
-[`evals/evals.json`](../../evals/evals.json) 收录了 11 个分类下的 32 条提示词：classification、single-page-classification、mixed-form-detection、per-form-writing、decision-framework、review、migration、large-system、adjacent-types、anti-pattern-avoidance、non-trigger。
+[`evals/evals.json`](../../evals/evals.json) 收录了 13 个分类下的 35 条提示词：classification、single-page-classification、mixed-form-detection、per-form-writing、decision-framework、review、migration、large-system、adjacent-types、anti-pattern-avoidance、tool-use、localization、non-trigger。
 
 每条评测把一个真实的提示词和一份"正确答案应有的形状"配成一对。评分是人工的——由人或模型阅读回答并判断。没有自动打分器，所以请把这些评测当作回归检查清单，而不是一个基准分数。新增评测的方法见 [开发与贡献](development.md#新增评测项)。
 
@@ -68,3 +68,9 @@ Diataxis 的做法是在动笔之前先问两个问题：这段内容是指导�
 ## 可以通过 `skills.paths` 从任意 checkout 安装吗？
 
 不可以。OpenCode 没有定义 `skills.paths` 配置项。请把 checkout 放进文档列出的项目级或全局 Skill 目录；也可以把其他位置的 checkout 复制或链接到这些目录。存放它的目录仍须命名为 `diataxis-docs`，与 frontmatter 里的 `name` 一致。支持的安装位置见[安装 Skill](installation.md#安装到-opencode)。
+
+## 为什么导出到 Claude Code 时不写 CLAUDE.md？
+
+因为 `CLAUDE.md` 是常驻上下文：它会被拼接到该项目的每一次请求前面，包括与文档毫不相关的请求。整份指南约 3,500 tokens，按每次请求计费。
+
+Claude Code 原生支持 Skill，宿主只在请求与 Skill 描述匹配时才加载它，所以默认的 `claude` 导出目标写的是 `.claude/skills/diataxis-docs/SKILL.md`。常驻写法仍然保留为需要显式选择的 `claude-md` 目标，供读取 `CLAUDE.md` 但不支持 Skill 的宿主使用。详见 [上下文成本](ide-integration.md#上下文成本)。

@@ -161,31 +161,185 @@ class CommandFrontmatterTests(unittest.TestCase):
     def setUp(self) -> None:
         check_local.warnings.clear()
 
-    def write_command(self, root: Path, frontmatter: str) -> None:
-        path = root / ".opencode" / "commands" / "docs-test.md"
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(f"---\n{frontmatter}---\n\nRun the command.\n", encoding="utf-8")
+    def write_commands(
+        self,
+        root: Path,
+        frontmatter: str,
+        *,
+        directory: str = ".opencode/commands",
+        body: str = "Run the command.\n\n$ARGUMENTS\n",
+        override: str | None = None,
+    ) -> None:
+        """Write the full command set for both hosts into a fixture tree.
 
-    def test_variant_is_recognised(self) -> None:
+        `frontmatter` applies to every file so a single malformed field can be
+        asserted on. `override` names the one command in `directory` that gets
+        it instead, keeping every other file valid.
+        """
+        valid = "description: Test command.\n"
+        for dir_name in check_local.COMMAND_DIRS:
+            for name in check_local.COMMAND_NAMES:
+                path = root / dir_name / f"{name}.md"
+                path.parent.mkdir(parents=True, exist_ok=True)
+                if override is None:
+                    fields = frontmatter
+                elif dir_name == directory and name == override:
+                    fields = frontmatter
+                else:
+                    fields = valid
+                path.write_text(f"---\n{fields}---\n\n{body}", encoding="utf-8")
+
+    def test_full_two_host_command_set_passes(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            self.write_command(root, "description: Test command.\nvariant: high\n")
+            self.write_commands(root, "description: Test command.\n")
             self.assertEqual(check_local.check_commands(root), [])
             self.assertEqual(check_local.warnings, [])
+
+    def test_opencode_variant_is_recognised(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write_commands(
+                root,
+                "description: Test command.\nvariant: high\n",
+                override="docs-audit",
+            )
+            self.assertEqual(check_local.check_commands(root), [])
+            self.assertEqual(check_local.warnings, [])
+
+    def test_claude_argument_hint_is_recognised(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write_commands(
+                root,
+                "description: Test command.\nargument-hint: <path>\n",
+                directory=".claude/commands",
+                override="docs-audit",
+            )
+            self.assertEqual(check_local.check_commands(root), [])
+            self.assertEqual(check_local.warnings, [])
+
+    def test_host_specific_field_in_wrong_directory_warns(self) -> None:
+        """An OpenCode-only field is silently ignored by Claude Code."""
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write_commands(
+                root,
+                "description: Test command.\nvariant: high\n",
+                directory=".claude/commands",
+                override="docs-audit",
+            )
+            self.assertEqual(check_local.check_commands(root), [])
+            self.assertTrue(
+                any("'variant'" in warning for warning in check_local.warnings),
+                check_local.warnings,
+            )
 
     def test_name_is_unrecognised_but_only_warns(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            self.write_command(root, "name: docs-test\ndescription: Test command.\n")
+            self.write_commands(
+                root, "name: docs-test\ndescription: Test command.\n", override="docs-audit"
+            )
             self.assertEqual(check_local.check_commands(root), [])
             self.assertTrue(any("'name'" in warning for warning in check_local.warnings))
 
     def test_description_is_required_by_repository_convention(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            self.write_command(root, "agent: build\n")
+            self.write_commands(root, "agent: build\n", override="docs-audit")
             problems = check_local.check_commands(root)
-            self.assertTrue(any("required by this repository" in problem for problem in problems), problems)
+            self.assertTrue(
+                any("required by this repository" in problem for problem in problems), problems
+            )
+
+    def test_body_without_arguments_placeholder_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write_commands(
+                root, "description: Test command.\n", body="Run the command.\n"
+            )
+            problems = check_local.check_commands(root)
+            self.assertTrue(any("$ARGUMENTS" in problem for problem in problems), problems)
+
+    def test_command_missing_from_one_host_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write_commands(root, "description: Test command.\n")
+            (root / ".claude" / "commands" / "docs-audit.md").unlink()
+            problems = check_local.check_commands(root)
+            self.assertTrue(
+                any(".claude/commands/docs-audit.md" in problem for problem in problems),
+                problems,
+            )
+
+    def test_unlisted_command_file_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write_commands(root, "description: Test command.\n")
+            (root / ".opencode" / "commands" / "docs-extra.md").write_text(
+                "---\ndescription: Extra.\n---\n\n$ARGUMENTS\n", encoding="utf-8"
+            )
+            problems = check_local.check_commands(root)
+            self.assertTrue(
+                any("COMMAND_NAMES" in problem for problem in problems), problems
+            )
+
+
+class AssetTests(unittest.TestCase):
+    def build(self, root: Path, *, assets: dict[str, str], readmes: dict[str, str]) -> None:
+        (root / "assets").mkdir(parents=True, exist_ok=True)
+        for name, content in assets.items():
+            (root / "assets" / name).write_text(content, encoding="utf-8")
+        for name, content in readmes.items():
+            (root / name).write_text(content, encoding="utf-8")
+
+    def test_repo_assets_are_all_referenced(self) -> None:
+        self.assertEqual(check_local.check_assets(), [])
+
+    def test_orphaned_asset_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.build(
+                root,
+                assets={"cover-en.png": "x", "cover-zh.png": "x", "stale.svg": "x"},
+                readmes={
+                    "README.md": '<img src="assets/cover-en.png">',
+                    "README.zh-CN.md": '<img src="assets/cover-zh.png">',
+                },
+            )
+            problems = check_local.check_assets(root)
+            self.assertTrue(any("stale.svg" in problem for problem in problems), problems)
+
+    def test_readme_without_cover_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.build(
+                root,
+                assets={"cover-en.png": "x", "cover-zh.png": "x"},
+                readmes={
+                    "README.md": "no image here",
+                    "README.zh-CN.md": '<img src="assets/cover-zh.png">'
+                    ' and a link to assets/cover-en.png',
+                },
+            )
+            problems = check_local.check_assets(root)
+            self.assertTrue(
+                any("does not embed its cover" in problem for problem in problems), problems
+            )
+
+
+class ExportContractTests(unittest.TestCase):
+    def test_repo_compact_sections_all_resolve(self) -> None:
+        _, body, problems = check_local.load_skill_frontmatter()
+        self.assertEqual(problems, [])
+        self.assertEqual(check_local.check_export_contract(body), [])
+
+    def test_renamed_heading_is_caught(self) -> None:
+        body = "## Renamed Heading\n\ntext\n"
+        problems = check_local.check_export_contract(body)
+        self.assertTrue(problems)
+        self.assertTrue(any("--compact would fail" in problem for problem in problems), problems)
 
 
 class EvalsValidationTests(unittest.TestCase):

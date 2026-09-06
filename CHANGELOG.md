@@ -5,6 +5,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-09-06
+
+Dual-host release. Claude Code and OpenCode are now equal citizens, `SKILL.md`
+is half its previous size, and the skill can reach its own audit script.
+
+### Added
+
+- `.claude/commands/`: all five slash commands for Claude Code, with `argument-hint` frontmatter. Previously the commands existed only for OpenCode, so Claude Code users had the skill but none of its modes.
+- `SKILL.md`: a `Bundled tools` section pointing at `scripts/audit_docs.py`. The scanner shipped in 0.2.0 but nothing in the skill body mentioned it, so the model never used it when auditing a docs set.
+- `SKILL.md`: a `The four forms at a glance` table replacing the per-form `Classification guide` prose. One table now carries what four sections used to, and it is included in `--compact`.
+- `scripts/export_rules.py`: a `claude` target that writes a native skill to `.claude/skills/diataxis-docs/SKILL.md`. The host loads it only when a request matches the description, so it costs nothing on unrelated requests.
+- `scripts/check_local.py`: `check_export_contract` verifies every `COMPACT_SECTIONS` entry still exists as an H2 heading in `SKILL.md`. Renaming a heading previously broke `--compact` for every always-on target, and only at run time.
+- `scripts/check_local.py`: commands must exist for every host in `COMMAND_DIRS` and must contain `$ARGUMENTS`. A command that silently ignores its input is worse than a missing one.
+- `.github/workflows/ci.yml`: a full-mode export dry-run alongside the compact one. The two modes take different paths through the size-limit fallback.
+
+- `scripts/check_local.py`: `check_assets` fails on an asset no markdown file references, and on a README that has lost its cover image. The link checker only validated images that *were* referenced, so a renamed or orphaned asset passed silently.
+
+### Changed
+
+- `README.md` and `README.zh-CN.md`: rebuilt around the new per-language cover art, with side-by-side install blocks per host, a collapsible section for the slash-command copy step, a tree diagram of the worked example, and `> [!IMPORTANT]` for the directory-name constraint. The prose is unchanged in substance; the page is easier to scan.
+- `assets/`: replaced `preview.svg` with `cover-en.png` and `cover-zh.png`, one per README language.
+- **Breaking.** `scripts/export_rules.py`: the `claude` target no longer writes `CLAUDE.md`. That file is always-on context, which cost roughly 5,200 tokens on every request in the project including requests that had nothing to do with documentation. The always-on behaviour is still available as the opt-in `claude-md` target; delete a stale `CLAUDE.md` written by an earlier version.
+- **Breaking.** `SKILL.md`: removed the `Classification guide`, `Guiding principles`, `Typical delivery pattern`, `Useful adjacent document types`, `Workflow philosophy`, and `References` sections, and merged `Large documentation systems` into a new `Working at scale`. Each either restated the compass, duplicated `references/doc-blueprints.md`, or duplicated the `Workflow` section. Body: 405 -> 201 lines, about 5,400 -> 3,400 tokens per invocation.
+- `README.md`, `README.zh-CN.md`, `docs/installation.md`, `docs/commands.md`, and their Chinese counterparts: Claude Code is documented alongside OpenCode rather than as an afterthought, including its own install path and command-copy step.
+- `scripts/export_rules.py`: `--compact` output now covers six sections instead of five, and the compact body is always built so the context-cost note can quote the actual saving.
+- `scripts/export_rules.py`: the `--list` and per-target output pad to the widest tool name instead of a hardcoded width, which the longer target names had broken.
+- `.gitignore`: ignores `/.claude/skills/`, the path the `claude` target exports into, while keeping `.claude/commands/` tracked as a source.
+
+### Fixed
+
+- `scripts/audit_docs.py`: code blocks no longer count as reference evidence. Every how-to is full of commands, so `docs/installation.md` — a single-form how-to — scored as a high-risk `how-to/reference` mix, and any installation guide would have done the same.
+- `scripts/audit_docs.py`: a table now needs at least one reference term beside it to count against a how-to. A symptom/cause/fix table is normal in a how-to; only interface vocabulary marks a table as reference material.
+- `scripts/audit_docs.py`: the weak `tutorial/how-to` rule can no longer raise a page's risk level by itself. It only adds a point to a page another rule already flagged, instead of promoting a clean page on the strength of having several code blocks.
+- `scripts/audit_docs.py`: Chinese step detection was anchored to the start of the line, like the English pattern, but Chinese instructions normally open with an adverbial phrase ("在项目根目录运行："), so almost none were counted. The verb is now matched anywhere in a short list item or colon-terminated lead-in, while headings, table rows, block quotes, and long prose lines are excluded.
+- `scripts/audit_docs.py`: dropped `模式` and `类型` from the Chinese reference terms. They match inside `反模式` (anti-pattern), `模式匹配` (pattern matching), and `文档类型` (document form), so any page discussing Diataxis scored as reference material; `数据类型`, `取值范围`, and `默认值` replace them.
+- `tests/test_audit_docs.py`: asserts every translated page scores the same risk as its English original, so drift between the per-language patterns fails a test instead of showing up as a one-sided CI failure.
+- `scripts/export_rules.py`: `--force` reported `overwrote` for files it had in fact created, because the label was derived from the flag rather than from whether the path existed.
+- `scripts/check_local.py`: removed an unused `fnmatch` import.
+
 ## [0.2.0] - 2026-07-31
 
 Documentation-structure release. The repository now follows its own advice: a

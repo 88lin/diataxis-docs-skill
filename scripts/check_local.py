@@ -8,12 +8,14 @@ Checks:
     - SKILL.md frontmatter is valid for OpenCode and Claude Code
     - SKILL.md stays within the recommended size budget
     - installation docs clone into a directory named after the skill
-    - slash command frontmatter follows the OpenCode command spec
+    - slash commands exist for every host, with valid per-host frontmatter
     - evals.json structure, unique ids, and known categories
     - internal markdown links, heading anchors, and image paths resolve
+    - every asset is referenced and both READMEs embed their cover
     - bilingual docs stay paired
     - required files exist
     - SKILL.md, evals.json, and CHANGELOG.md agree on the version
+    - the sections --compact exports still exist in SKILL.md
     - unit tests pass
 
 Usage:
@@ -22,7 +24,6 @@ Usage:
 
 from __future__ import annotations
 
-import fnmatch
 import json
 import os
 import re
@@ -38,10 +39,31 @@ ROOT = Path(__file__).resolve().parent.parent
 # https://opencode.ai/docs/skills/
 RECOGNISED_SKILL_FIELDS = {"name", "description", "license", "compatibility", "metadata"}
 
-# https://opencode.ai/docs/commands/ - the command name comes from the file name.
-# `description` is optional in OpenCode, but required by this repository so the
-# command picker remains useful.
-RECOGNISED_COMMAND_FIELDS = {"description", "agent", "model", "variant", "subtask"}
+# The command name comes from the file name in both hosts. `description` is
+# optional in each, but required by this repository so the command picker stays
+# useful. Fields are per-host: writing an OpenCode-only field into a Claude Code
+# command (or the reverse) is silently ignored by the host that does not know it.
+# https://opencode.ai/docs/commands/
+# https://docs.claude.com/en/docs/claude-code/slash-commands
+COMMAND_DIRS = {
+    ".opencode/commands": {"description", "agent", "model", "variant", "subtask"},
+    ".claude/commands": {
+        "description",
+        "argument-hint",
+        "model",
+        "allowed-tools",
+        "disable-model-invocation",
+    },
+}
+
+# Every command must exist for both hosts so neither is a second-class citizen.
+COMMAND_NAMES = [
+    "docs-classify",
+    "docs-split",
+    "docs-review",
+    "docs-audit",
+    "docs-quickstart",
+]
 
 SKILL_NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 DESCRIPTION_MAX_CHARS = 1024
@@ -89,7 +111,8 @@ REQUIRED_FILES = [
     "references/reader-analysis.md",
     "references/template-map.md",
     "references/zh-cn-anti-patterns.md",
-    "assets/preview.svg",
+    "assets/cover-en.png",
+    "assets/cover-zh.png",
     "docs/installation.md",
     "docs/commands.md",
     "docs/ide-integration.md",
@@ -106,17 +129,16 @@ REQUIRED_FILES = [
     "examples/messy-to-diataxis/after/02-how-to.md",
     "examples/messy-to-diataxis/after/03-reference.md",
     "examples/messy-to-diataxis/after/04-explanation.md",
-    ".opencode/commands/docs-classify.md",
-    ".opencode/commands/docs-split.md",
-    ".opencode/commands/docs-review.md",
-    ".opencode/commands/docs-audit.md",
-    ".opencode/commands/docs-quickstart.md",
     "scripts/export_rules.py",
     "scripts/audit_docs.py",
     "scripts/check_local.py",
     "tests/test_audit_docs.py",
     "tests/test_check_local.py",
     "tests/test_export_rules.py",
+]
+
+REQUIRED_FILES += [
+    f"{directory}/{name}.md" for directory in COMMAND_DIRS for name in COMMAND_NAMES
 ]
 
 warnings: list[str] = []
@@ -360,30 +382,59 @@ def check_install_paths(skill_name: str, root: Path | None = None) -> list[str]:
 
 
 def check_commands(root: Path | None = None) -> list[str]:
-    """Validate OpenCode slash command frontmatter and repository conventions."""
+    """Validate slash command frontmatter for every supported host.
+
+    Each host gets the same five commands. A command that exists for one host
+    and not the other is a gap the user only discovers at the prompt, so the
+    per-host sets must match `COMMAND_NAMES` exactly.
+    """
     root = root or ROOT
     problems: list[str] = []
-    command_dir = root / ".opencode" / "commands"
-    files = sorted(command_dir.glob("*.md"))
-    if not files:
-        return [".opencode/commands/: no command files found"]
-    for path in files:
-        rel = path.relative_to(root).as_posix()
-        frontmatter, _ = split_frontmatter(path.read_text(encoding="utf-8"))
-        if frontmatter is None:
-            problems.append(f"{rel}: missing or unterminated YAML frontmatter block")
+    total = 0
+
+    for dir_name, recognised in COMMAND_DIRS.items():
+        command_dir = root / dir_name
+        files = sorted(command_dir.glob("*.md"))
+        if not files:
+            problems.append(f"{dir_name}/: no command files found")
             continue
-        fields = parse_simple_yaml(frontmatter)
-        if not str(fields.get("description", "")).strip():
+        total += len(files)
+
+        present = {path.stem for path in files}
+        for missing in sorted(set(COMMAND_NAMES) - present):
+            problems.append(f"{dir_name}/{missing}.md: missing; every host ships the same commands")
+        for extra in sorted(present - set(COMMAND_NAMES)):
             problems.append(
-                f"{rel}: frontmatter missing or empty field: description "
-                "(required by this repository)"
+                f"{dir_name}/{extra}.md: not in COMMAND_NAMES; add it there and to "
+                "every other host directory, or remove it"
             )
-        unknown = sorted(set(fields) - RECOGNISED_COMMAND_FIELDS)
-        if unknown:
-            warn(f"{rel}: unrecognised command frontmatter fields {unknown}")
+
+        for path in files:
+            rel = path.relative_to(root).as_posix()
+            frontmatter, body = split_frontmatter(path.read_text(encoding="utf-8"))
+            if frontmatter is None:
+                problems.append(f"{rel}: missing or unterminated YAML frontmatter block")
+                continue
+            fields = parse_simple_yaml(frontmatter)
+            if not str(fields.get("description", "")).strip():
+                problems.append(
+                    f"{rel}: frontmatter missing or empty field: description "
+                    "(required by this repository)"
+                )
+            if "$ARGUMENTS" not in body:
+                problems.append(
+                    f"{rel}: body never substitutes $ARGUMENTS, so the command "
+                    "would ignore everything the user types after its name"
+                )
+            unknown = sorted(set(fields) - recognised)
+            if unknown:
+                warn(f"{rel}: frontmatter fields {unknown} are not recognised by this host")
+
     if not problems:
-        print(f"  slash commands OK: {len(files)} commands")
+        print(
+            f"  slash commands OK: {total} files, "
+            f"{len(COMMAND_NAMES)} commands x {len(COMMAND_DIRS)} hosts"
+        )
     return problems
 
 
@@ -620,6 +671,88 @@ def check_version_consistency(fields: dict[str, object]) -> list[str]:
     return problems
 
 
+def check_assets(root: Path | None = None) -> list[str]:
+    """Every file in assets/ must be referenced, and each README needs its cover.
+
+    The link checker validates images that *are* referenced, so a renamed or
+    orphaned asset passes it silently. This closes both directions: an unused
+    file is dead weight in every clone, and a README that lost its cover is a
+    visible regression on the project's front page.
+    """
+    root = root or ROOT
+    problems: list[str] = []
+    assets = root / "assets"
+    if not assets.is_dir():
+        return ["assets/: directory not found"]
+
+    referenced: set[str] = set()
+    for md in sorted(root.rglob("*.md")):
+        relative = md.relative_to(root)
+        if any(part in MARKDOWN_SKIP_DIRS for part in relative.parts[:-1]):
+            continue
+        text = md.read_text(encoding="utf-8")
+        for match in re.finditer(r"assets/([A-Za-z0-9._-]+)", text):
+            referenced.add(match.group(1))
+
+    for asset in sorted(assets.iterdir()):
+        if asset.is_file() and asset.name not in referenced:
+            problems.append(
+                f"assets/{asset.name}: not referenced by any markdown file; "
+                "reference it or delete it"
+            )
+
+    for readme, cover in (("README.md", "cover-en.png"), ("README.zh-CN.md", "cover-zh.png")):
+        path = root / readme
+        if not path.is_file():
+            continue
+        if f"assets/{cover}" not in path.read_text(encoding="utf-8"):
+            problems.append(f"{readme}: does not embed its cover image assets/{cover}")
+
+    if not problems:
+        # Count files on disk, not references: CHANGELOG.md legitimately mentions
+        # assets removed in earlier releases, and those are history, not orphans.
+        shipped = sum(1 for asset in assets.iterdir() if asset.is_file())
+        print(f"  assets OK: {shipped} shipped and referenced, both README covers embedded")
+    return problems
+
+
+def check_export_contract(body: str) -> list[str]:
+    """Every section --compact exports must still exist in SKILL.md.
+
+    `export_rules.py` selects compact sections by exact H2 heading text. Renaming
+    a heading in SKILL.md would otherwise break the compact export for every
+    always-on target, and the export itself only fails at run time.
+    """
+    problems: list[str] = []
+    export_path = ROOT / "scripts" / "export_rules.py"
+    try:
+        source = export_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        return [f"scripts/export_rules.py could not be read: {exc}"]
+
+    block = re.search(r"COMPACT_SECTIONS\s*=\s*\[(.*?)\]", source, re.DOTALL)
+    if not block:
+        return ["scripts/export_rules.py: COMPACT_SECTIONS list not found"]
+    wanted = re.findall(r"[\"']([^\"']+)[\"']", block.group(1))
+    if not wanted:
+        return ["scripts/export_rules.py: COMPACT_SECTIONS is empty"]
+
+    headings = {
+        match.group(1).strip().casefold()
+        for match in re.finditer(r"^##\s+(.+?)\s*#*\s*$", body, re.MULTILINE)
+    }
+    for section in wanted:
+        if section.strip().casefold() not in headings:
+            problems.append(
+                f"scripts/export_rules.py: COMPACT_SECTIONS lists {section!r}, "
+                "which is not an H2 heading in SKILL.md; --compact would fail"
+            )
+
+    if not problems:
+        print(f"  export contract OK: {len(wanted)} compact sections resolve in SKILL.md")
+    return problems
+
+
 def check_unit_tests() -> list[str]:
     result = subprocess.run(
         [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py"],
@@ -644,11 +777,13 @@ def main() -> int:
         all_problems.extend(check_skill_frontmatter(fields, body))
         all_problems.extend(check_install_paths(str(fields.get("name", "")).strip()))
         all_problems.extend(check_version_consistency(fields))
+        all_problems.extend(check_export_contract(body))
 
     for check in (
         check_commands,
         check_evals,
         check_links,
+        check_assets,
         check_translation_parity,
         check_structure,
         check_unit_tests,

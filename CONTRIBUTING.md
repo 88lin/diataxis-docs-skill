@@ -12,7 +12,7 @@ Useful contributions usually do one of these:
 - add more realistic eval prompts, including negative (`non-trigger`) cases
 - improve bilingual wording
 - add a new example for API, SDK, or developer portal documentation
-- add or refine a slash command under `.opencode/commands/`
+- add or refine a slash command (in both `.claude/commands/` and `.opencode/commands/`)
 
 ## Before you open a pull request
 
@@ -31,15 +31,15 @@ Before pushing, always run:
 python scripts/check_local.py
 ```
 
-The script runs validation checks locally and mirrors the CI workflow exactly:
+It is the single source of truth for repository validation; CI runs this exact command. The full list of checks is in [Develop and contribute](docs/development.md#run-the-checks). The ones most likely to catch a contribution:
 
-- **Validate evals.json** — JSON is well-formed, every eval has the required fields (`id`, `category`, `prompt`, `expected_output`, `files`), every `id` is unique, every `category` is in the whitelist, and prompts/expected outputs are non-trivial.
-- **Check internal links** — every relative Markdown link points to a file and heading anchor that exists, and Markdown files do not contain hidden zero-width characters.
-- **Verify structure** — all required files and example files are present, including `scripts/export_rules.py` (the universal export script for AI IDE integration), `scripts/audit_docs.py` (the optional docs smell scanner), and its unit tests.
-- **Check version consistency** — `SKILL.md`, `evals/evals.json`, and `CHANGELOG.md` agree on the current version.
-- **Run audit docs tests** — `tests/test_audit_docs.py` verifies the heuristic scanner output.
+- **Slash-command parity** — both host directories ship the same five commands, each with a `description`, a `$ARGUMENTS` placeholder, and frontmatter fields that host actually recognises.
+- **Export contract** — every section `export_rules.py --compact` selects still exists as an H2 heading in `SKILL.md`. Renaming a heading breaks the compact export for every always-on target.
+- **evals.json** — required fields, unique ids, whitelisted categories, referenced files exist, and prompts are non-trivial.
+- **Internal links** — every relative link and heading anchor resolves, and no file contains hidden zero-width characters.
+- **Version consistency** — `SKILL.md`, `evals/evals.json`, and `CHANGELOG.md` agree.
 
-CI runs the same checks on every push to `master` and on every pull request, so a passing local run is the fastest way to keep CI green.
+A passing local run is the fastest way to keep CI green.
 
 ## Adding or editing an eval
 
@@ -71,6 +71,8 @@ Each eval must include:
 - `migration`
 - `adjacent-types`
 - `anti-pattern-avoidance`
+- `tool-use`
+- `localization`
 - `non-trigger`
 
 `non-trigger` is the only **negative** category. Its `expected_output` should describe how the skill declines, refuses, or stays silent. The skill must not read any reference files for these evals, which is why `files` is `[]`.
@@ -92,14 +94,16 @@ Aim for at least two evals per category. Single-eval categories are easy to regr
 
 ## Adding or editing a slash command
 
-Slash commands live in `.opencode/commands/`. Each file is a small prompt template with a YAML frontmatter block.
+Every command ships once per host: `.claude/commands/` for Claude Code and `.opencode/commands/` for OpenCode. Each file is a small prompt template with a YAML frontmatter block.
 
 Conventions:
 
 - Filename: `docs-<verb>.md`, lowercase, hyphen-separated. Use one of `classify`, `split`, `review`, `audit`, `quickstart`, or add a new verb that matches what the command actually does.
-- Frontmatter must include `description` on the first five lines; this is a repository convention so the command picker stays useful. OpenCode derives the command name from the file name and recognises only `description`, `agent`, `model`, `variant`, and `subtask` in command frontmatter.
+- Add the command to **both** directories and to `COMMAND_NAMES` in `scripts/check_local.py`. A command that exists for one host only is a gap the user finds at the prompt; the checker fails on it.
+- Keep the bodies identical across hosts and vary only the frontmatter. Both hosts derive the command name from the file name. Claude Code recognises `description`, `argument-hint`, `model`, `allowed-tools`, and `disable-model-invocation`; OpenCode recognises `description`, `agent`, `model`, `variant`, and `subtask`. Anything else is silently ignored by that host, so the checker warns.
+- `description` is required by this repository so the command picker stays useful, and the body must contain `$ARGUMENTS` or the command discards whatever the user typed.
 - The body should be a short system prompt that references the relevant section of `SKILL.md` rather than duplicating its content. The point of a slash command is to point the model at the right part of the skill, not to copy it.
-- If you add a new command, also add a row to the `Slash commands` / `斜杠命令` table in `README.md` and `README.zh-CN.md`.
+- If you add a new command, also add a row to the `Slash commands` / `斜杠命令` table in `README.md` and `README.zh-CN.md`, and to `docs/commands.md` and `docs/zh-CN/commands.md`.
 
 ## Style
 
